@@ -1,0 +1,276 @@
+.cc_openid_edit {
+    background: #FFFFFF url('../images/openid-icon-small.gif') no-repeat scroll 0pt 50%;
+    padding-left: 18px;
+    width: 230px;
+    height: 15px;
+}
+
+form .cc_openid_edit {
+	margin-bottom: 8px;
+	margin-top:    8px;
+}
+
+a.cc_openid_link {
+    font-weight: normal;
+    background: transparent url('../images/openid-icon-rnd.gif') no-repeat scroll 0pt 50%;
+    padding: 3px 2px 2px 18px;
+    background-color: #FFF;
+    color: #41483b;
+    height: 15px;
+}
+
+a#cc_openid_enabled {
+    font-weight: normal;
+    font-variant: small-caps;
+    background: transparent url('../images/openid-icon-rnd.gif') no-repeat scroll 0pt 50%;
+    padding: 3px 2px 2px 18px;
+    background-color: #FFF;
+    border-top: 1px solid black;
+    border-left: 1px solid black;
+    margin-top: 2px;
+    color: #41483b;
+}
+
+a#cc_openid_enabled div {
+    font-weight: normal;
+    font-size: 0.6em; 
+}
+
+
+.cc_name_ban {
+   text-decoration: line-through;
+   color: red;
+   font-weight: normal;
+}
+
+.cc_name_hidden {
+   text-decoration: line-through;
+   color: #999;
+   font-weight: normal;
+   font-style: italic;
+}
+
+.cc_breadcrumbs {
+	margin: 0.3em 0px 1.4em 0px;
+}
+
+a.cc_external_link, a.cc_external_link:link, a.cc_external_link:visited {
+	font-weight: normal;
+}
+
+a.cc_external_link span {
+	text-decoration: underline;
+}
+
+a.flag {
+	background: url('../images/flag-white.gif') top left no-repeat;
+	width: 12px;
+	height: 12px;
+	display:block;
+}
+
+a.flag:hover {
+	background: url('../images/flag-red.gif') top left no-repeat;
+	text-decoration: none;
+}
+
+div#beta_message {
+	position: absolute;
+	top: 15px;
+	left: 30%;
+	background-color: white;
+	border: 1px solid red;
+	color: #FF4444;
+	padding: 5px;
+	z-index: 100;
+}
+
+div#site_disabled_message {
+	position: absolute;
+	top: 15px;
+	left: 15%;
+	background-color: #DDD;
+	border: 1px solid blue;
+	color: #FF4444;
+	padding: 5px;
+	z-index: 100;
+}
+
+.MB_alert p {
+	border: 1px solid #AAA;
+	padding: 5px;
+}
+
+#MB_close {
+	border: 1px solid #555;
+}
+
+#cc_thinking {
+    border-width: 1px;
+	border-style: solid;
+    padding: 9px;
+	z-index: 4;
+	position: absolute;
+}
+
+.ajaxmsg_message {
+	background-color: green;
+	color: white;
+	font-weight: bold;
+}
+
+#cc_thinking.ajaxmsg_error,
+.ajaxmsg_error {
+	background-color: red;
+	color: white;
+	font-weight: bold;
+}
+
+#cc_thinking.ajaxmsg_warning,
+.ajaxmsg_working,
+.ajaxmsg_warning {
+	background-color: yellow;
+	color: black;
+	font-weight: bold;
+}
+
+
+#form_mask_msg {
+	width: 90%;
+	margin: 24% auto;
+	text-align: center;
+}
+
+/* todo: move this, colorize */
+.pool_item_type {
+	font-weight: bold;
+	color: green;
+}
+
+#nsfw {
+	color: red;
+	white-space: nowrap;
+}
+
+div#nsfw {
+	clear: both;
+	padding-top: 11px;
+}
+
+#blurbs {
+}
+
+.blurb_name {
+	font-variant: small-caps;
+	display: block;
+	margin: 1.0em 1.2em 0px 0px;
+	text-align: center;
+	background-color: #CCC;
+	padding: 2px;
+}
+
+.blurb_text {
+	display: block;
+	margin: 0px 1.2em 0px 0px;
+	padding: 0.3em 0px 0.3em 0.6em;
+	border-left: 3px solid #CCC;
+	border-right: 3px solid #CCC;
+	border-bottom: 3px solid #CCC;
+}
+
+#trackback_submit {
+    float: left;
+}
+
+#requested_reviews, #recommended_by {
+	margin-bottom: 1em;
+}
+
+.cc_playlist_menu_item { 
+	display: block; 
+}
+
+a.cc_playlist_edit {
+	font-weight: normal;
+}
+
+.cc_playlist_menu_item a.cc_playlist_edit {
+	font-weight: normal;
+}
+
+ul.page_topic_toc {
+	list-style: none;
+	margin: 1px;
+	padding: 2px;
+}
+
+ul.page_topic_toc li {
+	display: inline;
+	margin: 0px 12px 0px 0px;
+	}
+
+select.page_topic_toc {
+	font-size: 0.85em;
+	margin-left: 70%;
+	display: block;
+	}
+	
+	
+/* yes, all this stuff below belongs somewhere else: */
+
+a.instareview_btn {
+	text-decoration: none;
+	background: url('../images/pencil.png') top left no-repeat;
+	width: 16px;
+	height: 16px;
+	display: block; 
+	float: right;
+	margin-right: 4px;
+}
+
+a.instareview_btn:hover {
+	text-decoration: none;
+	background: url('../images/pencil_add.png') top left no-repeat;
+}
+
+#ownermenubox ul {
+   margin: 2px;
+   list-style: none;
+   padding: 0px;
+ }
+
+#ownermenubox ul li {
+    margin: 3px;
+    padding: 0px;
+}
+
+a.upload_review_link {
+	padding-left: 14px;
+	height: 13px;
+	background: url('../images/comments.gif') top left no-repeat;
+	
+}
+
+
+.review_pre {
+	width: 475px;
+	height: 150px;
+	margin: 0px auto;
+	overflow: scroll;
+	background-color: white;
+}
+.review_pre_user {
+	font-weight: bold;
+	margin: 1em 0px 0px 0px;
+}
+.review_pre_date {
+	font-style: italic;
+	color: #777;
+}
+.review_pre_text {
+	width: 410px;
+	margin: 4px auto;
+	padding-left: 1.5em;
+}
+
+

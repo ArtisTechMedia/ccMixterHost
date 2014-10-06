@@ -1,0 +1,150 @@
+
+body {
+	margin: 0px;
+	padding: 0px;
+	background-color: #777;
+}
+
+img {
+	border: 0px;
+}
+
+a, a:link, a:visited {
+	text-decoration: none;
+}
+
+.hide {
+	display: none;
+}
+
+#content a {
+	font-weight: bold;
+}
+
+#header {
+	padding: 3px 4px 3px 0px;
+}
+
+#site_title {
+	margin: 0px 0px 0px 2em;
+}
+
+#site_title a {
+	text-decoration: none;
+}
+
+#site_description {
+	margin: 0px 0px 0px 2em;
+	font-size: 0.8em;
+}
+
+#header_search {
+	float: right;
+	text-align: right;
+	margin: 0px 14px;
+}
+
+#header_search h3 {
+	font-size: 0.8em;
+	margin: 0.3em 0em; 
+}
+
+#header_search span {
+	font-size: 0.5em;
+}
+
+#login_info {
+	float: right;
+}
+
+#tabs {
+	margin: 1em 2em;
+	padding: 0px;
+	list-style: none;
+}
+
+#tabs li a {
+	font-size: 0.9em;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+#tabs li a, 
+#tabs li a:visited
+{
+	color: black;
+}
+
+#header #tabs a:hover span { color: white; }
+#header #tabs a span { color: #999; }
+#header #tabs li.selected_tab a span { color: #CCC; }
+
+#content #sub_tabs a:hover span { border: 1px solid #CCC; color: #CCC;}
+#content #sub_tabs a span { border: 1px solid #999; color: #999; padding: 3px;}
+#content #sub_tabs li.selected_tab a span { border: 1px solid #BBB; color: #BBB; }
+#content #sub_tabs { height: 1.1em; margin-bottom: 12px; }
+#content #post_sub_tabs_breaker { clear: both; }
+
+#sub_tabs li.selected_tab a,
+#tabs li.selected_tab a
+{
+	color: #BBB;
+}
+
+#content h1 {
+	clear: both;
+	text-align: center;
+}
+
+.menu_group p {
+	margin: 0.3em 0.1em 0.1em 0.1em;
+	font-weight: bold;
+}
+
+.menu_group ul {
+	margin: 6px;
+	padding: 0px;
+	list-style: none;
+}
+
+.menu_group li {
+	margin: 0px;
+	padding: 0px;
+}
+
+.menu_group li a, 
+.menu_group li a:visited, 
+a.cc_more_menu_link {
+	text-decoration: none;
+}
+
+a.cc_more_menu_link {
+	font-style: italic;
+}
+
+#extra div.menu_group {
+	padding: 5px;
+}
+
+#footer img {
+	float: left;
+	margin: 3px 16px 4px 10px;
+}
+
+#footer {
+	padding: 7px;
+	}
+#footer p {
+  margin: 14px;
+  width: 70%;
+  font-size: 0.7em;
+}
+
+div.taglinks {
+	word-spacing: 1.0em;
+}
+
+div.taglinks a  {
+	font-weight: normal;
+}
+

@@ -1,0 +1,42 @@
+.client_menu_table {
+	margin:8px;
+}
+
+.client_menu_table td, 
+.client_menu_table th {
+	padding-bottom: 5px;
+	vertical-align: top;
+}
+
+.client_menu_table th {
+	vertical-align: top;
+	font-weight: normal;
+	text-align: right;
+	margin-right: 10px;
+}
+
+
+.client_menu a {
+	font-weight: bold;
+	font-size: 1.1em;
+}
+
+table.client_menu_table th a:hover {
+	text-decoration: underline;
+}
+
+span.config_star {
+	display: inline;
+	font-weight: bold;
+	color: red;
+}
+
+.client_menu_help {
+	width: 70%;
+	margin: 0px auto;
+}
+.client_menu_hint {
+	margin: 0.7em auto;
+	width: 70%;
+	font-style: italic;
+}

@@ -1,0 +1,82 @@
+
+#browser_client {
+	width: 850px;
+	margin: 0px auto;
+}
+
+#limit_picker_container, #stream_link_container, #play_link_container {
+  float: left;
+  margin-right: 11px;
+  width: 140px;
+}
+
+#play_link_container #mi_play_page,
+#stream_link_container #mi_stream_page {
+	padding-left: 22px;
+  font-size: 16px;
+}
+
+#limit_picker {
+  font-size: 11px;
+}
+
+#browser_head {
+  height: 25px;
+  padding: 0px;
+  margin: 8px;
+}
+
+.cc_playlist_item {
+  width: 320px;
+}
+
+
+#featured {
+  border: 1px solid;
+  padding: 8px;
+  overflow: hidden;
+  float: right;
+  width: 150px;
+}
+
+.featured_info {
+  border: 1px solid;
+  padding: 7px;
+  margin-bottom: 5px;
+  overflow:hidden;
+}
+
+
+.cc_playlist_item {
+  width: 290px;
+}
+
+#featured h3 {
+  font-family: Verdana;
+  text-align: center;
+  letter-spacing: 0.3em;
+  margin: 0px 0px 3px 0px;
+  font-variant: small-caps;
+  font-size: 13px;
+}
+
+
+.clear_me {
+  clear: left;
+}
+
+.browse_prevnext {
+  float: left;
+  margin-right: 10px;
+}
+
+#feed_links {
+  margin: 2px 0px 10px 0px;
+  clear: left;
+}
+
+#bottom_breaker {
+  clear: right;
+  margin-bottom: 4px;
+}
+

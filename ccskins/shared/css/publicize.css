@@ -1,0 +1,170 @@
+/*
+
+Creative Commons has made the contents of this file
+available under a CC-GNU-GPL license:
+
+ http://creativecommons.org/licenses/GPL/2.0/
+
+ A copy of the full license can be found as part of this
+ distribution in the file LICENSE.TXT
+
+You may use the ccHost software in accordance with the
+terms of that license. You agree that you are solely 
+responsible for your use of the ccHost software and you
+represent and warrant to Creative Commons that your use
+of the ccHost software will comply with the CC-GNU-GPL.
+
+$Id: publicize.css 10380 2008-07-03 09:02:37Z fourstones $
+
+*/
+
+#pubintro {
+  border: 1px solid black;
+  padding: 8px;
+  line-height: 140%;
+  margin: 10px 15% 20px 10%;
+  height: 110px;
+  vertical-align: middle;
+}
+#pubintro img {
+  float: left;
+  margin: 14px;
+}
+#pubintro div {
+  padding-top: 20px;
+}
+
+#target_text {
+  width: 550px;
+  height:75px;
+  font-size: 11px;
+  background-color: #EFE;
+}
+
+#target_text_p {
+  text-align: center;
+}
+
+#puboptions1 {
+  margin-left: 20%;
+}
+
+#puboptions1 td,
+#puboptions1 th {
+  vertical-align: top;
+  }
+
+#puboptions1 th {
+  text-align: right;
+  width: 25%;
+}
+
+.pubhelp {
+  display:block;
+  font-weight: normal;
+  font-size: 10px;
+}
+
+#preview_container {
+  /* width: 90%; */
+  padding: 9px;
+  border-width: 1px;
+  border-style: solid;
+}
+
+#preview_block {
+  background-color: white;
+  color: black;
+  border: 1px solid black;
+  padding: 4px;
+  margin-top: 10px;
+  width: 70%;
+}
+
+#src_preview {
+  white-space: pre;
+  overflow: scroll;
+}
+
+#seehtml {
+   float: right;
+   width: 150px;
+   margin: 3px;
+}
+
+select {
+  font-size: 11px;
+}
+
+#pubinstructions {
+	font-size: 12px;
+	color: green;
+	margin-left: 8%;
+}
+
+#preview_warn, #html_warn  {
+	width: 80%;
+	margin-left: 5%;
+}
+
+  .linkhead {
+    font-size: 13px;
+    color: green;
+    margin: 12px 0px 8px 0px;
+  }
+  
+  #linktype {
+    font-size: 11px;
+  }
+  
+  #linktext {
+    width: 420px;
+    height: 80px;
+    font-size: 11px;
+  }
+  
+  #share_email {
+    margin-left: 40%;
+    width: 200px;
+  }
+  
+  #share_email span {
+  }
+  
+  #inner_share {
+    background: url('../images/shareicons/email.gif') no-repeat top left;
+    padding-left: 21px;
+  }
+
+
+
+
+#share_div {
+  margin: 4px;
+}
+
+#share_table td {
+  vertical-align: middle;
+  padding: 2px;
+  border: 1px solid #DDD;
+}
+
+#share_table td a {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding-right: 20px;
+}
+
+#share_table td img {
+  margin: 2px;
+  float: left;
+}
+
+#share_table td a:hover {
+  text-decoration: none;
+}
+
+#share_table td:hover {
+  border:  1px solid #00F;
+}

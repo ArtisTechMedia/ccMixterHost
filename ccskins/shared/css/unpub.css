@@ -1,0 +1,13 @@
+
+#unpub_listing {
+	margin: 2.0em;
+}
+#unpub_listing table td {
+	padding: 6px 0px 2px 20px;
+	border-bottom: 1px dashed #888;
+}
+
+.upload_banned {
+    color:red;
+	font-style: italic;
+}

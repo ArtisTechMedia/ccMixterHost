@@ -1,0 +1,9 @@
+
+div#remix_search_controls {
+	width: 100%;
+	border: 1px solid black;
+}
+
+#pool_select_contaner {
+	display: inline;
+}

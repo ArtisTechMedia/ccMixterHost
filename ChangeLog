@@ -1,0 +1,1884 @@
+Change log for 5.1 - since 11/12/2008
+==============================
+
+
+2009-08-09  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 13250:
+	podcast extras
+	added chop to topic links
+	
+	* 13251:
+	tweek format layout stuff (clear 'indent' boxes, etc.)
+	* 13252:
+	toc drop down was stepping on topic boxes
+	* 13253:
+	bad IDs were bombing
+	* 13254:
+	5.1 version
+
+2009-08-06  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 13246:
+	pass the topic format through the dataview so formatting can work
+	properly
+
+2009-08-03  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 13214:
+	count uploads on mixup
+	* 13215:
+	user's couldn't remove themselves
+	* 13216:
+	user's couldn't remove themselves
+
+2009-08-01  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 13211:
+	admin user lookup at admin/user
+
+2009-07-31  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 13182:
+	add admin 'remove' button
+	* 13205:
+	still chasing quick navigate popup bug
+
+2009-07-30  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 13119:
+	FF bombing on 'edit tags' with lots of user data
+	* 13122:
+	wups on apostrophe
+
+2009-07-28  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 13111:
+	user list wasn't updating at right time
+	* 13112:
+	lame bugs
+	* 13114:
+	pink screen after mode edit
+	* 13117:
+	ui cleanup
+
+2009-07-27  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 13107:
+	mixee/er reversed
+	* 13108:
+	sql injection hole in topic page navigation
+
+2009-07-26  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 13103:
+	phase 2 of mixup
+	no more flicker on :hover links w/bg imgs
+
+2009-07-24  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 13098:
+	mixter: mixup feature
+
+2009-07-20  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12997:
+	thumb icon not showing in playlist browser
+
+2009-07-19  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12990:
+	"do anything from anywhere"
+	* 12991:
+	missed an ajax review case in prev. checkin
+	* 12992:
+	recommend was not highlighted in new action menu stuff  for
+	pellbrowser
+
+2009-07-16  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12963:
+	added twit/fb to share page
+	* 12965:
+	typo (of course)
+	* 12966:
+	ping.fm
+
+2009-07-13  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12909:
+	more itunes feed clean up
+	add nsfw topic field
+	* 12910:
+	
+	* 12917:
+	new flash no longer restricts bit rates
+
+2009-07-09  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12896:
+	dnstools no longer works, whois url now admin configurable
+	* 12899:
+	seems yahoo player is offline (?)
+
+2009-07-08  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12890:
+	itunes podcast specific feeds
+
+2009-07-07  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12881:
+	unhack: no longer faking html topic types
+
+2009-06-16  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12781:
+	bugfix: blowup in histogram when child was hidden/banned
+
+2009-06-07  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12739:
+	bugfix: licenses with '+' (sampling+) were not editable
+	included 5.0.1 stuff in 'news'
+	bumped version #
+
+2009-06-06  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12735:
+	don't default to cczero for submit forms
+
+2009-06-05  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12724:
+	cleanup podcast scripts for "release"
+	* 12729:
+	prep for 5.1.0.RC.01
+	svn keywords:id
+	* 12730:
+	svn keywords:id
+	* 12731:
+	svn keywords:id
+	* 12732:
+	svn keywords:id
+	* 12733:
+	svn keywords:id
+	* 12734:
+	svn keywords:id
+
+2009-06-04  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12718:
+	bugfix: trying to read huge irrellevant files
+	* 12719:
+	offer more restrictive lics on remix (admin controlled)
+	* 12720:
+	offer more restrictive lics on remix (with fixes)
+	* 12721:
+	renamed waiver->upgrade
+	iTunes rejected podcast, maybe b/c of feed encoding
+	* 12722:
+	more tweaking on podcast feed
+	* 12723:
+	svn id
+
+2009-06-03  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12710:
+	scripts for creating podcasts
+	new vadim page
+	* 12711:
+	cleaning up mixter pages
+	added new form api for getting submit meta
+	added [enclosure] format
+	* 12712:
+	cleaning up mixter pages
+	added new form api for getting submit meta
+	added [enclosure] format
+	* 12715:
+	don't say "license" when you mean "waiver"
+	stuff submit meta data info submit forms
+	* 12716:
+	(wups, debug code left in)
+	* 12717:
+	rrrrg
+
+2009-05-31  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12683:
+	don't freak if no [var] is found
+	publicize with no user would blow up
+
+2009-05-30  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12682:
+	mixter podcast scripts
+	default to 'home' for content manager
+	add [enclosure] tag
+
+2009-05-28  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12674:
+	bugfix: a write error on config writing caused another error hiding
+	the first one
+	bugfix: user_basic was spitting out bad artist_page_urls, breaking
+	remix history
+	* 12675:
+	bugfix: editing root-url in config-repair was broken
+	default to new cch5 skin if no skin-settings found
+	* 12676:
+	ugly podcast/enclosure hack
+
+2009-05-27  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12670:
+	archive.org friendly links dump
+
+2009-05-25  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12653:
+	typo
+
+2009-05-24  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12646:
+	fixed bug in filter override for OCAL
+	* 12647:
+	admin/access was missing css/js includes
+	* 12648:
+	OCAL was still seeing js errors on nav away
+
+2009-05-23  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12641:
+	inject new topics into upgrade
+	now rendering flash/games intellegently
+	don't create TEXTINDEX stuff on install/upgrade
+	upgrade was smashing old licenses, broke upload list
+	submit form was broken if no suggested_tags
+	* 12642:
+	hack of thumbnail (relies on sudo cmdline access)
+	generalized the link to the render/play/show in skins
+	* 12643:
+	bug: #2789610 'playlist' icons are music specific
+	* 12644:
+	bug #2789220 /radio template has broken strings in it
+	* 12645:
+	bug #2790950 javascript errors if click too fast (I hope)
+
+2009-05-22  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12639:
+	cleanup default profiles
+	tempalte -> template
+	cmdline set user passwork (in /bin)
+	* 12640:
+	officially added histogram stuff
+	previous checkin broke 'picks' page
+
+2009-05-21  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12634:
+	derivation history screens
+	* 12635:
+	derivation history screens/dataviews
+	streampad player
+	css clean up on embedded player
+	* 12636:
+	css clean up on embedded player
+	* 12637:
+	xspf on playlist head
+
+2009-05-20  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12629:
+	make podcast trackbacks audio specific
+	* 12630:
+	allow dev override of default filtering eating
+	* 12631:
+	forum topics were bombing when not logged in
+	* 12633:
+	licenses on new install was broken
+	wrong title on 'delete vroot' screen
+
+2009-05-19  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12626:
+	generalize dcmi type
+	generates "alternative" submit types
+	* 12627:
+	last checkin broke uploads
+	* 12628:
+	submit button was grey even remix source was pre-selected
+
+2009-05-18  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12624:
+	feat.req: 1353656 Licenses right now are hardcoded and need to be
+	dynamic
+	licenses picker now embedded in submit forms
+	gutted obsolete contest code
+	license images now can point to CC (or any site)
+
+2009-05-15  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12621:
+	last checkin broke playlists
+
+2009-05-14  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12619:
+	bug #2789535 should not create 'contest' dir on new install
+	bug #2789210 temp dir is readable on web by default
+	bug #2789209 Log file blank on new install
+	now logging in admin during install
+	cleaned up crufty forum admin screen
+	removed 'contest' upload path from admin/paths
+	button update was setting all kinds of settings (why?)
+	user feeds atom links were broken
+	* 12620:
+	bug# 2789221 non-stringized str_ when adding menu items
+
+2009-05-13  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12608:
+	stringized nav tab generated title
+	RDFa clean up on upload page
+	* 12609:
+	"click here to give credit..."
+	* 12610:
+	"info" popup was not popping up at cursor in cc5 skin
+	some /bin tools needed updating
+	* 12611:
+	bug: #2790380 missing breadcrumbs on submit/*
+	bug: #2789693 contact forms need breadcrumbs
+	bug: #2789585 missing breadcrumbs on preferences
+	bug: #2789581 missing breadcrumbs on edit profile
+	bug: #2789223 missing bread crumbs on 'notify/edit'
+	bug: #2789222 admin usability: meaningless 'preferences' on menu
+	* 12612:
+	added breadcrumbs and page_title to content pages
+	* 12613:
+	added breadcrumbs and page_title to content pages
+	* 12614:
+	bug: using dropdown toc in content page was broken on new installs
+	* 12618:
+	cleaned up new install scripts
+	added breadcrumbs to some reply screens
+	cleaned up forum admin screens
+	blurbs now, er, work
+
+2009-05-12  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12599:
+	bug# 2789520 save as playlist creates dupe playlist
+	* 12601:
+	internal lic format changed
+	* 12602:
+	fancy prompts for cc5 skin
+	* 12606:
+	bug# 2789607 tools icon broken in recommends browser
+	pell browser now shows total pell count
+	download templates comment helper
+	closed <div on upload page
+	no longer going to /people/playlists from playlist user link
+	* 12607:
+	upload_page_wide is now a table layout (blame IE6-8)
+
+2009-05-11  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12594:
+	allow custom_user_profile to overwrite default profile page
+	* 12595:
+	bug: 2789916  	 editing extras can delete extras
+	added news sidebar extra
+	added ccMixter 2009 skin profile
+	bugfix: cmdline tpl parser generated band function names
+	dev: forms can now save title/breadcrum info
+	admin UI: links to back where you came from, after saving config
+	bug:  2789517  	 missing breadcrumbs on admin/license
+	bug: 2789587  	 allow ratings is duplicated
+	admin: ratings sort criteria editable by admin
+	dev: CCSkin::LookUpMacro now allows for fail
+	bug: massmailer vs openid 'contact' hook
+	feature: admin can choose mp3-page player (yahoo,delicious,etc.)
+	* 12596:
+	wups
+
+2009-05-09  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12588:
+	query: playlist_type parameter
+	* 12589:
+	finally allow different types of audio players
+
+2009-05-08  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12577:
+	make [skinimg] more generic
+	* 12581:
+	format: added [var] for template vars (user_name,site-title, etc.)
+	added GetArg to $T for safe access to vars
+	now setting perms on cached header files
+	disabled TEXTINDEX option in settings
+	cmdline tpl-parser was broken
+	accept ?pool and ?sourcesof for submit/remix (phase 1)
+	bugfix: upload_listing broken for non-audio
+
+2009-05-07  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12566:
+	bumped version # to 5.1.0.SVN
+	admin: sticky content topics codified
+	* 12567:
+	feature: added box, indent, cmd and skinimg to formatting
+	* 12568:
+	feature: added define (for 'version') to formatting
+	fixed url stuff from prev. checkin
+	* 12570:
+	itch-scratch: disable browser auto-complete on security key input
+	* 12575:
+	snapshot of cc5
+	underline search results links
+	* 12576:
+	admin: you can re-title content page without chaning url
+	admin: 'sticky' content hack
+	cc5 (snapshot checkin)
+
+2009-05-06  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12559:
+	admin: text-align debug output
+	dev: add user_id param to login event
+	dev: no longer need hack for logout screen
+	bugfix: reorder playlist broken with hidden tracks
+	admin: update=1 now looks in local_files/lib too
+	* 12560:
+	crufty download code broke 'action' menu
+	(prev checkin: glob returns 'false' on some setups)
+	* 12561:
+	pointed to vadim instead of bucky
+	* 12562:
+	pointed to nowhere instead of vadim
+
+2009-05-05  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12548:
+	cc5 skin (first draft)
+	* 12549:
+	cc5 skin (first draft)
+	* 12553:
+	make playlist reorder prettier
+	specify 'stable' getID3 in install help
+	prevent errors in Bucky pages (bot stomp)
+	* 12554:
+	fixed prev. checkin
+	* 12555:
+	--rubegoldberg
+	* 12556:
+	playlist style listings was broken
+
+2009-05-04  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12531:
+	bugfix: fork thread was mis-numbering topics
+
+2009-05-03  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12523:
+	workaround for IE8 z-index issue
+
+2009-05-01  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12515:
+	counts were inaccurate on playlist pages
+
+2009-04-30  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12500:
+	
+
+2009-04-29  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12469:
+	bug: (re)assigning IDs blew up
+	* 12470:
+	more clean up in manage IDs form
+
+2009-04-28  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12465:
+	reworked openid stuff based on user feedback
+	* 12466:
+	doc'ing all URLs, ensuring they all work (1)
+	* 12467:
+	doc'ing all URLs, ensuring they all work (2)
+	* 12468:
+	missing admin generated mixter pages
+
+2009-04-26  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12426:
+	bugfix: profile edit was deleting password for openid accts.
+
+2009-04-25  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12419:
+	these mixter images were never checked in
+	* 12420:
+	tightened up some parameter passing
+	stringized more missed strings
+	now setting proper access on view logs
+	* 12422:
+	re-sync mixter pages
+	don't put out h2 in content boxes
+
+2009-04-23  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12374:
+	openid UI cleanup for re-directs to older hosts (like yahoo)
+	* 12400:
+	handle case where openid account didn't give email
+	allow user to 'detatch' openid from account
+	move array_combine to ccutil
+	removed uneeded page->String calls
+	centered box title in native boxes
+	added generic cc_openid_link css
+	* 12401:
+	checked in the wrong file
+	* 12403:
+	bugfix: notify on trackback looked broken (wasn't)
+	added 'manage items' button to pools menu
+	sting'ized a whole bunch of stuff that should have been
+	had to undo previous bugfix for NextID - will revisit later
+	* 12404:
+	search was busted by new paging
+	cached-headers broken by prev. checkin
+	had to undo previous bugfix for NextID - will revisit later
+
+2009-04-22  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12335:
+	cleaning up 'native' boxes
+	hack for cached headers on admin/skins/layouts
+	* 12354:
+	bug 2728181
+	button styles (rounded buttons, etc)
+	made html forms into proper prop files
+	add 'PrintOnce' api to template to share js/css links
+	cleaned up string in user tabs
+	%user_name% now subs in user tab names/help
+	paging now using rounded buttons
+	* 12355:
+	left debug code
+	* 12369:
+	this was pink (!) on OSX
+	* 12370:
+	bugfix: new paging broke howididit
+	cleanup for UI
+
+2009-04-21  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12308:
+	bugfix #2769240
+	* 12322:
+	feat. req 2769162
+	* 12325:
+	bug fixes needed for feat. req. 2769147
+	* 12326:
+	bug fixes needed for feat. req. 2769147 (part 2)
+	* 12327:
+	bug #2776646
+	* 12331:
+	svn property 'id' was missing
+	* 12332:
+	svn property 'id' was missing
+	* 12333:
+	don't allow extension-less avatars (screws up 404 re-writes)
+	* 12334:
+	bugs in the update
+
+2009-04-20  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12267:
+	openid (safety checkin 3 - not operational)
+	* 12278:
+	janrain openid lib
+	* 12279:
+	openid (safety checkin 3 - not operational)
+	* 12280:
+	some ui cleanup
+	* 12281:
+	some ui cleanup
+	* 12282:
+	missing id keyword
+	* 12299:
+	less tolerance for 404s
+	* 12300:
+	new paging stuff broke reviews page
+	* 12301:
+	openid feature (ready for testing)
+	* 12302:
+	login broke
+	* 12303:
+	login broke (2)
+
+2009-04-19  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12259:
+	bugfix: f=php was broken for many cases
+	* 12260:
+	openid (safety checkin - not operational)
+	* 12261:
+	bugfix: f=count  was broken for playlist cases
+	* 12262:
+	openid (safety checkin 2 - not operational)
+	* 12263:
+	typo
+	* 12264:
+	typo
+
+2009-04-17  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12241:
+	native (less ugly) rounded corners
+
+2009-04-16  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12228:
+	more paging options
+	* 12231:
+	bugfix: paging was not properly handled for query f=html
+	admin: allow creation of local/fake Sample Pool wrapper
+	admin: local/fake pools Add/Manage items
+
+2009-04-15  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12193:
+	admin: new installs now default to CC skin (not plain)
+	bugfix: fixed a bunch of leaking 'str_' values
+	feature: google style paging
+	admin: paging style now admin choice in admin/skins/settings
+	* 12198:
+	bugfix: verify ALL head-cache files are there
+	* 12199:
+	bugfix: verify ALL head-cache files are there (take 2)
+	* 12202:
+	bugfix: verify ALL head-cache files are there (take 3, sigh)
+	* 12212:
+	added paging to new installs/upgrades
+	* 12213:
+	feat. req. #2182085
+
+2009-04-09  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 12082:
+	typo
+
+2009-03-27  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11960:
+	don't allow ref to be /login when logging in
+
+2009-03-24  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11943:
+	bugfix: bogus lic info tagged into files on file_replace/add
+
+2009-03-23  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11936:
+	bugfix: no longer displaying bogus dates on pool items
+	bugfix: upgrade was missing require's
+	feature: login redirects to last screen
+	dev: give admin option to allow custom skin to override ccskins
+	bugfix: no longer sending 'ratings' notify mail for 'recommends'
+	bugfix: stats would div by 0 with no data
+
+2009-03-15  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11876:
+	format=count was broken for /api/pool
+	add info xml for magnatune/olpc sample pools
+	* 11877:
+	added proposed 2.0 stuff
+
+2009-03-06  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11793:
+	search pools via query api
+	added pool/trackback search
+	added 'fork branch' to topics
+	bugfix: topic/stick was not admin_only
+	added linux friendly fonts to font browser
+	fixed cc:url in feeds
+	moved pool api doc to shared/pages (no affect on user)
+
+2009-02-25  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11706:
+	fix layout for lower res screen
+
+2009-02-24  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11691:
+	old compat urls were broken
+	'type' param was broken
+	* 11692:
+	updated to newer urls
+	* 11693:
+	linux likes arial
+
+2008-12-31  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11443:
+	feat: notify on trackbacks
+
+2008-12-30  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11442:
+	removing double dash from about property
+
+2008-12-23  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11440:
+	disabled automated 'news' feature - too much spam
+
+2008-11-30  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11343:
+	friendlier default fonts for 'nix machines
+
+2008-11-28  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11336:
+	reinstating use-translate of topics
+	* 11337:
+	feed links with dbl-quotes in title attr blowing chunks
+	* 11338:
+	reinstating user-translate of topics
+	* 11339:
+	reinstating user-translate of topics
+	'reply' will now show original text
+	* 11340:
+	broken for installs not at root
+	* 11341:
+	added 'xlat' param for topic searches (need to make more robust me
+	thinks)
+	* 11342:
+	bugfix: leaving feed-max empy (the default install :0) broke all
+	feeds
+
+2008-11-24  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11319:
+	convert isitlegal.php to content manager
+	* 11320:
+	now reading google alerts for news clips
+	* 11321:
+	cc_temp_dir was not looking at logfile-dir
+	feedreader was clipping desc at first newline
+	* 11322:
+	skip google "news"
+	* 11323:
+	ugh, change it to hourly updates
+	* 11324:
+	ah
+
+2008-11-21  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11318:
+	typo: artist in stats page
+	tweak css for feat-playlist
+
+2008-11-17  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11256:
+	
+
+2008-11-16  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11245:
+	bugfix: (admin) editing menus horked query URLs (not sure we're done
+	here)
+	* 11246:
+	
+	* 11247:
+	fixed 'required args'
+	now point to official mini-cc graphic
+	* 11248:
+	bugfix: (admin) delete vroot didn't redirect properly
+	* 11249:
+	added inner/outer div to allow style overwrites
+	* 11250:
+	removed cruft from config
+	put in conditional debug code for logging head cache clears
+
+2008-11-15  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11235:
+	typos
+	* 11236:
+	more typos
+	* 11237:
+	add first round of cc-lic stuff
+	* 11238:
+	because I can't check in without typos
+	* 11239:
+	cc favicon (I don't what this was before!)
+	* 11240:
+	added gpl header
+	* 11241:
+	added gpl header
+	* 11242:
+	enable Id keyword
+	* 11243:
+	fixed stream url
+
+2008-11-14  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11201:
+	mixter 'remix-me' feature
+	* 11202:
+	fixed desc
+	* 11204:
+	had wrong urls in embed template
+	* 11205:
+	removed .js .css embedd from code, moved them to templates
+	* 11206:
+	removed .js .css embedd from code, moved them to templates
+	* 11207:
+	redirect doesn't work because headers have already been sent - ugh
+
+2008-11-13  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11198:
+	add config_changed handler for clear 'head' caches
+	added hack (sorry) to workaround auto-re-version bug at ccM (wtf?
+	dunno)
+
+2008-11-12  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11177:
+	perf: updating if-mod date too much
+	* 11178:
+	ignores at the root dir
+	mixter: config-catch.php debug
+	* 11180:
+	wups 5.0.1 upgrade instructions
+	* 11181:
+	clean-install was broken by last checkin
+	* 11182:
+	plain footer was not text'ized
+
+
+
+Change log for previous version 
+====================================
+
+
+2008-11-11  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11151:
+	enable new /commands CommandDump
+	introduce admin flag to turn off collabs
+	
+	* 11152:
+	stateshirt checkbox in submit/prop forms
+	* 11161:
+	bugfix: edit hidi was broken with empty values
+	added config_changed event
+	* 11162:
+	catch crazyness at mixter
+	* 11163:
+	more verbose log on config change
+
+2008-11-08  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11148:
+	wrong file type
+
+2008-11-03  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11098:
+	tweaks for 5.0.1
+
+2008-10-31  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11079:
+	typo in notify admin screen
+	* 11080:
+	str_site_license and str_footer were not expanding
+
+2008-10-30  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11075:
+	missing hidi string'ized title
+
+2008-10-29  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11064:
+	
+	* 11065:
+	#2186607 config save bug
+	* 11066:
+	#2186607 config save bug (part 2)
+	* 11067:
+	#2200265 Deleting menu groups horks site
+	(removed debug code)
+
+2008-10-17  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 11001:
+	5.0 stuff
+
+2008-10-16  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10993:
+	updated dcma/terms.php
+
+2008-10-11  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10969:
+	bugfix: empty images in submit forms confused the code
+	bugfix: forum counts in profiles were (still) busted after post
+	Delete
+	api: added 'pool' to api/pool/* for consistency with api/query
+
+2008-10-10  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10965:
+	5.0 install cleanup
+	* 10966:
+	version 5.0
+	* 10967:
+	remove debug code ccskins/shared/access.tpl
+	add BreadCrumbs to 'restrict access'
+	no longer caching 'news' sidebar extra
+	updated version info and prep for 5.0 release
+	
+
+2008-10-08  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10949:
+	make paging work for topic pages
+	import files bread crumbs were broken
+	* 10950:
+	fixed tabpos for safari
+	missing access.css
+	* 10951:
+	nuke proofing.php (etc)
+	add proper paging to featured-playlists.php
+	* 10952:
+	added lic update for upgrades
+	* 10953:
+	nuke 4.x admin docs
+
+2008-10-02  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10936:
+	wrong svn url
+
+2008-09-18  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10893:
+	add type=uploads_alt so query api search works for user name
+
+2008-09-16  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10873:
+	change mail encoding to utf-8
+
+2008-09-15  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10872:
+	bugfix: wrong counts on topic delete
+
+2008-07-29  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10589:
+	head tag cache/ganging
+	reformatted 'client-menu'
+	cut/past cruft in playlist.css
+	extracted upload_list_wide datasource
+
+2008-07-28  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10588:
+	[ cctools-Bugs-2030676 ] "Create New Virtual Root" fails
+	[ cctools-Bugs-2030522 ] Can't find: images/lics/pd.gif
+
+2008-07-20  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10538:
+	sample pool search with apos; was busted
+	content page paging
+	
+	* 10539:
+	content page paging
+
+2008-07-16  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10522:
+	teru's nit picks
+
+2008-07-15  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10517:
+	stream was broken
+	now do links to playlists
+	* 10518:
+	added num playlists for 'picks' page
+
+2008-07-14  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10498:
+	added columns to helper dvs
+	* 10503:
+	missing datasources
+	* 10504:
+	bug #2014601, #2014608 (BreadCrumbs)
+	* 10506:
+	brought admin crumbs upto alignment with others
+	* 10508:
+	bunch of first-time install bugs
+	* 10509:
+	finally nuke unneeded cctools
+	* 10510:
+	brought admin crumbs upto alignment with others
+	no longer hacking around ccM workaround
+
+2008-07-13  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10487:
+	add befored/u to query
+	* 10488:
+	query docs
+	* 10489:
+	can't send redir from template (doh)
+
+2008-07-12  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10481:
+	don't limit to page when doing playlist
+	* 10482:
+	forum feed was broken
+	* 10485:
+	quick review list out was wrong
+
+2008-07-11  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10478:
+	more bread crumbs
+	updating admin docs on url maps
+	highlightable playlist items
+	
+	* 10479:
+	missing semi
+	* 10480:
+	override sort for playlist to calm down mcjitb
+
+2008-07-10  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10470:
+	bug 2014745, bug 2014616, bug 2014606, bug 2014595,
+	bug 2014594, bug 2014593, bug 2014591, bug 1948014
+	bug 1862862, bug 1862841
+	playlists were busted in ie7
+	
+	* 10471:
+	some bread crumb stuff
+
+2008-07-09  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10445:
+	playlist redux
+	new lic images
+	* 10449:
+	friendlier error recovery
+	* 10451:
+	missing pl desc
+	* 10452:
+	feat playlist
+	* 10457:
+	chopping tags
+	* 10458:
+	some cosmetic stuff
+
+2008-07-06  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10410:
+	allow rewrite of tag base url in /tags
+	gather uploads' tags for playlist properties form
+	new gen_button formatter for forms (about time)
+	
+	* 10411:
+	loosen the reigns a little on min tags
+	* 10412:
+	
+	* 10413:
+	
+	* 10414:
+	
+
+2008-07-05  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10401:
+	doc
+	* 10403:
+	fixed 'recent playlists' sidebar extra
+	default sort for playlist= now is playlist order (not date)
+	* 10404:
+	fixed 'recent playlists' sidebar extra
+	* 10405:
+	allow feed links from content page
+	* 10406:
+	skip post-dated topics
+	* 10407:
+	these pages have feed links
+	* 10408:
+	set limit on [query] to page default
+	* 10409:
+	playlist search and templates
+
+2008-07-04  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10394:
+	broke search for user
+	* 10395:
+	admin tagger missing cc-page include
+	license_url was not expanding in ID3 tags
+	send 404 on missing template
+	user_match was broken, datasource missing from template
+	use topics list was broken (missing '&' in arg list)
+	admin topic 'lock' was broken (empty lock value in sql statement)
+	pool source search results broken (missing ok param for setting
+	dataview)
+	
+	* 10396:
+	add page limit to 'media' sidebar links
+	* 10397:
+	finally a decent way to handle feed links (4 years later)
+	* 10398:
+	finally a decent way to handle feed links (take 2)
+	* 10399:
+	deleting forum threads wasn't updating thread tabl properly
+	* 10400:
+	
+
+2008-07-03  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10378:
+	y! just won't work for embeddings
+	* 10379:
+	some optimizations
+	* 10380:
+	let this show up in docs
+	* 10382:
+	fixed IE7 vs prototype.js
+	* 10383:
+	better error recovery
+	* 10386:
+	topics templates
+	* 10387:
+	close to final approach on content pages
+	bringing ccM files into sync with reality
+	* 10389:
+	new query api doc
+	* 10390:
+	debug markers for js exceptions
+	added 'page' and 'feed' limit back in
+	* 10391:
+	added 'page' and 'feed' limit back in
+	* 10392:
+	un-broke noexit=1
+	* 10393:
+	un-broke stuff
+
+2008-07-02  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10367:
+	better [query= handling
+	* 10368:
+	optimize and otherwise make work
+	* 10369:
+	
+	* 10370:
+	
+	* 10371:
+	
+	* 10372:
+	
+	* 10373:
+	IE7 vs. prototype.js (temp fix) 'actions' menu was busted
+	* 10374:
+	turn scrolling box back on
+
+2008-07-01  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10354:
+	long dead url mapping
+	* 10355:
+	query eng. 2.0
+	* 10356:
+	query eng. 2.0
+	* 10357:
+	query eng. 2.0
+	* 10358:
+	been a bad mapping in use profile forever
+	last checkin broke it even worse
+	* 10359:
+	various cleans ups for new query api
+	* 10361:
+	cleaned up search template docs
+	* 10362:
+	required_args not working properly
+	* 10363:
+	allow flash players to embed directly
+	Y! music player
+	* 10364:
+	proper credits for EasyListener player
+	* 10365:
+	user templates now need to specificy datasource=user
+	* 10366:
+	alias datasource=users -> user
+
+2008-06-28  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10336:
+	add account into to contact mail
+	* 10337:
+	add account into to notify mail
+
+2008-06-27  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10333:
+	nosort in playlists stream was broken
+	* 10334:
+	prevent more hack attempts
+	* 10335:
+	"fix" from before was broken
+
+2008-06-26  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10291:
+	semantic micro formats goo
+	* 10292:
+	turn on if-mod code for non registered users
+	* 10293:
+	turn on if-mod code for non registered users
+	* 10294:
+	can't seem to make strings_js cached
+	* 10317:
+	FF3 bugfix
+
+2008-06-25  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10277:
+	friendlier log renaming
+	* 10289:
+	error when no records match
+	* 10290:
+	a better behaved version of the previous checkin
+
+2008-06-24  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10252:
+	flipped sprintf args
+	* 10259:
+	more hacker prevent
+	* 10260:
+	got 'headers were sent' err on last checkin on non-dev machine
+	* 10272:
+	an official admin log viewer
+	* 10273:
+	an official admin log viewer
+
+2008-06-23  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10248:
+	more hacker prevent
+
+2008-06-22  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10211:
+	bread crumbs in publicize
+	'edit' on playlist menus
+	* 10212:
+	'edit' on playlist menus
+	* 10213:
+	'edit' on playlist menus (formatting)
+	* 10214:
+	freesound RDF is starting to change
+	* 10215:
+	(removed debug code)
+	* 10216:
+	mixter-specific stats
+	* 10217:
+	remove visible comment
+	* 10218:
+	now paying close attn to if-modified-since
+	* 10219:
+	now paying close attn to if-modified-since
+	* 10220:
+	now paying close attn to if-modified-since
+	* 10222:
+	temp fix for clash between Locking tables and if-mod-since
+	* 10223:
+	perm fix for clash between Locking tables and if-mod-since
+	* 10224:
+	send no-cache when redirecting
+	* 10225:
+	sigh - disable if-mod until further notice
+
+2008-06-20  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10199:
+	admin throttle was broken
+	* 10202:
+	admin throttle (2)
+	* 10207:
+	amp in titles were being truncated
+	* 10209:
+	grid form formatting
+	prevent double click on modal link
+
+2008-06-18  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10176:
+	show 'send email' to members other than yourself
+	* 10177:
+	no files were showing to members
+	* 10178:
+	dblquotes in 'next/prev' links was broken
+
+2008-06-17  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10163:
+	added non alphanum to passwords
+	* 10164:
+	ampersands in title were disappearing
+
+2008-06-15  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10151:
+	safer param check on url
+	* 10152:
+	FF3 compat (bypass fancy selector-addon)
+	* 10153:
+	more bot safety checks
+	* 10155:
+	contest sources urls were bad
+
+2008-06-14  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10143:
+	missing arg means bad url means bot (send 404 instead of log error)
+	* 10144:
+	better err handling
+	* 10145:
+	sort=rank was broken (these templates were missing %cols%)
+	* 10146:
+	sort=rank was broken (these templates were missing %cols%)
+	* 10147:
+	streaming pop tracks was broken
+	* 10148:
+	(much) better error handing
+	* 10149:
+	hide 'edit' 'del' button from non-admin
+	default to 'none' on pool approves
+	* 10150:
+	hack prevention
+
+2008-06-13  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10122:
+	bpm in download template
+	* 10123:
+	bad code
+	* 10124:
+	ok, bpm in dl template works this time
+	* 10139:
+	still putting out 'limit' fires
+	* 10141:
+	add edit button to pool item
+	add view button to pool admin listing
+	* 10142:
+	better error recovery (temp fix)
+
+2008-06-12  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10120:
+	default (admin) page limit was using old ccH4 value
+	people page was returning all records
+	* 10121:
+	reviews were *still* cutting off
+	new values for limit are default/page/feed/query
+	(will need another checkin to verify)
+
+2008-06-11  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10106:
+	allow delete submit forms
+	finally (?) fixed dropping avatars in submit forms
+	fixed bugs in compat with 4.x  forms
+	* 10107:
+	prep for bad bot battler
+	* 10108:
+	fixed 'limit' bugs
+	* 10109:
+	last checkin limited thread queries
+	* 10110:
+	limit was *still* broken on php4 (ccMixter)
+
+2008-06-10  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10103:
+	moved freesound to be a content page
+	* 10104:
+	forgot to add del vroot button to admin template
+	* 10105:
+	admin bugfixes:
+	- submit form losing avatar
+	- missing menu add item
+	- missing menu Delete
+	- missing menugroup additem
+	- missing menugroup delete
+	- editing content page reverted to some default fields
+	- returning to bad url after vroot delete
+	queryapi: new format "textfile"
+
+2008-06-09  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10084:
+	ccMixter specific strings
+	* 10085:
+	'home page' was confusing
+
+2008-06-08  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10073:
+	artists spotlights
+
+2008-06-07  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10068:
+	wups, didn't mean to replace 'new remixes'
+	* 10069:
+	download popups were not consistently scroll-enabled
+	* 10070:
+	last checkin broke hidi browser
+
+2008-06-06  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10064:
+	display filename as link (not nickname)
+	* 10066:
+	better support for recently updated files
+	* 10067:
+	add recent update to user feed page
+
+2008-06-05  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10051:
+	experiment: allowing user HTML to pass thru to cdata sec
+	* 10052:
+	wups, debug code left in
+
+2008-06-04  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10022:
+	search broken when single dash passed in
+	* 10023:
+	don't display thread with no topics (an internal error anyway)
+	* 10024:
+	api/file was broken
+	* 10047:
+	making queries more friendly to playlists
+	num playlists in upload page and user profile
+	* 10048:
+	making queries more friendly to playlists
+	num playlists in upload page and user profile
+	* 10049:
+	making queries more friendly to playlists
+	num playlists in upload page and user profile
+
+2008-06-03  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 10005:
+	user feeds hanging off profile
+	* 10006:
+	user feeds hanging off profile
+	* 10012:
+	share playlists
+	* 10013:
+	share playlists
+	* 10020:
+	stringified publicize module
+	fixed problems with dyn playlist sharing
+	* 10021:
+	stringified publicize module
+	fixed problems with dyn playlist sharing
+
+2008-06-01  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9989:
+	permalinks in forum topics had double #
+	* 9990:
+	display 'admin' tag in forums
+
+2008-05-31  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9988:
+	bugfix: email friend on user profile broken
+
+2008-05-30  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9978:
+	missing '/' in url
+	extras divs disabled menus
+
+2008-05-29  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9970:
+	double-quotes were lost in form edit fields
+	search miss string was uninformative
+	* 9971:
+	show num files on download menu item
+	* 9974:
+	new template: user feeds
+	* 9976:
+	user= now works when datasource is user
+	* 9977:
+	typo broke search by remix source title
+
+2008-05-28  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9958:
+	sample search was broken
+	* 9965:
+	missing columns macro, broke sort by rank
+
+2008-05-27  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9930:
+	return to old behav. for user search in topics
+	* 9932:
+	added - and quoted strs for generic search
+	* 9935:
+	limit review to topic_type review (ugh, no replies)
+	* 9943:
+	'match phrase' was broken
+	new 'teru' style 'manage files'
+	* 9944:
+	bad url in edit properties
+
+2008-05-26  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9927:
+	finish info box layout stuff
+	IE layout stuff
+	
+	* 9928:
+	IE won't style on ajax callbacks
+	* 9929:
+	admins can now add google search form with checkbox
+	added 'generic' text search that doesn't use TEXTINDEXes
+	TEXTINDEX type search is now admin configurable (and useless)
+	Magnatune pool now uses 'generic pool' as base class
+	
+
+2008-05-25  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9925:
+	include show have been require_once
+	* 9926:
+	bugs in new add type code
+	reorder was broken
+
+2008-05-24  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9924:
+	bugfix: default dataview had no count, would blow up some basic
+	queries
+	feature: user can select ccud tag type (e.g. sample) when adding
+	files
+	bugfix: license tag was lost when editing upload properties
+	code: string in edit properties forms were hard wired
+	api: cc_get_submit_types
+	feature: user can manage file from 'Submit Files'
+	bugfix: empy playlist would not reset item count
+	bugfix: ?user= on query browser would return ajax goo
+	ui: cleaned up info popup
+	ui: changed some edit menu items
+	
+	
+	
+	
+
+2008-05-12  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9815:
+	share was broken (recc.tp needed 'type' field)
+	deleted topics were being output in feeds
+
+2008-05-11  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9799:
+	not allowing amps in desc was screwing with entities
+	* 9801:
+	nuking 4.x cruft (finally)
+	* 9802:
+	added 'recc' to query to see who recommends an upload
+	now sort keys in config-repair
+	* 9803:
+	stuffed 'recommended by' into recent review file macros (should
+	probably move somewhere else)
+	
+	* 9804:
+	earlier checkin fixing entities broke regular & amps;
+
+2008-05-10  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9795:
+	playlists were not paging properly
+	* 9796:
+	topic part of url was wrong in notify msg
+	* 9797:
+	bugfix: template search cache could be fooled and return bad results
+	template perf: we were searching for misses multiple times
+	* 9798:
+	README/VERSION for v5.beta.0
+
+2008-05-09  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9782:
+	bugfix: missing include
+	* 9783:
+	bugfix: we were completely hosed on safemode() sites (now we're just
+	i8 hosed)
+	* 9784:
+	forms api: run js after adding a dynamic row
+	query api: reqtags were broken
+	template api: added cc_query_default_args/cc_query_get_optset
+	skin api: added GetStyles
+	removed debug code for psuedo-verify
+	admin feature: Query browse option sets for driving look/feel of
+	query browser
+	
+	
+	
+	* 9785:
+	js api: popup hook is no longer a fixed size
+	grid forms can now run js after insertion of new row
+	query browser now has 'save to playlist' button
+	query browser now respect admin edited 'optsets'
+	'create playlist' repsects optsets
+	(although this UI may be killed completely)
+	expand ZIPs in sample browser
+	
+	
+	* 9787:
+	narrow query browsing was ugly
+	make 'save to playlist' button optional
+	
+	* 9788:
+	dyn. playlists on new installs was broken
+	make save to playlist button optional (part 2)
+	* 9793:
+	last checkin was broken on php4
+	added 'min' arg to browse/playlists
+	* 9794:
+	added 'min' arg to browse/playlists
+
+2008-04-28  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9685:
+	security: download urls were linked directly
+
+2008-04-27  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9671:
+	bugfix: file order was broken (may still be flaky)
+	bugfix: locked threads assert() and showed 'reply' button
+	* 9672:
+	bugfix: locked threads assert() and showed 'reply' button
+	
+
+2008-04-26  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9670:
+	bugfix: locking topic was broken
+
+2008-04-09  paulproteus
+
+	* 9581:
+	Actually create the po.old files
+	* 9600:
+	Optionally specify a $1 for the directory to process
+
+2008-04-03  paulproteus
+
+	* 9549:
+	Fix update_po_files so that it only modifies the PO file if msgmerge
+	had no errors
+
+2008-03-31  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9522:
+	(ignore local file)
+	* 9523:
+	'download this page' in menu
+	generic sample pool search (import not. impl)
+	allow local pools to be added through UI (not. doc'd)
+	missing user would blow things up
+	don't notify in email when file is not published
+	make search link a button on remix submit form
+	make several file macro links into gen. buttons
+	typo in remix submit form
+	
+
+2008-03-26  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9495:
+	remove skull image reference
+
+2008-03-24  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9480:
+	deleting 'test'
+
+2008-03-19  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9437:
+	admin: hide all files for a user
+	* 9438:
+	admin: allow embed code in pool items when editing
+	* 9452:
+	multiple file download indicator
+	* 9453:
+	multiple file download indicator
+	* 9454:
+	typo in last checkin
+
+2008-03-17  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9399:
+	in-situ reviewing on wide listing page
+	* 9400:
+	missed a template
+	* 9401:
+	wups, debug code
+	* 9410:
+	js throwing error
+
+2008-03-14  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9383:
+	min num of tags was blowing things up
+	* 9384:
+	stp cover up
+	* 9385:
+	n-th trackback was broken
+	* 9386:
+	deleting collab wiped wrong topics
+
+2008-03-05  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9293:
+	titles clipped on remix search_remix
+	* 9294:
+	titles clipped on remix search_remix
+	* 9295:
+	closed threads where blowing up
+
+2008-03-04  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9266:
+	get rid of slashes in feed names
+	/files/username url was error'ing out
+	flag email had bad url
+	clean up pool ui for IE
+	flash players were not working
+	random button was playing wrong track
+	spelling 'reviews of'
+	nsfw not in listing
+	
+	* 9271:
+	deleting newest topic in thread broke
+
+2008-02-27  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9184:
+	reading configs was broken
+	* 9187:
+	v4 template importer
+	* 9189:
+	content admin was broken on new installs
+	* 9197:
+	fixing more new-install bugs
+	* 9198:
+	
+	* 9200:
+	more release tweaks
+
+2008-02-26  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9179:
+	wrong name in meta data
+	* 9180:
+	edpicks menu was not showing for non-admins
+	* 9181:
+	as seen
+	* 9182:
+	as seen pics
+	credits
+
+2008-02-22  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9165:
+	flag upload was broken
+
+2008-02-18  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9070:
+	removing debug info
+	* 9071:
+	remove debug info
+	* 9072:
+	new user reg was broken on some cases
+	* 9073:
+	mixter error pages
+	* 9074:
+	disable playcount bumping (seems not fully impl.)
+	* 9075:
+	ugh, ajax call to bump was returning a whole page
+	* 9076:
+	flag missing from upload page
+	howididit_browse missing style sheet
+	allow content admin to control content page width
+
+2008-02-17  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9067:
+	edit button on 'approve' page
+	* 9068:
+	edit button on 'approve' page
+	* 9069:
+	lucas and michael
+
+2008-02-15  Victor Stone <fourstones@users.sourceforge.net>
+
+	* 9044:
+	extra IP on captcha broke on Buckman's fancy connect
+	* 9046:
+	extra meta tag field (for things like google verify)
+	* 9048:
+	deleting topic nodes was broken
+	* 9049:
+	deleted review topics where showing through
+	* 9064:
+	cleaned up trackback admin'ing
+	* 9065:
+	cleaned up trackback admin'ing
+

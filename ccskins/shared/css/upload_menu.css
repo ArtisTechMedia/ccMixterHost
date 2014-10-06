@@ -1,0 +1,42 @@
+.cc_share_button {
+	background: url('../images/share-link.gif') no-repeat top left;
+	width: 80px;
+	height: 16px;
+	display: block;
+}
+
+#ajax_menu #trackbackbox {
+	width: 40%;
+	float: left;
+	margin-right: 2%;
+}
+
+#download_box .cc_share_button {
+	margin-top: 11px;
+}
+
+p#trackback_caption {
+	overflow: hidden;
+	margin: 0px 0px 10px 0px;
+	padding-bottom: 4px;
+	border-bottom: 1px solid #777;
+}
+#download_box li {
+	line-height: 130%;
+}
+
+#cc_download {
+	margin: 10px;
+}
+/*
+#cc_download a {
+	font-weight: bold;
+	font-size: 1.2em;
+	display: block;
+	padding: 3px;
+}
+*/
+#download_help {
+	margin: 5px;
+	padding: 3px;
+}

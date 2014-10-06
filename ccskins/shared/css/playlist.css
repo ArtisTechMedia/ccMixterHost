@@ -1,0 +1,313 @@
+
+.cc_playlist_line {
+	padding: 4px;
+	font-size: 12px;
+	cursor: pointer;
+	margin-bottom: 2px;
+	font-weight: bold;
+	border-width: 1px;
+	border-style: solid;
+}
+
+.cc_playlist_line span {
+    margin-left: 20px;
+	font-weight: normal;
+}
+
+.cc_playlist_dyn_user {
+	font-style: italic;
+	display: block;
+	float: right;
+}
+
+.pl_cart_name {
+	font-size: 1.4em;
+	font-style: normal;
+	margin-left: 4px;
+}
+
+.cc_playlist_detail {
+    padding: 5px;
+    border: 1px solid #C4985C;
+}
+
+.cc_playlist_popup {
+    border-width: 1px;
+	border-style: solid;
+    padding: 9px;
+	z-index: 1000;
+	height: auto;
+	width: auto;
+}
+
+span.cc_playlist_menu_item {
+	display: block;
+	margin: 2px;
+}
+
+.cc_playlist_name {
+	font-weight: bold;
+}
+
+a.cc_playlist_edit {
+	font-weight: normal;
+}
+
+.cc_playlist_add_mi {
+	font-style: italic;
+}
+
+.cc_playlist_feed {
+	float: right;
+	width: 100px;
+	margin: 5px;
+}
+
+.gd_description div {
+	white-space: normal;
+	margin: 4px;
+	background-color: #EEC; /* colorize */
+	color: #333;
+	padding: 0px;
+}
+
+.cc_pl_table .taglinks {
+	width: 500px;
+    margin-bottom: 3px;
+    margin-top: 5px;
+	white-space: normal;
+}
+
+.cc_pl_table .taglinks a {
+	display: inline;
+	font-size: 10px;
+}
+
+.moveupdown{
+	width: 18px;
+	text-align:center;
+	padding: 2px 4px 2px 4px;
+}
+
+div.cc_playlist_action  {
+	padding: 2px 4px 2px 4px;
+	border-width: 1px;
+}
+
+.cc_playlist_owner_menu {
+	padding: 10px; 
+	margin: 6px;
+	list-style-type: none;
+	border-width: 1px;
+	border-style: solid;
+}
+
+.cc_playlist_owner_menu li {
+	margin-bottom: 2px;
+}
+
+.cc_playlist_owner_menu li a:hover {
+	text-decoration: underline;
+}
+
+.tdc a.info_button {
+	margin: 0px 4px 0px 4px;
+}
+
+.cc_pl_table {
+   /* width: 720px; */
+}
+
+.trr {
+  /* width: 700px; */
+  height: 23px;
+  clear: left;
+}
+
+.hrc {
+  clear: left;
+}
+
+.cc_pl_table .tdc {
+}
+
+.tdc {
+	vertical-align: top;
+	padding-right: 10px;
+	float: left;
+	white-space: nowrap;
+}
+
+
+.cc_playlist_playlink {
+	font-weight: bold;
+}
+
+.cc_playlist_title {
+	font-size: 17px;
+	font-weight: bold;
+	margin: 4px;
+}
+
+.cc_playlist_date {
+	margin-left: 10px;
+}
+
+.cc_playlist_pcontainer {
+   width: 21px;
+   white-space: nowrap;
+}
+
+.cc_playlist_popup_window .cc_playlist_pcontainer {
+   width: 35px;
+   white-space: nowrap;
+}
+
+.cc_playlist_popup_window .cc_player_controls {
+	position: static;
+	padding: 0px;
+	border: 0px;
+	background: transparent;
+}
+
+.cc_playlist_item {
+	width: 380px;
+	overflow: hidden;
+	padding-top: 2px;
+	padding-bottom: 1px;
+	border-bottom: 1px dotted #BBF;
+}
+
+.cc_playlist_item span a {
+   font-weight: bold;
+}
+
+
+/* filter form */
+#dyn_filter_editor_parent {
+	width: 600px;
+	margin: 0px auto;
+}
+#dyn_filter_editor {
+	margin: 14px 0px 0px 25px;
+	padding: 9px;
+	width: 595px;
+}
+
+#dyn_filter_editor, 
+#dyn_filter_editor input,
+#dyn_filter_editor select,
+#dyn_filter_editor option {
+	font-size: 11px;
+}
+
+#dyn_filter_editor .filterform span.th {
+	width: 100px;
+	font-weight: bold;
+	text-align: right;
+	display: block;
+	float: left;
+	margin-right: 12px;
+}
+
+#dyn_filter_editor .filterform div {
+	margin-bottom: 14px;
+}
+
+
+#dyn_filter_editor .close_button {
+	display: none;
+}
+
+#dyn_filter_editor .cc_autocomp_edit {
+	margin: 4px 0px 5px 0px;
+}
+
+#dyn_filter_editor .cc_autocomp_list {
+    background-color: #FFF; 
+	z-index: 201;
+}
+
+#dyn_filter_editor #_ap_stat_tags {
+	font-weight: bold;
+}
+
+#dyn_filter_editor p.cc_autocomp_line {
+	margin: 1px;
+}
+
+#dyn_filter_editor p.cc_autocomp_selected {
+    /* background-color: #CCC; */
+}
+
+#dyn_filter_editor p.cc_autocomp_picked {
+	font-style: italic;
+	background-color: white;
+/*	color: blue; */
+}
+
+#dyn_filter_editor .cc_autocomp_list {
+	margin-top: 3px;
+	cursor: pointer;
+	width: 220px;
+}
+
+#dyn_filter_editor .cc_autocomp_clear {
+}
+
+.cc_autocomp_stat {
+	display: block;
+	margin-bottom: 4px;
+}
+
+#dyn_filter_editor .cc_autocomp_border {
+    border-width: 1px;
+	border-style: solid;
+	/* #666; */
+}
+
+#dyn_filter_editor .filterbuttontray {
+	margin-left: 40%;
+	width: 180px;
+}
+
+#dyn_filter_editor .filterbuttontray a span {
+	font-weight: bold;
+}
+
+.pl_action_button {
+	cursor: pointer;
+	width: 19px;
+	height: 19px;
+}
+
+.pl_action_button a {
+	display: block;
+	width: 100%;
+	height: 19px;
+	background: transparent url('../images/tool.png') no-repeat top left;
+}
+
+.pl_action_button a:hover{
+	text-decoration: none;
+	background-image: url('../images/tool-fg.png');
+}
+
+.pl_action_button:hover{
+}
+
+.pl_found_in {
+	display:block;
+	width: 24px;
+	height: 19px;
+	padding-left: 20px;
+	background: transparent url('../images/folder.png') no-repeat top left;
+	color: black;
+}
+	
+
+.pl_found_in:hover {
+	text-decoration: none;
+	background-image: url('../images/folder-hi.png');
+	color: #D88F8F;
+}

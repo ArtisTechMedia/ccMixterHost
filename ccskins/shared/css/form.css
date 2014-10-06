@@ -1,0 +1,297 @@
+/*
+* Creative Commons has made the contents of this file
+* available under a CC-GNU-GPL license:
+*
+* http://creativecommons.org/licenses/GPL/2.0/
+*
+* A copy of the full license can be found as part of this
+* distribution in the file LICENSE.TXT.
+* 
+* You may use the ccHost software in accordance with the
+* terms of that license. You agree that you are solely 
+* responsible for your use of the ccHost software and you
+* represent and warrant to Creative Commons that your use
+* of the ccHost software will comply with the CC-GNU-GPL.
+*
+* $Id: form.css 10209 2008-06-20 22:54:29Z fourstones $
+*
+*/
+
+/* 
+	------------------------------------
+	table.form_table .flat_form
+			tr.form_error_row 
+				td.form_error
+			tr.form_row       
+				td.form_label  div
+				td.form_label  span
+			    td.form_element
+	------------------------------------
+	table.form_table .stacked_form
+			tr.form_error_row 
+				td.form_error
+			tr.form_row       
+				div.form_label
+				span
+			    div.form_element
+	------------------------------------
+	fieldset.form_fieldset
+			legend.form_label
+			div.form_error_row 
+				div.form_error
+			fieldset span
+			div.form_element
+	------------------------------------
+	table.grid_form_table
+			tr.grid_form_header_row 
+				th.grid_form_header
+			tr.form_error_row
+				td.form_error
+			tr.form_row
+				td.form_element
+	------------------------------------
+	table.cc_2by_grid_form_table
+		tr
+			td.cc_2by_grid_names
+				div
+					a.menu_item_title
+			td.cc_2by_grid_fields
+				div (hidden)
+					div.f
+						span.col
+					div.gform_breaker
+		tr.form_add_row
+			td
+				a
+	------------------------------------
+
+	form_error_input 
+*/
+
+/* Field sets */
+
+fieldset.form_fieldset {
+	width: 50%;
+	padding: 1.0em;
+	margin-bottom: 1.5em; 
+	margin-left: auto;
+	margin-right: auto;
+}
+
+fieldset.form_fieldset legend.form_label {
+	font-weight: bold;
+	padding: 0.3em;
+}
+
+fieldset.form_fieldset .form_input {
+	width: 90%;
+}
+
+fieldset.form_fieldset div.form_element {
+	margin-top: 0.2em;
+}
+
+/* Labels next to fields */
+
+table.flat_form, table.stacked_form {
+	width: 80%;
+	margin: 1.5em auto;
+}
+
+table.flat_form td {
+	vertical-align: top;
+	padding-bottom: 1.5em;
+}
+
+table.flat_form td.form_label {
+	width: 30%;
+	text-align: right;
+	padding-right: 1.0em;
+}
+
+table.flat_form .form_label div {
+	white-space: nowrap;
+	font-weight: bold;
+}
+
+table.flat_form .form_label span {
+	font-weight: normal;
+}
+
+table.flat_form .form_input {
+	width: 320px;
+}
+
+table.flat_form .form_input_short,
+table.flat_form .cc_form_input_short{
+	width: 100px;
+}
+
+/* ALL */
+
+td.form_error, div.form_error {
+	color: red;
+	font-weight: bold;
+}
+
+.form_error_input {
+	background-color: pink;
+	border: 1px solid red;
+}
+
+#cc_form_help_container {
+	width: 85%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.cc_form_about a {
+	font-weight: bold;
+}
+
+input.cc_form_submit {
+	margin-left: 40%;
+	margin-bottom: 2.0em;
+}
+
+.horizontal_form input.cc_form_submit {
+	margin: 0px;
+}
+
+/* ----------------- */
+
+
+/*  STACKED  */
+
+table.stacked_form .form_input {
+	width: 250px;
+}
+
+table.stacked_form .form_input_short {
+	width: 120px;
+}
+
+.stacked_form div.form_label {
+	font-weight: bold;
+	float: left;
+	padding-right: 2em;
+}
+
+.stacked_form div.form_element {
+	clear: both;
+	padding-top: 0.4em;
+	padding-bottom: 2em;
+}
+
+.form_label span {
+	font-style: italic;
+}
+
+
+/* submit forms page */
+
+.cc_submit_forms_outer {
+	margin: 0px auto;
+	width: 520px;
+}
+
+.cc_submit_forms {
+	margin-bottom: 10px;
+}
+
+.cc_submit_forms img {
+	float: left;
+	margin: 7px;
+}
+
+.cc_submit_form_help {
+	text-align: justify;
+}
+.cc_submit_form_url {
+	font-size: 1.4em;
+	clear: left;
+	margin: 9px;
+	font-weight: bold;
+	text-align: center;
+}
+
+.cc_quota_message {
+	font-style: italic;
+	font-weight: normal;
+}
+
+/************************** 
+	grid form stuff 
+***************************/
+
+.cc_2by_grid_form_table {
+	width: 550px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 20px;
+}
+
+.cc_2by_grid_form_table td {
+	vertical-align: top;
+}
+
+
+.cc_2by_grid_names {
+	text-align: right;
+	padding-bottom: 25px;
+}
+
+.cc_2by_grid_names div {
+	padding: 3px;
+	border-width: 2px;
+	border-style: solid;
+}
+
+.cc_2by_grid_names div.selected {
+	border-right-style: none;
+}
+
+.cc_2by_grid_names div a {
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+.cc_2by_grid_form_table cc_form_input {
+	width: 250px;
+}
+
+.cc_2by_grid_form_table cc_form_input {
+	width: 250px;
+}
+
+.cc_2by_grid_fields {
+	width: 400px;
+	padding: 13px;
+}
+
+.cc_2by_grid_fields .f {
+	margin-bottom: 4px;
+}
+
+.cc_2by_grid_fields .col {
+	display: block;
+	float: left;
+	text-align: right;
+	width: 60px;
+	padding-right: 12px;
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+table.grid_form_table .form_input_short,
+table.grid_form_table .cc_form_input_short{
+	width: 45px;
+}
+
+table.grid_form_table td{
+	padding-left: 2px;
+}
+
+.gform_breaker {
+	clear: left;
+}

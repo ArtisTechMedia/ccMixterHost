@@ -1,0 +1,55 @@
+/*
+[meta]
+	desc = _('Narrow browser')
+	type = query_browser_styles
+[/meta]
+*/
+@import url('playlist.css'); 
+@import url('info.css');
+@import url('qbrowser_wide.css');
+
+
+#browser_client {
+    width: 640px;
+    margin: 0px auto;
+}
+
+.cc_playlist_item {
+	width: 280px;
+	clear: left;
+}
+
+.cc_playlist_pagelink {
+    display: block;
+    float: left;
+    overflow: hidden;
+    margin-right: 8px;
+	width: 260px;
+}
+
+#browser_area {
+    float: left;
+    margin-left: 40px;
+}
+
+#filter_controls, #browser_filter {
+	width: 113px; 
+}
+
+#filter_controls {
+   padding-right:5px; 
+   float: left;
+}
+
+#filter_controls select {
+    width: 105px;
+}
+
+.cc_autocomp_list, .cc_autocomp_edit, .cc_autocomp_stat {
+    width: 110px;
+}
+
+.filterform {
+    width: 112px;
+}
+

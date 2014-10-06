@@ -1,0 +1,52 @@
+
+
+.pickspage td
+{
+    vertical-align: top;
+    padding-right: 12px;
+}
+.pickspage
+{
+	width: 80%;
+}
+.pickspage td p
+{
+  margin: 1px;
+}
+.pickspage td a
+{
+   white-space: nowrap; 
+}
+.pickspage td span, 
+.pickspage td i
+{
+  white-space: nowrap;
+  padding-left: 20px;
+}
+.pickspage td i
+{
+  color: green;
+}
+.pickspage td div
+{
+  margin: 7px;
+}
+.pickspage .cc_file_link
+{
+  font-weight: bold;
+}
+.pickspage h3 {
+  border-bottom: 1px dotted #77A;
+}
+
+.pickslinks a {
+	display: block;
+	float: left;
+	margin: 0px 13px 0px 0px;
+	height: 20px;
+}
+
+.pickslinks_break {
+	clear: left;
+	height: 20px;
+}

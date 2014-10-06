@@ -1,0 +1,75 @@
+/* colorize */
+#user_listing_page {
+	height: 1520px;
+}
+
+#user_index {
+	margin: 9px;
+	padding: 4px;
+	border-width: 1px;
+	border-style: solid;
+	padding-left: 20px;
+}
+
+#user_index a {
+    width: 14px;
+	text-align: center;
+	margin-right: 6px;
+	font-size: 12px;
+	font-weight: bold;
+	background-color: transparent;
+	display: block;
+	float: left;
+	padding: 1px;
+	font-family: Arial;
+}
+
+#user_index a:hover {
+	background-color: white;
+	color: black;
+	text-decoration: none;
+}
+
+#user_listing {
+}
+
+#user_record {
+	margin-bottom: 4px;
+}
+
+.avatar {
+	float: left;
+	height: 93px;
+	width: 93px;
+	margin-right: 12px;
+	padding: 4px;
+	text-align: right;
+}
+
+.avatar img {
+}
+
+.user_breaker {
+	clear: left;
+}
+
+.user_link {
+	padding-top: 18px;
+	font-size: 16px;
+	font-weight: bold;
+	display: block;
+	font-family: Arial;
+}
+
+.user_link span {
+	font-size: 11px;
+	font-weight: normal;
+}
+
+.contact_link {
+}
+
+.member_since {
+	font-size: 11px;
+	font-style: italic;
+}

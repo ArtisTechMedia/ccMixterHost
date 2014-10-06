@@ -1,0 +1,161 @@
+/*
+	Topic thread
+*/
+table.cc_topic_thread {
+	clear: left;
+}
+
+div.forum_cmds a {
+	float: left;
+	margin-right: 1.0em;
+}
+table.cc_topic_thread div.cc_topic_commands a {
+	float: left;
+	margin-right: 1.0em;
+}
+
+table.cc_topic_thread td {
+	vertical-align: top;
+}
+
+table.cc_topic_thread .user_role {
+	margin-top: 3px;
+	text-align: center;
+	text-transform: uppercase;
+	}
+
+table.cc_topic_thread td.cc_topic_head {
+	padding-top: 1.4em;
+	padding-right: 1.0em;
+}
+
+table.cc_topic_thread td.cc_topic_body {
+	padding-top: 1.4em;
+}
+
+table.cc_topic_thread td.cc_topic_body div.cc_topic_date {
+}
+
+table.cc_topic_thread td.cc_topic_body div.cc_topic_text {
+}
+
+table.cc_topic_thread td.cc_topic_body div.cc_topic_commands,
+table.cc_topic_thread td.cc_topic_body div.cc_topic_date,
+table.cc_topic_thread td.cc_topic_body div.cc_topic_text {
+	padding: 4px 0px 4px 15px;
+	margin: 0px;
+	width: 85%;
+}
+
+table.cc_topic_thread td.cc_topic_body div.cc_topic_commands,
+table.cc_topic_thread td.cc_topic_reply div.cc_topic_commands { 
+	height: 2.1em;
+	white-space: nowrap;
+}
+
+
+table.cc_topic_thread td.cc_topic_reply { 
+	padding: 6px;
+}
+
+table.cc_topic_thread td.cc_topic_reply div.cc_topic_reply_body { 
+	padding: 5px 5px 3px 21px;
+	background-image: url('../images/reply-arrow.gif');
+	background-position: 0px 10px;
+	background-repeat: no-repeat;
+	width: 85%;
+}
+
+table.cc_topic_thread td.cc_topic_reply div.cc_topic_reply_body div.cc_topic_reply_head { 
+	margin: 0px; 
+	padding: 4px;
+}
+
+table.cc_topic_thread td.cc_topic_reply div.cc_topic_reply_text { 
+	float:left;
+	padding: 8px;
+}
+
+table.cc_topic_thread td.cc_topic_reply div.cc_topic_commands { 
+	clear: left;
+}
+
+
+/*
+	Topic browse
+*/
+table.cc_topic_table {
+	margin: 0.2em;
+}
+
+table.cc_topic_user_table td.cc_topic_thumb,
+table.cc_topic_table td.cc_topic_see, 
+table.cc_topic_table td.cc_topic_thumb {
+	vertical-align: top;
+}
+
+table.cc_topic_user_table td.cc_topic_thumb {
+	padding-bottom: 12px;
+}
+
+table.cc_topic_table td.cc_topic_see {
+	text-align: right;
+	padding: 0px 1.0em 1.0em 0em;
+}
+
+table.cc_topic_user_table td.cc_topic_date,
+table.cc_topic_table td.cc_topic_date {
+	vertical-align: top;
+	text-align: right;
+	padding-right: 1.0em;
+	padding-bottom: 0.2em;
+}
+
+table.cc_topic_table td.cc_topic_thumb_head {
+	font-size: 1.2em;
+	vertical-align: top;
+}
+
+table.cc_topic_user_table td.cc_topic_thumb a,
+table.cc_topic_table td.cc_topic_thumb a {
+	font-style: italic;
+	font-weight: normal;
+}
+
+.leftby_link {
+	text-align: right;
+	margin: 0px 2em 2em 0px;
+	float: right;
+}
+a.topic_flag {
+	float: right;
+	margin-right: 12px;
+	padding: 1px;
+}
+a.topic_permalink {
+	float: right;
+	display: block;
+	margin-right: 1em;
+}
+
+.topic_deleted {
+	width: 60%;
+	margin: 1em 0px 0px 0px;
+	padding: 2px 0px 2px 4em;
+}
+.topic_deleted a.user_link {
+	font-weight: normal;
+}
+	
+.topic_reply_head {
+	width: 70%;
+	margin: 3em auto;
+}
+
+.topic_reply_head h3 {
+	padding: 0.5em;
+}
+
+.topic_reply_text {
+	padding: 1em;
+}

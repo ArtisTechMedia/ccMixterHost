@@ -1,0 +1,30 @@
+@import url('upload_list_wide.css');
+
+
+#pool_info {
+    text-align:center;
+}
+#remix_info {
+   /* width: 40%; */
+}
+.pool_item_info {
+    width: 59%;
+    float: left;
+}
+
+#pool_filter {
+    text-align: right;
+	margin-right: 20%;
+}
+#pool_target {
+    display: inline;
+}
+
+#pools_list {
+    width: 40%;
+    margin: 0px auto;
+}
+
+.pool_item_type {
+	text-transform: small-caps;
+}

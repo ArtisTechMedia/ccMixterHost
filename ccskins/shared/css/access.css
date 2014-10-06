@@ -1,0 +1,83 @@
+/*  */
+/*
+* Creative Commons has made the contents of this file
+* available under a CC-GNU-GPL license:
+*
+* http://creativecommons.org/licenses/GPL/2.0/
+*
+* A copy of the full license can be found as part of this
+* distribution in the file LICENSE.TXT.
+* 
+* You may use the ccHost software in accordance with the
+* terms of that license. You agree that you are solely 
+* responsible for your use of the ccHost software and you
+* represent and warrant to Creative Commons that your use
+* of the ccHost software will comply with the CC-GNU-GPL.
+*
+* $Id: access.css 10950 2008-10-08 11:21:54Z fourstones $
+*
+*/
+
+
+.acc_table {
+   width: 550px;
+}
+
+.acc_table td {
+	vertical-align: top;
+}
+
+.acc_head {
+	background-color: #DDF;
+	font-weight: bold;
+	padding: 1px;
+	height: 17px;
+	margin-bottom: 3px;
+	margin-left: 40px;
+		cursor: pointer;
+
+}
+
+.acc_table td select {
+	font-size: 11px;
+	font-family: Verdana;
+}
+
+.acc_url {
+	text-align: left;
+	font-weight: bold;
+	padding-left: 40px;
+	padding-top: 4px;
+	width: 330px;
+}
+
+.acc_desc {
+	border-bottom: 1px solid #776;
+	padding-bottom: 2px;
+	padding-left: 40px;
+}
+
+.acc_knob {
+	float: right;
+	background: url('../images/down-button-bg.gif');
+	width: 17px;
+	height: 17px;
+	cursor: pointer;
+}
+
+.acc_knob_selected {
+	display: block;
+	background: url('../images/down-button-fg.gif');
+	cursor: default;
+}
+
+.acc_div {
+	display: none;
+	width: 550px;
+	margin-left: 50px;
+}
+
+.acc_group_selected {
+	display: block;
+}
+

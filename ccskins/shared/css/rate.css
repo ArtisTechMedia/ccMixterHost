@@ -1,0 +1,34 @@
+.small_stars, .recommend_block {
+	float: right;
+	margin-right: 20px;
+	white-space: nowrap;
+}
+
+.rated {
+	background-image: url('../images/thumbs_up_tiny.gif');
+}
+
+.recommend_link, .rated {
+	padding-right: 20px;
+	height: 18px;
+	background-position: right top;
+	background-repeat: no-repeat;
+}
+.recommend_link, .recommend_block {
+	height: 18px;
+	margin-top: -4px;
+	padding-top: 4px;
+}
+
+.recommend_link {
+	color: #FA044F; /* well.... */
+	font-weight: bold;
+	cursor: pointer;
+	background-image: url('../images/rate_it.gif');
+	white-space: nowrap;
+}
+
+#action_recommends .small_stars,
+#action_recommends .recommend_block {
+	float: left;
+}

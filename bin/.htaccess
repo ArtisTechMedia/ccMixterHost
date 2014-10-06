@@ -1,0 +1,5 @@
+# should deny from the outside
+<Limit GET>
+order deny,allow
+deny from all
+</Limit>

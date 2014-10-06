@@ -1,0 +1,105 @@
+/*
+
+Creative Commons has made the contents of this file
+available under a CC-GNU-GPL license:
+
+ http://creativecommons.org/licenses/GPL/2.0/
+
+ A copy of the full license can be found as part of this
+ distribution in the file LICENSE.TXT
+
+You may use the ccHost software in accordance with the
+terms of that license. You agree that you are solely 
+responsible for your use of the ccHost software and you
+represent and warrant to Creative Commons that your use
+of the ccHost software will comply with the CC-GNU-GPL.
+
+$Id: search.css 12575 2009-05-08 00:33:14Z fourstones $
+
+*/
+
+#searchform td {
+	padding-right: 20px;
+}
+
+#searchform {
+	margin-bottom: 2em;
+}
+
+div.search_result_block {
+	margin-bottom: 2.4em;
+}
+
+div.search_result_title {
+	text-transform: lowercase;
+	letter-spacing: 0.15em;
+	display: block;
+	text-align: left;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #aaaaaa;
+	width: 55%;
+	margin-bottom: 0.5em;
+	padding-left: 1em;
+	font-size: 1.6em;
+	color: #666;
+}
+
+div.search_results_link a {
+  font-size: 1.1em;
+  text-decoration: underline;
+}
+
+
+div.search_result_count {
+	margin: 0.3em 0px 0.4em 2.0em;
+}
+
+div.search_result_count span {
+	font-weight: bold;
+}
+
+div.search_results_link {
+	margin-top: 0.6em;
+	margin-left: 2.0em;
+}
+
+div.search_results, div.search_result_count   {
+	font-weight: normal;
+	color: #888;
+	font-style: italic;
+	margin-left: 2.5em;
+}
+
+div.search_results {
+	margin-left: 2.5em;
+}
+
+div.search_results span, div.search_result_count span  {
+	font-weight: bold;
+	color: green;
+	font-style:normal;
+}
+
+div.search_more_links{
+	margin: 1.0em;
+	font-size: 1.2em;
+	padding-left: 3.0em;
+}
+
+div.search_more_links a {
+	font-weight: normal;
+	font-style: italic;
+}
+
+div.search_miss {
+	margin: 0px 2em 2em 2em;
+}
+
+div.search_miss ul li{
+	margin: 0.5em;
+}
+
+div.search_result_block table#cc_prev_next_links {
+	display: none; /* this table is taking up space otherwise */
+}

@@ -1,0 +1,140 @@
+@import url('rate.css');
+@import url('trackback.css');
+@import url('upload_menu.css');
+
+#main_content h1 {
+	margin-top: 1.1em;
+}
+
+#download_box ul {
+    margin: 0px;
+    padding: 0px;
+    list-style: none;
+}
+#download_box ul li {
+    margin: 0px;
+    padding: 0px;
+}
+
+#date_box {
+    font-weight: bold;
+    color: #888888;
+}
+
+#modified_date {
+    margin-left: 50px;
+}
+
+#license_info p {
+    position: relative;
+    margin: 0px;
+}
+
+#license_info_t {
+    text-align: center;
+    margin: 0px;
+}
+
+#license_info p img {
+ }
+
+#remix_info img, #pick_box img {
+    float: left;
+    margin: 4px;
+}
+
+#remix_info h2, #pick_box h2 {
+    padding-left: 30px;
+}
+
+#remix_info {
+    margin-top: 22px;
+}
+
+#remix_info p {
+    margin: 0px;
+    clear: left;
+}
+
+
+#pick_box p {
+    margin: 0px;
+}
+
+
+.pick_reviewer {
+    margin-top: 12px;
+    text-align: right;
+    font-style: italic;
+}
+
+
+.remix_link {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+#credit_info {
+    font-size: 11px;
+    margin-bottom: 10px;
+}
+
+#credit_info th {
+    text-align: right;        
+	text-transform: lowercase;
+}
+
+#credit_info td, #credit_info th {
+    vertical-align: top;
+    padding: 2px;
+}
+
+div.taglinks {
+    padding: 9px;
+}
+
+.zipdir_title {
+	font-style: italic;
+}
+
+.zipdir_title span {
+	font-style: normal;
+	font-weight: bold;
+}
+
+
+.cc_zipdir {
+	list-style: none;
+	padding: 0px;
+}
+
+.cc_zipdir li {
+	margin: 0px;
+	font-size: 0.8em;
+}
+
+.cc_name_ban {
+   text-decoration: line-through;
+   color: red;
+   font-weight: normal;
+}
+
+.cc_name_hidden {
+   text-decoration: line-through;
+   color: #999;
+   font-weight: normal;
+}
+
+span.playerlabel {
+	display: block;
+	float: left;
+}
+a.upload_flag {
+	float: right;
+	margin-right: 20px;
+	}
+
+#histogram_link {
+    text-align: center;
+    margin: 5px;
+}

@@ -1,0 +1,36 @@
+div#after_submit {
+	margin: 20px auto;
+	width: 70%;
+	padding: 10px;
+	text-align: center;
+	border: 1px solid;
+}
+div#after_submit h2 {
+	margin: 2px;
+}
+div#after_submit p {
+	font-size: 1.1em;
+	margin-bottom: 2.3em;
+}
+div#after_submit a#add_block {
+	display: block;
+	margin: 0.5em;
+	font-size: 1.3em;
+	padding: 6px;
+	border-top:      1px solid #888;
+	border-left:     1px solid #888;
+	border-bottom:   1px solid #ddd;
+	border-right:     1px solid #ddd;
+	background: url('../images/bg_fade.gif') repeat-x top left;
+	color: #333;
+}
+
+div#after_submit a#add_block:hover {
+	border-bottom:      1px solid #888;
+	border-right:     1px solid #888;
+	border-top:   1px solid #ddd;
+	border-left:     1px solid #ddd;
+	background: #EEE;
+	color: black;
+	text-decoration: none;
+}

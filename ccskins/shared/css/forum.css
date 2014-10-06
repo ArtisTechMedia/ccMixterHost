@@ -1,0 +1,72 @@
+table.forum_listing {
+	width: 80%;
+	margin: 0px auto;
+}
+
+table.forum_listing td {
+	vertical-align: top;
+	padding-left: 1.3em;
+}
+
+
+div.forum_sticky_thread {
+	float: left;
+	width: 16px;
+	height: 16px;
+	background: url('../images/sticky.gif') top left no-repeat;
+}
+
+div.forum_index {
+	width: 100%;
+}
+
+div.forum_group {
+	width: 70%;
+	margin-left: 23%;
+}
+
+table.forum_listing th  {
+	font-weight: normal;
+	text-align: left;
+	padding-left: 1.3em;
+}
+
+div.forum_group_name, table.forum_listing th  {
+	text-transform: lowercase;
+	letter-spacing: 0.3em;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #aaaaaa;
+}
+
+div.forum_group_name {
+	display: block;
+	text-align: left;
+	width: 55%;
+}
+
+div.forum_group_name, div.forum {
+	padding-left: 1em;
+}
+
+div.forum {
+	margin: 0.5em;
+	height: 5.5em;
+}
+div.forum_name {
+	font-size: 1.2em;
+}
+div.forum_description {
+	font-size: 0.8em;
+}
+
+div.forum_stats {
+	position: absolute;
+	top: 3px;
+	left: 46%;
+	width: 320px;
+}
+
+div.forum_cmds a {
+	float: left;
+}

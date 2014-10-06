@@ -1,0 +1,90 @@
+/* colorize */
+/* big div sections */
+@import url('rate.css');
+@import url('trackback.css');
+@import url('upload_menu.css');
+
+.upload {
+    margin: 15px; /* 0px 4px 0px; */
+    padding: 4px;
+    border-bottom: 1px dashed #8E8;
+}
+.upload_name {
+	font-size: 130%;
+}
+.upload_avatar {
+    width: 95px;
+    height: 95px;
+    float: left;
+    margin-right: 8px;
+}
+.upload_info {
+    width: 340px;
+    float: left;
+}
+#remix_info {
+    width: 250px;
+    float: left;
+	margin-left: 12px;
+}
+.list_menu {
+    float: left;
+    width: 75px;
+	border: 1px dotted;
+	padding: 4px 0px 0px 4px;
+	margin-right: 4px;
+}
+
+/* other stuff */
+
+.lic_link {
+    float: right;
+    margin-right: 12px;
+}
+.upload_date {
+    color: #888;
+}
+.list_menu a {
+    display: block;
+	margin-bottom: 4px;
+}
+.remix_link {
+    font-weight: bold;
+}
+.remix_more_link {
+    font-style: italic;
+}
+#remix_info h2 {
+ 	text-transform: lowercase;
+	letter-spacing: 0.3em;
+	display: block;
+	text-align: left;
+	border-bottom: 1px solid #AAA;
+	margin-top: 0px;
+	margin-bottom: 0.5em;
+	font-size: 11px;
+	font-weight: normal;
+}
+.playerdiv {
+    white-space: nowrap;
+}
+.playerlabel {
+    display: block;
+    float: left;
+}
+
+.taglinks {
+   padding: 5px;
+}
+
+div#user_tags_filter {
+	margin-left: 3%;
+}
+div#user_tag_target {
+	display: inline;
+}
+a.upload_flag {
+	float: right;
+	margin-right: 12px;
+}
+

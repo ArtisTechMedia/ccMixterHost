@@ -1,0 +1,248 @@
+
+.cc_collab { /* colorize */
+}
+
+legend {
+	/* border: 1px solid black; */
+	padding: 3px 3px 3px 11px;
+	font-weight: bold;
+	font-variant: small-caps;
+	letter-spacing: 1em;
+/*
+	background: #88D;
+	color: white;
+*/
+}
+
+fieldset {
+	margin-bottom: 14px;
+}
+
+.cc_collab_by {
+	margin: 8px;
+}
+
+.cc_collab_desc {
+	border-width: 1px;
+	border-style: solid;
+	padding: 4px;
+}
+
+.cc_collab_header div {
+	float: left;
+	margin-right: 20px;
+}
+
+.user_line, .file_line {
+	margin: 4px;
+	padding: 3px;
+	clear: left;
+}
+
+
+a.fname {
+	font-weight: bold;
+}
+
+.user_line {
+	height: 14px;
+}
+
+.file_line {
+	/* background-color: #DDE; */
+	border-width: 1px;
+	border-style: solid;
+	/* #ACA; */
+	margin-bottom: 11px;
+}
+
+.remix_line {
+	/* background-color: white; */
+}
+
+
+.file_dl_table {
+	margin: 5px;
+	clear: left;
+}
+
+.file_dl_table .nic {
+	font-weight: bold;
+	padding-right: 14px;
+}
+
+.file_dl_table .down_button {
+    display: block;
+    width: 17px;
+    height: 17px;
+	background: url('../images/down-button-fg.gif');
+}
+
+.file_dl_table .down_button:hover {
+	background: url('../images/down-button-bg.gif');
+	text-decoration: none; 
+}
+
+.user_line {
+	white-space: nowrap;
+}
+
+.user_line .user {
+	width: 150px;
+	overflow: hidden;
+}
+
+.user_line .role {
+	width: 150px;
+}
+
+.user_line .credit {
+	width: 150px;
+	overflow: hidden;
+}
+
+.file_list .tags, .user_line .role {
+	font-size: 10px;
+}
+
+.file_list .file_info {
+	width: 30%;
+	overflow: hidden;
+}
+
+.user_line div, .file_line div {
+	float: left;
+	padding: 1px 10px 1px 5px;
+}
+
+.user_break {
+	clear: left;
+}
+
+#invite_container {
+	margin-top: 5px;
+}
+
+#invite_container .cc_autocomp_edit {
+	margin: 4px 0px 5px 0px;
+}
+
+#invite_container .cc_autocomp_list {
+    background-color: #FFF;
+}
+
+#invite_container #_ap_stat_tags {
+	font-weight: bold;
+}
+
+#invite_container p.cc_autocomp_line {
+	margin: 1px;
+}
+
+#invite_container p.cc_autocomp_selected {
+    background-color: #CCC;
+}
+
+#invite_container p.cc_autocomp_picked {
+	font-style: italic;
+	color: blue;
+}
+
+#invite_container .cc_autocomp_list {
+	margin-top: 3px;
+	cursor: pointer;
+	width: 220px;
+}
+
+#invite_container .cc_autocomp_clear {
+	display: block;
+	text-align: right;
+	width: 110px;
+	float: right;
+}
+
+.cc_autocomp_stat {
+	display: block;
+	margin-bottom: 4px;
+}
+
+#invite_container .cc_autocomp_border {
+    border: 1px solid #666;
+}
+
+#upform {
+	margin-left: 5%;
+}
+
+#upform, #upform select, #upform option, #upform input, #upform button {
+	font-size: 11px;
+}
+
+#credit_editor, #tags_editor, #contact_editor {
+	border: 1px solid #666;
+	background-color:white;
+	padding: 3px;
+	margin: 10px;
+	width: 60%;
+}
+
+#contact_editor {
+	width: 60%;
+}
+
+#contact_editor textarea {
+	margin-right: 1em;
+}
+
+#collabs_table td {
+	padding: 3px 14px 3px 10px;
+}
+
+#collabs_table th {
+	background-color: #666;
+	padding: 2px;
+	color: white;
+}
+
+.collab_name {
+	font-weight: bold;
+	font-size: 12px;
+}
+
+a.collab_upload {
+	font-weight: bold;
+}
+
+#collab_topic_add {
+	margin-top: 1em;
+	float: left;
+}
+
+/* show_collabs */
+  .collab_entry {
+    margin: 4px;
+    padding: 6px;
+  }
+
+  .collab_name {
+    font-weight: bold;
+    font-size: 13px;
+    margin: 0px 0px 4px 0px;
+  }
+  .collab_date {
+    color: #888;
+    font-style: italic;
+    margin: 4px;
+    display: block;
+    float: right;
+    width: 90px;
+    text-align: right;
+  }
+
+div.ccud {
+	float: right;
+	border-top: 1px solid;
+	border-left: 1px solid;
+	border-right: 2px solid;
+	border-bottom: 2px solid;
+}

@@ -1,0 +1,92 @@
+/*
+* Creative Commons has made the contents of this file
+* available under a CC-GNU-GPL license:
+*
+* http://creativecommons.org/licenses/GPL/2.0/
+*
+* A copy of the full license can be found as part of this
+* distribution in the file LICENSE.TXT.
+* 
+* You may use the ccHost software in accordance with the
+* terms of that license. You agree that you are solely 
+* responsible for your use of the ccHost software and you
+* represent and warrant to Creative Commons that your use
+* of the ccHost software will comply with the CC-GNU-GPL.
+*
+* $Id: cc-format.css 13251 2009-08-09 17:24:09Z fourstones $
+*
+*/
+
+
+/*--------------------------------------------------------
+	Styles for the formatted textedit editing in forms
+--------------------------------------------------------*/
+.cc_close_preview {
+ float:right;
+ font-size:7px;
+}
+
+.cc_format_preview {
+	padding: 5px;
+}
+
+.format_preview_outer {
+	border: 1px solid #999;
+}
+
+.format_preview_outer h3 {
+	margin: 0px;
+	padding-left: 3px;
+	border-bottom: 1px solid #999;
+	background-color: #DDD;
+	height: 18px;
+
+}
+
+a.cc_format_link {
+	color: rgb(0, 80, 128);
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+.cc_close_preview,
+div.cc_ed_buttons input {
+     background-color: #FFD;
+     border: 1px solid #666;
+     cursor: pointer;
+     padding: 1px;
+
+  }
+span.big { font-size: 20px }
+span.small { font-size: 9px }
+span.red { color: red; }
+span.green { color: green; }
+span.blue { color: blue; }
+span.u { text-decoration: underline; }
+span.b { font-weight: bold; }
+span.i { font-style: italic; }
+span.quote { 
+	display: block;
+	margin-left: 24px;
+	font-style: italic;
+	padding: 3px;
+}
+span.quote span {
+    display: block;
+	margin-bottom: 2px;
+	font-weight: bold;
+}
+span.right {
+	display: block;
+	float: right;
+	margin: 10px;
+}
+span.left {
+	display: block;
+	float: left;
+	margin: 10px;
+}
+
+.format_indent {
+	clear: both;
+}

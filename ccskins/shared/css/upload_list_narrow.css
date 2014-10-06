@@ -1,0 +1,52 @@
+@import url('rate.css');
+@import url('trackback.css');
+@import url('upload_menu.css');
+
+.upload_name {
+	font-size: 120%;
+	font-weight: bold;
+}
+
+#cc_narrow_list {
+	margin: 0px 2%;
+	}
+#cc_narrow_list td {
+	padding: 2px;
+	vertical-align: top;
+}
+
+#cc_narrow_list th {
+	padding: 2px;
+	text-align: right;
+	font-variant: small-caps;
+}
+
+#cc_narrow_list td .upload_name {
+	display: block;
+	margin-bottom: 0.5em;
+	}
+
+#cc_narrow_list td.rec_end {
+	height: 20px;
+	border-top: 1px solid;
+}
+
+.small_stars {
+	float: left;
+	margin-right: 15%;
+}
+
+#remix_info {
+	float: left;
+	margin-left: 2em;
+}
+
+#remix_info h2 {
+	font-size: .8em;
+	margin: 1px;
+}
+
+a.upload_flag {
+	float: right;
+	margin-right: 12px;
+}

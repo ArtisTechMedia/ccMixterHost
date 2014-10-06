@@ -1,0 +1,153 @@
+/*
+* Creative Commons has made the contents of this file
+* available under a CC-GNU-GPL license:
+*
+* http://creativecommons.org/licenses/GPL/2.0/
+*
+* A copy of the full license can be found as part of this
+* distribution in the file LICENSE.TXT.
+* 
+* You may use the ccHost software in accordance with the
+* terms of that license. You agree that you are solely 
+* responsible for your use of the ccHost software and you
+* represent and warrant to Creative Commons that your use
+* of the ccHost software will comply with the CC-GNU-GPL.
+*
+* $Id: info.css 13103 2009-07-26 23:07:55Z fourstones $
+*
+*/
+/*************************************
+* see formats/info.php               *
+**************************************/
+
+a.info_button {
+	background: url('../images/i-bg.png') no-repeat;
+	width: 18px;
+	height: 18px;
+	display:block;
+	cursor: pointer;
+}
+
+a.info_button:hover {
+	text-decoration: none;
+	background: url('../images/i-fg.png') no-repeat;
+}
+
+.info_popup {
+	border: 1px solid black;
+	background: white url("../images/bg_fade.gif") repeat-x;
+	padding: 12px;
+/*	width: 520px; */
+	z-index: 100;
+}
+
+
+.info_detail td.liclogo {
+   height: 40px;
+   }
+
+.info_detail td.liclogo img {
+	/* vertical-align: top; */
+	float: left;
+	margin: 5px;
+}
+
+
+.info_detail .info_list {
+	background-color: transparent;
+	width: auto;
+}
+
+.info_detail .info_list .taglinks {
+    margin-bottom: 3px;
+    margin-top: 5px;
+	width: 450px; 
+	white-space: normal;
+}
+
+.info_detail .info_list .taglinks a {
+	display: inline;
+	font-size: 10px;
+}
+
+.info_detail .dtitle, .info_detail .dtitle a {
+   font-size: 15px;
+}
+
+.info_detail .dtitle {
+	margin: 1px;
+}
+
+.info_detail .gd_description {
+	margin: 9px;
+	background-color: #EEC; /* colorize */
+	color: #333;
+	padding: 0px;
+	width: 500px;
+}
+
+.info_detail .title{
+	font-weight: bold;
+	font-size: 12px;
+}
+
+.info_detail .files_table {
+	width: 550px;
+}
+
+.info_detail .files_table td {
+	vertical-align: top;
+}
+
+.info_detail .files_table td .files_info .cx {
+	white-space: nowrap;
+}
+
+.info_detail .files_table td .files_info {
+	overflow: hidden;
+}
+
+.info_detail .upload_menu_outer {
+	margin: 0px 11px 0px 0px;
+	float: right;
+	padding: 0px;
+	width: 120px;
+	background: #B5BEA5;
+    border: 1px solid #616B6A;
+}
+
+.info_detail .upload_menu_title {
+	font-weight: bold;
+	color: white;
+    background: #616B6A;
+	padding: 4px;
+	text-align: center;
+	display: block;
+	font-size: 12px;
+	font-variant: small-caps;
+}
+
+.info_detail .upload_menu_outer div {
+	padding: 2px;
+}
+
+.info_detail .upload_menu_outer div:hover {
+	/* margin: 0px; */
+  background-color: #C4985C;
+}	
+
+.info_detail .upload_menu_outer div a {
+    padding: 3px;
+	color: white;
+	font-variant: small-caps;
+	white-space: nowrap;
+}
+
+#info_bpm {
+	float: right;
+	margin: 4px;
+}
+
+#info_bpm span {
+	font-weight: bold;
+}

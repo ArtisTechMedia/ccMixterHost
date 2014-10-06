@@ -1,0 +1,111 @@
+.cc_player_controls {
+	position: absolute;
+	padding: 4px;
+	border: 1px solid black;
+	background: url('../images/bg_fade_wide.gif') repeat-y top left;
+}
+
+.cc_player_button {
+    display: block;
+    width: 17px;
+    height: 17px;
+    float: left;
+}
+
+.cc_player_pos, .cc_player_volume {
+  margin-top: 2px;
+  height: 13px;
+  padding-top: 1px;
+  float: left;
+  cursor: pointer;
+}
+
+.cc_player_pos_bk {
+  background-color: transparent;
+  color: #CCC;
+  width: 101px;
+  padding-left: 14px;
+  letter-spacing: 0.35em;
+}
+
+.cc_player_pos {
+  width: 11px;
+  background-color: #CCC;
+}
+
+.cc_player_volume {
+  width: 50px;
+  background: url('../images/player/bar.gif') repeat-x top left;
+  margin: 3px 22px 0px 5px;
+}
+
+.cc_player_label {
+	color: #339933 ;
+}
+
+.cc_player_slider {
+  background: #339933 url('../images/player/marker.gif') no-repeat top right;
+  width:   1px;
+  height:  12px;
+}
+
+.cc_player_knob {
+  background: url('../images/player/knob.gif') no-repeat top right;
+  width:   50px;
+  height:  12px;
+}
+
+.cc_player_knob_hover {
+  background: url('../images/player/knob-sel.gif') no-repeat top right;
+}
+
+.cc_player_spacer {
+  width: 20px;
+}
+
+.cc_player_hear {
+  background: url('../images/player/hear-button-fg.gif');
+}
+.cc_player_hear:hover {
+  background: url('../images/player/hear-button-bg.gif');
+  text-decoration: none; 
+}
+
+.cc_player_prev {
+  text-decoration: none;
+  background: url('../images/player/dleftt-button-fg.gif');
+}
+.cc_player_prev:hover {
+  background: url('../images/player/dleftt-button-bg.gif');
+}
+
+.cc_player_next {
+  text-decoration: none;
+  background: url('../images/player/dright-button-fg.gif');
+}
+.cc_player_next:hover {
+  text-decoration: none;
+  background: url('../images/player/dright-button-bg.gif');
+}
+
+.cc_player_play {
+  background: url('../images/player/pause-button-fg.gif');
+}
+.cc_player_play:hover {
+  text-decoration: none;
+  background: url('../images/player/pause-button-bg.gif');
+}
+.cc_player_pause {
+  background: url('../images/player/right-button-fg.gif');
+}
+.cc_player_pause:hover {
+  text-decoration: none;
+  background: url('../images/player/right-button-bg.gif');
+}
+.cc_player_stop {
+  background: url('../images/player/stop-button-fg.gif');
+}
+.cc_player_stop:hover {
+  text-decoration: none;
+  background: url('../images/player/stop-button-bg.gif');
+}

@@ -1,0 +1,112 @@
+/*
+
+Creative Commons has made the contents of this file
+available under a CC-GNU-GPL license:
+
+ http://creativecommons.org/licenses/GPL/2.0/
+
+ A copy of the full license can be found as part of this
+ distribution in the file LICENSE.TXT
+
+You may use the ccHost software in accordance with the
+terms of that license. You agree that you are solely 
+responsible for your use of the ccHost software and you
+represent and warrant to Creative Commons that your use
+of the ccHost software will comply with the CC-GNU-GPL.
+
+$Id: radio.css 8960 2008-02-11 22:15:54Z fourstones $
+
+*/
+
+#radio_container{
+   margin: 0px auto;
+   width: 600px;
+}
+
+#channel_form td {
+  vertical-align: top;
+  padding-right: 7px;
+}
+
+#channel_content {
+  width: 500px;
+}
+
+#djback {
+   width: 600px;
+  height: 240px;
+}
+
+#channel_intro {
+   margin: 6px 0px 0px 50px;
+   width: 400px;
+}
+
+h2 {
+  text-align: center;
+  font-family: Verdana;
+}
+
+#channels {
+  margin: 20px 0px 0px 30px;
+  width: 440px;
+}
+
+#channels td {
+    vertical-align: top;
+    text-align: left;
+}
+
+.cbutton {
+   vertical-align: middle;
+   margin: 1px;
+   padding: 2px 0px 2px 4px;
+   border-top: 2px solid #CCE;
+   border-left: 2px solid #CCE;
+   border-bottom: 1px solid black;
+   border-right: 1px solid black;
+   height: 16px;
+   cursor: pointer;
+   font-family: Helvetica;
+}
+
+.cbutton_selected { /* colorize */
+ /* background-color: #EEF;
+  color: #006; */
+}
+
+#channel_form {
+  padding: 0px;
+  margin: 0px;
+}
+
+#channels {
+	margin-bottom: 8px;
+}
+
+#score, #sinceu, #limit, #num_scores {
+  font-size: 10px;
+}
+
+#countresults {
+  font-style: italic;
+  margin: 0px;
+  text-align: right;
+  float: right;
+}
+
+div.radio_opt {
+	margin: 3px 0px 10px 10%;
+}
+
+#gobuttons {
+	padding: 2px;
+	margin-bottom: 12px;
+}
+
+#gobuttons a {
+	height: 25px;
+	float: left;
+	padding-left: 23px;
+	margin-right: 40px;
+}

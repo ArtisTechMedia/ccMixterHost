@@ -1,0 +1,43 @@
+/*--------------------------------------------------------
+	Rounded Boxes
+--------------------------------------------------------*/
+
+/* rounded boxes */
+
+
+.cssbox, .cssbox_body, .cssbox_head, .cssbox_head h2 {
+	background-color: transparent;
+	background-repeat: no-repeat;
+	background-attachment: scroll;
+	background-position: right bottom;
+}
+
+.cssbox, .cssbox { 
+	padding-right: 15px; /* the gap on the right edge of the image (not content padding) */ 
+	margin: 0px auto; /* use to position the box */ 
+} 
+
+/* set the top-right image */ 
+.cssbox_head { 
+	background-position: top right; 
+	margin-right: -15px; /* pull the right image over on top of border */ 
+	padding-right: 40px; /* right-image-gap + right-inside padding */ 
+} 
+
+/* set the top-left image */ 
+.cssbox_head h2
+{
+	background-position: top left; 
+	margin: 0; /* reset main site styles*/ 
+	border: 0; /* ditto */ 
+	padding: 20px 0 10px 40px; /* padding-left = image gap + interior padding ... no padding-right */ 
+} 
+
+/* set the lower-left corner image */ 
+.cssbox_body
+{
+	background-position: bottom left; 
+	margin-right: 25px; /* interior-padding right */ 
+	padding: 2px 0 25px 40px; /* mirror .cssbox_head right/left */ 
+} 
+
