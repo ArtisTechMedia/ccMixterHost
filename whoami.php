@@ -17,7 +17,6 @@
 * $Id: index.php 13849 2009-12-27 22:47:13Z fourstones $
 *
 */
-libxml_disable_entity_loader(true);
 if( !empty($_GET['ccm']) && preg_match('/\.(gif|png|ico|jpg|mp3|jpeg|___)$/i',$_GET['ccm']) )
 {
     header("HTTP/1.0 404 Not Found");
@@ -141,34 +140,8 @@ if( !empty($CC_GLOBALS['extra-lib']) )
 */
 CCUser::InitCurrentUser();             
 
-/*
-* Don't generate the page if the browser already has
-* the latest version
-*/
-cc_check_if_modified();
+$username = CCUser::CurrentUserName();
 
 
-/*
-*  Let all the modules know that config is set
-*  and user has been logged in.
-*/
-CCEvents::Invoke(CC_EVENT_APP_INIT);
-
-/*
-*  Process incoming URL
-*/
-CCEvents::PerformAction();
-
-/*
-*  Show the resulting page
-*/
-require_once('cchost_lib/cc-page.php');
-CCPage::Show();           
-
-/*
-*  Shut down the session
-*/
-CCDebug::InstallErrorHandler(false); 
-CCEvents::Invoke(CC_EVENT_APP_DONE);    
-
+echo "{\"username\": \"$username\"}";
 ?>

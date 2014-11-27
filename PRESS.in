@@ -1,0 +1,95 @@
+Creative Commons Sponsored Software ccHost Releases Version 5.1
+
+San Francisco, USA
+
+Creative Commons, a nonprofit organization that provides flexible
+copyright licenses for authors and artists along with the Creative
+Commons Developer Community released the ccHost 5.1 today. ccHost is an
+Open Source web-based media sharing software. This
+release builds upon ccHost's novel support of collaboration, sharing,
+and storage of multi-media using the different Creative Commons licenses
+and metadata.
+
+These features most notably show up and are tested in Creative Commons'
+project, ccMixter (www.ccmixter.org), a popular on-line social network
+service that supports legal music sharing and remixing. ccHost is the
+Open Source Software engine powering ccmixter.org and which anyone may
+download, install, and use to freely build media sharing communities.
+
+This 5.1 represents over a year of stabalization of the major 5.0 upgrade
+from from early 2008. There are also many new features, including support
+for OpenID, CC0 (CC Zero) waivers, extensive license configuration and
+dozens of other imporvements and features. 
+
+The ccHost development community encourages new developers to
+contribute to the project. The future of ccHost is bright with upcoming
+development focusing on user and admin requests for features like further
+generalization of media support, better tools to support social networking
+features, and further language support.
+
+Join the project mailing list
+(https://lists.sourceforge.net/mailman/listinfo/cctools-cchost), and
+edit the project wiki page to help shape this project's future direction
+(http://wiki.creativecommons.org/ccHost).
+
+
+Project Website
+
+http://wiki.creativecommons.org/ccHost
+
+
+ccHost Download
+
+http://sourceforge.net/project/showfiles.php?
+group_id=80503&package_id=156675
+
+
+Feature Requests
+
+https://sourceforge.net/tracker/?group_id=80503&atid=559969
+
+
+Bug Reports
+
+https://sourceforge.net/tracker/?atid=559966&group_id=80503&func=browse
+
+
+About ccHost
+
+ccHost is a content management system, winner of the Linux Journal
+LinuxWorldExpo Product Excellence Award for Best Open Source Solution. 
+The goal of this project is to spread media content that is licensed
+under Creative Commons throughout the web in much the same way that
+weblogs spread CC licensed text. ccHost is web-based infrastructure that
+may be used to host and allow for commenting, remixing, and distribution
+globally. The more installations of ccHost and its variations, the more
+content there will be available for enjoyment and artistic re-use in a
+sane and legal setting. ccHost is what is used for the infamous Creative
+Commons ccMixter project, which supports legal media sharing and remixing.
+
+
+About Creative Commons
+
+Creative Commons is a nonprofit organization that promotes the creative
+re-use of intellectual and artistic works - whether owned or in the
+public domain. Creative Commons licenses provide a flexible range of
+protections and freedoms that build upon the "all rights reserved" concept
+of traditional copyright to offer a voluntary "some rights reserved"
+approach. Creative Commons is sustained by the generous support of various
+foundations including the John D. and Catherine T. MacArthur Foundation,
+the Omidyar Network Fund, the Hewlett Foundation, and the Rockefeller
+Foundation, as well as members of the public.
+
+For general information, visit http://creativecommons.org/.
+
+
+Contact
+
+Nathan Yergler
+nathan@creativecommons.org
+
+
+Press Kit
+
+http://creativecommons.org/presskit
+

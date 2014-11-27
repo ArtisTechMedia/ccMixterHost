@@ -1,4 +1,0 @@
-[127.0.0.1 - 2014-10-01 10:20 pm] Mail sent from admin -- to admin
-[127.0.0.1 - 2014-10-01 10:23 pm] Mail sent from admin -- to admin
-[::1 - 2014-10-01 10:25 pm] Mail sent from admin -- to admin
-[::1 - 2014-10-01 10:37 pm] Mail sent from admin -- to admin

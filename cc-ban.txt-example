@@ -1,0 +1,8 @@
+<?
+if( !defined('IN_CC_HOST') ) exit;
+$cc_banned_ips = array (
+    '(121\.54\.42\.234)',
+
+);
+if( @preg_match('/' . implode('|',$cc_banned_ips) . '/',$_SERVER['REMOTE_ADDR']) ) exit;
+?>
