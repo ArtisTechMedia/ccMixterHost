@@ -322,7 +322,8 @@ class CCUserAPI
             $upload_dir = $CC_GLOBALS['avatar-dir'];
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle('str_prof_edit_your_settings');
+        $page =& CCPage::GetPage();
+        $page->SetTitle('str_prof_edit_your_settings');
         CCUser::AddUserBreadCrumbs('str_prof_edit_your_settings');
         $id    = CCUser::IDFromName($username);
         $form  = new CCUserProfileForm($id, $upload_dir );
@@ -372,11 +373,12 @@ class CCUserAPI
         }
 
         if( !$ok )
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
     }
 
     function AddToFavs($user_to_add_or_remove)
     {
+        $page =& CCPage::GetPage();
         require_once('cchost_lib/cc-tags.php');
         $current_favs = CCUser::CurrentUserField('user_favorites');
         $favs = CCTag::TagSplit($current_favs);
@@ -384,13 +386,13 @@ class CCUserAPI
         $msg = '';
         if( in_array( $user_to_add_or_remove, $favs ) )
         {
-            CCPage::SetTitle('str_favorites_removed_from');
+            $page->SetTitle('str_favorites_removed_from');
             $favs = array_diff($favs,array($user_to_add_or_remove));
             $msg = sprintf(_("%s has been removed from your list of favorites."), $user_to_add_or_remove);
         }
         else
         {
-            CCPage::SetTitle('str_favorites_added_to');
+            $page->SetTitle('str_favorites_added_to');
             $favs[] = $user_to_add_or_remove;
             $msg = sprintf(_("%s has been added to your list of favorites."), $user_to_add_or_remove);
         }
@@ -405,7 +407,7 @@ class CCUserAPI
         $link1a = "<a href=\"$url\">";
         $link2 = '</a>';
         $msg .= ' ' . sprintf(_("Go back to %syour profile page%s or %s%s's%s"),$link1,$link2,$link1a,$user_to_add_or_remove,$link2);
-        CCPage::Prompt($msg);
+        $page->Prompt($msg);
     }
 
 

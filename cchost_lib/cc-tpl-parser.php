@@ -184,10 +184,115 @@ function cc_tpl_parse_url($prefix,$varname)
     return "$prefix \$T->URL($v); ?>";
 }
 
+function _cc_tpl_parse_table_callback( $M )
+{
+    $ident = $M[1];
+    $result  = "";
+    switch( $ident )
+    {
+        // special param handling
+        case 'call':
+        {
+            $result = cc_tpl_parse_call_macro($M[2] . ' ',$M[3]);
+            break;
+        }
+        
+        // one param
+        case 'switch':
+        {
+            $result = cc_tpl_parse_switch($M[2]);
+            break;
+        }
+        case 'inspect':
+        {
+            $result = cc_tpl_parse_inspect($M[2]);
+            break;
+        }
+        case 't':
+        {
+            $result = cc_tpl_parse_t($M[2]);
+            break;
+        }
+        
+        // two params
+        case 'query_sql':
+        {
+            $result = cc_tpl_parse_query_sql($M[2],$M[3]);
+            break;
+        }
+        case 'loop':
+        {
+            $result = cc_tpl_parse_loop($M[2],$M[3]);
+            break;
+        }
+        case 'if':
+        {
+            $result = cc_tpl_parse_if_null($M[2],$M[3]);
+            break;
+        }
+        case 'define':
+        case 'map':
+        {
+            $result = cc_tpl_parse_define($M[2],$M[3]);
+            break;
+        }
+        case 'first':
+        {
+            $result = cc_tpl_parse_first($M[2],$M[3]);
+            break;
+        }
+        case 'last':
+        {
+            $result = cc_tpl_parse_last($M[2],$M[3]);
+            break;
+        }
+        case 'url':
+        {
+            $result = cc_tpl_parse_url($M[2],$M[3]);
+            break;
+        }
+        case 'if_attr':
+        {
+            $result = cc_tpl_parse_if_attr($M[2],$M[3]);
+            break;
+        }
+        
+        // four params
+        
+        case 'chop':
+        {
+            $result = cc_tpl_parse_chop($M[2], $M[3], $M[4]);
+            break;
+        }
+        case 'date':
+        {
+            $result = cc_tpl_parse_date($M[2], $M[3], $M[4]);
+            break;
+        }
+        case 'if_not_class':
+        case 'if_class':
+        {
+            $result = cc_tpl_parse_if_class($M[2], $M[3], $M[4]);
+            break;
+        }
+    }
+    
+    return $result;
+}
+
+function _cc_tpl_parse_table_with_callbacks( $text, $ttable )
+{
+    foreach( $ttable as $regex => $callback )
+    {
+        $text = preg_replace_callback( $regex, $callback, $text );
+    }
+    return $text;
+}
+
 function cc_tpl_parse_text($text,$bfunc)
 {
-    static $ttable;
-
+    static $ttable1, $ttable2_cb, $ttable3, $ttable4_cb, $ttable5;
+    
     $w   = '(?:\s+)?';      // optional whitespace
     $op  = '\(' . $w;       // open paren
     $cp  = $w . '\)';       // close paren
@@ -196,67 +301,73 @@ function cc_tpl_parse_text($text,$bfunc)
     $a   = '([^\)]+)';      // final arg
     $qa  = "'([^']+)'";     // quoted arg
     $aoq = "'?([^\)']+)'?"; // arg, optional quotes
-
-    if( !isset($ttable) )
+    
+    if( !isset($ttable1) )
     {
-       $ttable = array(
+       $ttable1 = array(
         
-        '#\[(meta|dataview)\].*\[/\1\]#Us' => '',         // trim out metas
-        '/((?:\s|^)+%%[^%]+%%)/' => '',         // trim out comments
+            '#\[(meta|dataview)\].*\[/\1\]#Us' => '',         // trim out metas
+            '/((?:\s|^)+%%[^%]+%%)/' => '',         // trim out comments
+            '/^\s+/'  => '',                         // trim out all spaces
+            '/\s+$/'  => '',
+            '/%\s+%/' => '%%',
+        );
+        
+        $ttable2_cb = array( 
+            "/%(!?)(?:var)?{$op}{$a}{$cp}%/" => function($M) { return cc_tpl_parse_echo($M[1] . ' ',$M[2], ' ?>'); },
+        );
 
-        '/^\s+/'  => '',                         // trim out all spaces
-        '/\s+$/'  => '',
-        '/%\s+%/' => '%%',
-
-        "/%(!?)(?:var)?{$op}{$a}{$cp}%/e"  =>   "cc_tpl_parse_echo('$1 ','$2', ' ?>');",
-
-        '/%!/'           => '<?= ',
-        '/%([a-z\(])/'   => '<? $1',
-
-        "/<\? loop{$op}{$ac}{$a}{$cp}%/e"                 =>   "cc_tpl_parse_loop('$1','$2');",
-
-        "/(<\?=?) call(?:_macro)?{$op}{$a}{$cp}%/e"       =>   "cc_tpl_parse_call_macro('$1 ','$2');",
-        "/<\? if_(not_)?(?:empty|null){$op}{$a}{$cp}%/e"  =>   "cc_tpl_parse_if_null('$1','$2');"  ,
-        "/<\? (?:define|map){$op}{$ac}{$a}{$cp}%/e"       =>   "cc_tpl_parse_define('$1','$2');",
-        "/(<\?=?) chop{$op}{$ac}{$a}{$cp}%/e"             =>   "cc_tpl_parse_chop('$1', '$2','$3');",
-        "/(<\?=?) date{$op}{$ac}{$qa}{$cp}%/e"            =>   "cc_tpl_parse_date('$1', '$2','$3');",
-        "/<\? switch{$op}{$a}{$cp}%/e"                    =>   "cc_tpl_parse_switch('$1');",
-        "/<\? inspect{$op}{$a}{$cp}%/e"                   =>   "cc_tpl_parse_inspect('$1');",
-        "/<\? if_(not_)?first{$op}{$a}{$cp}%/e"           =>   "cc_tpl_parse_first('$1','$2');",  
-        "/<\? if_(not_)last{$op}{$a}{$cp}%/e"             =>   "cc_tpl_parse_last('$1','$2');",  
-        "/(<\?=?) url{$op}{$a}{$cp}%/e"                   =>   "cc_tpl_parse_url('$1','$2');",
-        "/<\?=? if_attr{$op}{$ac}{$a}{$cp}%/e"            =>   "cc_tpl_parse_if_attr('$1','$2');",
-        "/<\?=? if_(not_)?class{$op}{$ac}{$a}{$cp}%/e"    =>   "cc_tpl_parse_if_class('$1','$2','$3');",
-        "/<\? text{$op}{$a}{$cp}%/e"                      =>   "cc_tpl_parse_t('$1');", 
-        "/<\? query_sql{$op}{$ac}{$a}{$cp}%/e"            =>   "cc_tpl_parse_query_sql('$1','$2');", 
-
-        "/<\? else%/"                           =>   "<? } else { ?>",
-        "/<\? end_(?:macro|if|switch)%/"   =>   "<?\n } ?>",
-        "/<\? end_case%/"                       =>   "<?\n } break;\n; ?>",
-        "/<\? end_loop%/"                       =>   "<?\n } } ?>",
-
-        "/<\? if\(([^\)]+)\)%/"                           =>   "<? if( !empty(\$A['$1']) ) { ?>",
-        "/<\? if_not\(([^\)]+)\)%/"                       =>   "<? if( empty(\$A['$1']) ) { ?>",
-        "/<\? prepend{$op}{$ac}{$aoq}{$cp}%/"              =>   "<? array_unshift(\$A['$1'],'$2'); ?>",
-        "/<\? append{$op}{$ac}{$aoq}{$cp}%/"              =>   "<? \$A['$1'][] = '$2'; ?>",
-        "/<\? import_skin{$op}{$aoq}{$cp}%/"              =>   "<? \$T->ImportSkin('$1'); ?>",
-        "/<\? case{$op}{$a}{$cp}%/"                       =>   "<? case $1: { ?>",
-        "/<\? query{$op}{$aoq}{$cp}%/"                    =>   "<?= cc_query_fmt('f=html&noexit=1&nomime=1&' . '$1'); ?>",
-        "/<\? customize%/"                                =>   "<? \$T->AddCustomizations(); ?>",
-        "/<\? return%/"                                   =>   "<? return 'ok'; ?>",
-        "/<\? settings{$op}{$ac}{$a}{$cp}%/"              =>   "<? \$A['$2'] = CC_get_config('$1'); ?>",
-        "/<\? un(?:define|map){$op}{$a}{$cp}%/"           =>   "<? unset(\$A['$1']); ?>",
+        $ttable3 = array(        
+            '/%!/'           => '<?= ',
+            '/%([a-z\(])/'   => '<? $1',
+        );
+        
+        $ttable4_cb = array(
+            "/<\? loop{$op}{$ac}{$a}{$cp}%/"                 =>    function($M) { return cc_tpl_parse_loop($M[1],$M[2]); },
+            "/(<\?=?) call(?:_macro)?{$op}{$a}{$cp}%/"       =>    function($M) { return cc_tpl_parse_call_macro($M[1] . ' ',$M[2]); },
+            "/<\? if_(not_)?(?:empty|null){$op}{$a}{$cp}%/"  =>    function($M) { return cc_tpl_parse_if_null($M[1],$M[2]); },
+            "/<\? (?:define|map){$op}{$ac}{$a}{$cp}%/"       =>    function($M) { return cc_tpl_parse_define($M[1],$M[2]); },
+            "/(<\?=?) chop{$op}{$ac}{$a}{$cp}%/"             =>    function($M) { return cc_tpl_parse_chop($M[1], $M[2],$M[3]); },
+            "/(<\?=?) date{$op}{$ac}{$qa}{$cp}%/"            =>    function($M) { return cc_tpl_parse_date($M[1], $M[2],$M[3]); },
+            "/<\? switch{$op}{$a}{$cp}%/"                    =>    function($M) { return cc_tpl_parse_switch($M[1]); },
+            "/<\? inspect{$op}{$a}{$cp}%/"                   =>    function($M) { return cc_tpl_parse_inspect($M[1]); },
+            "/<\? if_(not_)?first{$op}{$a}{$cp}%/"           =>    function($M) { return cc_tpl_parse_first($M[1],$M[2]); },  
+            "/<\? if_(not_)last{$op}{$a}{$cp}%/"             =>    function($M) { return cc_tpl_parse_last($M[1],$M[2]); },  
+            "/(<\?=?) url{$op}{$a}{$cp}%/"                   =>    function($M) { return cc_tpl_parse_url($M[1],$M[2]); },
+            "/<\?=? if_attr{$op}{$ac}{$a}{$cp}%/"            =>    function($M) { return cc_tpl_parse_if_attr($M[1],$M[2]); },
+            "/<\?=? if_(not_)?class{$op}{$ac}{$a}{$cp}%/"    =>    function($M) { return cc_tpl_parse_if_class($M[1],$M[2],$M[3]); },
+            "/<\? text{$op}{$a}{$cp}%/"                      =>    function($M) { return cc_tpl_parse_t($M[1]); }, 
+            "/<\? query_sql{$op}{$ac}{$a}{$cp}%/"            =>    function($M) { return cc_tpl_parse_query_sql($M[1],$M[2]); }, 
+        );
+        
+        $ttable5 = array (
+            "/<\? else%/"                           =>   "<? } else { ?>",
+            "/<\? end_(?:macro|if|switch)%/"        =>   "<?\n } ?>",
+            "/<\? end_case%/"                       =>   "<?\n } break;\n; ?>",
+            "/<\? end_loop%/"                       =>   "<?\n } } ?>",
+            
+            "/<\? if\(([^\)]+)\)%/"                           =>   "<? if( !empty(\$A['$1']) ) { ?>",
+            "/<\? if_not\(([^\)]+)\)%/"                       =>   "<? if( empty(\$A['$1']) ) { ?>",
+            "/<\? prepend{$op}{$ac}{$aoq}{$cp}%/"              =>   "<? array_unshift(\$A['$1'],'$2'); ?>",
+            "/<\? append{$op}{$ac}{$aoq}{$cp}%/"              =>   "<? \$A['$1'][] = '$2'; ?>",
+            "/<\? import_skin{$op}{$aoq}{$cp}%/"              =>   "<? \$T->ImportSkin('$1'); ?>",
+            "/<\? case{$op}{$a}{$cp}%/"                       =>   "<? case $1: { ?>",
+            "/<\? query{$op}{$aoq}{$cp}%/"                    =>   "<?= cc_query_fmt('f=html&noexit=1&nomime=1&' . '$1'); ?>",
+            "/<\? customize%/"                                =>   "<? \$T->AddCustomizations(); ?>",
+            "/<\? return%/"                                   =>   "<? return 'ok'; ?>",
+            "/<\? settings{$op}{$ac}{$a}{$cp}%/"              =>   "<? \$A['$2'] = CC_get_config('$1'); ?>",
+            "/<\? un(?:define|map){$op}{$a}{$cp}%/"           =>   "<? unset(\$A['$1']); ?>",
         );
     }
-
-    $ttable["/<\? macro\(([^\)]+)\)%/"] = "<? \nfunction $bfunc$1(&\$T,&\$A) { ?>"; 
-
-    $text = preg_replace( array_keys($ttable), array_values($ttable), $text );
+    $ttable5["/<\? macro\(([^\)]+)\)%/"] = "<? \nfunction $bfunc$1(&\$T,&\$A) { ?>"; 
+    
+    $text = preg_replace( array_keys($ttable1), array_values($ttable1), $text );
+    $text = _cc_tpl_parse_table_with_callbacks( $text, $ttable2_cb );
+    $text = preg_replace( array_keys($ttable3), array_values($ttable3), $text );
+    $text = _cc_tpl_parse_table_with_callbacks( $text, $ttable4_cb );
+    $text = preg_replace( array_keys($ttable5), array_values($ttable5), $text );
 
     return preg_replace( array( '/\?>(\s+)?<\?=?/', '/<!-- -->/'), array( '', ''),  $text ) . '<? return "ok"; ?>';  
 }
-
-/*
-*/
 
 ?>

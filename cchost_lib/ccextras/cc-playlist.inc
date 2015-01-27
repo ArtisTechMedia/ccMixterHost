@@ -40,10 +40,12 @@ class CCPlaylists
         global $CC_GLOBALS;
 
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPageGetPage();
+        
         require_once('cchost_lib/cc-query.php');
         require_once('cchost_lib/zend/json-encoder.php');
 
-        CCPage::SetTitle('str_pl_create_dynamic_playlist');
+        $page->SetTitle('str_pl_create_dynamic_playlist');
         $args = array();
         $args['promo_tag'] = empty($CC_GLOBALS['playlist_promo_tag']) ? '' : $CC_GLOBALS['playlist_promo_tag'];
         $query = new CCQuery();
@@ -51,7 +53,7 @@ class CCPlaylists
         $args['edit_query'] = CCZend_Json_Encoder::encode($qargs);
         $args['submit_url'] = ccl('api','query');
         $args['submit_text'] = 'str_pl_create_playlist';
-        CCPage::PageArg( 'plargs', $args, 'playlist.xml/playlist_create_dyn');
+        $page->PageArg( 'plargs', $args, 'playlist.xml/playlist_create_dyn');
     }
 
     function EditQuery($playlist_id='',$commit='')
@@ -62,7 +64,8 @@ class CCPlaylists
         $cart =& CCPlaylist::GetTable();
         $row = $cart->QueryKeyRow($playlist_id);
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle(array('str_pl_edit_dynamic_playlist_s',$row['cart_name']));
+        $page =& CCPage::GetPage();
+        $page->SetTitle(array('str_pl_edit_dynamic_playlist_s',$row['cart_name']));
         if( empty($commit) )
         {
             parse_str($row['cart_dynamic'],$qargs);
@@ -71,8 +74,8 @@ class CCPlaylists
             $args['promo_tag'] = '';
             $args['submit_url'] = ccl('playlist','editquery',$playlist_id,'commit');
             $args['submit_text'] = 'str_pl_save_playlist_query';
-            CCPage::PageArg( 'playlist_create_dyn', 'playlist.xml/playlist_create_dyn' );
-            CCPage::PageArg( 'plargs', $args, 'playlist_create_dyn' );
+            $page->PageArg( 'playlist_create_dyn', 'playlist.xml/playlist_create_dyn' );
+            $page->PageArg( 'plargs', $args, 'playlist_create_dyn' );
         }
         else
         {
@@ -265,9 +268,10 @@ class CCPlaylists
         if( empty($cmd) )
         {
             require_once('cchost_lib/cc-page.php');
+            $page =& CCPage::GetPage();
             $this->_build_bread_crumb_trail($playlist_id,'str_pl_edit_playlist_order');
-            CCPage::SetTitle('str_pl_edit_playlist_order');
-            CCPage::PageArg('playlist_id',$playlist_id); // there should be a better way to do this
+            $page->SetTitle('str_pl_edit_playlist_order');
+            $page->PageArg('playlist_id',$playlist_id); // there should be a better way to do this
             $args = $query->ProcessAdminArgs('t=playlist_reorder&playlist='.$playlist_id);
             $query->Query($args);
         }
@@ -621,7 +625,8 @@ EOF;
         $url = ccl('people', CCUser::CurrentUserName(), 'playlists' );
         $link = "<a href=\"$url\">";
         $link2 = '</a>';
-        CCPage::Prompt(array('str_pl_return_to',$msg,$link,$link2));
+        $page =& CCPage::GetPage();
+        $page->Prompt(array('str_pl_return_to',$msg,$link,$link2));
     }
 
     function _test_pl($upload_id,$playlist_id,$test_upload,$test_playlist,$test_owner)

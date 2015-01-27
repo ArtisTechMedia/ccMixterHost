@@ -40,7 +40,7 @@ class v_5_openid2 extends CCUpdate
         $CC_GLOBALS['openid-type'] =    /* just to be safe, put it in the globals */
         $arg['openid-type'] = true; /* this we'll write to disk */
         $cfg->SaveConfig( 'config', $arg,'', true );
-        CCPage::Prompt('OpenID Flag is set');
+        $page =& CCPage::GetPage(); $page->Prompt('OpenID Flag is set');
     }
 }
 

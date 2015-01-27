@@ -383,18 +383,20 @@ class CCThrottle
 
     function Admin()
     {
+        $page =& CCPage::GetPage();
         $this->_build_bread_crumb_trail(false);
-        CCPage::SetTitle(_("Administer Upload Throttle"));
+        $page->SetTitle(_("Administer Upload Throttle"));
         $form = new CCAdminThrottleForm();
-        CCPage::AddForm( $form->GenerateForm() );
+        $page->AddForm( $form->GenerateForm() );
     }
 
     function Rules()
     {
+        $page =& CCPage::GetPage();
         $this->_build_bread_crumb_trail(true);
 
         $configs =& CCConfigs::GetTable();
-        CCPage::SetTitle(_("Upload Throttle Rules"));
+        $page->SetTitle(_("Upload Throttle Rules"));
 
         if( !empty($_POST['addrule']) )
         {
@@ -409,7 +411,7 @@ class CCThrottle
 
             $form = new CCAdminThrottleRulesForm($rules);
             $tmpl = $form->GenerateForm();
-            CCPage::AddForm($tmpl );
+            $page->AddForm($tmpl );
         }
         elseif( empty($_POST['adminthrottlerules']) )
         {
@@ -427,7 +429,7 @@ class CCThrottle
             }
 
             $form = new CCAdminThrottleRulesForm($throttle_rules);
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -510,7 +512,8 @@ class CCThrottle
         }
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
 }

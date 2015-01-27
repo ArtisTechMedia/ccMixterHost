@@ -71,6 +71,13 @@ function cc_temp_dir()
     return getcwd();
 }
 
+function cc_split( $a, $b )
+{
+    CCDebug::LogVar("split key", $a);
+    return explode( $a, $b );
+}
+
+
 /**
 */
 function cc_setcookie($name,$value,$expire,$path='',$domain='')
@@ -110,7 +117,7 @@ function cc_weight_sorter($a, $b)
 */
 class CCUtil
 {
-    function Strip(&$mixed) 
+    public static function Strip(&$mixed) 
     {
         if( is_array($mixed) )
         {
@@ -132,13 +139,13 @@ class CCUtil
      * @param string $var
      * @return string
      */
-    function HTMLEncode($text)
+    public static function HTMLEncode($text)
     {
         return htmlentities($text, CC_QUOTE_STYLE, CC_ENCODING) ;
     }
 
 
-    function StripText(&$text)
+    public static function StripText(&$text)
     {
         if( is_integer($text) )
             return($text);
@@ -148,7 +155,7 @@ class CCUtil
         return($text);
     }
 
-    function StripSlash(&$mixed)
+    public static function StripSlash(&$mixed)
     {
         if( get_magic_quotes_gpc() == 1 )
         {
@@ -166,14 +173,14 @@ class CCUtil
         return($mixed);
     }
 
-    function CleanNumbers($keys)
+    public static function CleanNumbers($keys)
     {
         if( is_array($keys) )
             $keys = join(':',$keys);
         return preg_split('/([^0-9]+)/',$keys,0,PREG_SPLIT_NO_EMPTY);
     }
 
-    function TextToHTML($text,$convert_nl=true)
+    public static function TextToHTML($text,$convert_nl=true)
     {
         if( empty($text) )
             return('');
@@ -191,7 +198,7 @@ class CCUtil
         return($text);
     }
 
-    function CheckTrailingSlash($dir,$slash_required)
+    public static function CheckTrailingSlash($dir,$slash_required)
     {
         $dir = str_replace('\\','/',$dir);
         if( preg_match('#^(.*)/$#',$dir,$m) )
@@ -205,7 +212,7 @@ class CCUtil
         return( $dir );
     }
 
-    function AccessError($file='',$lineo='')
+    public static function AccessError($file='',$lineo='')
     {
         $str = "Access attempt from: {$_SERVER['REMOTE_ADDR']}:{$_SERVER['REMOTE_PORT']}\n{$_SERVER['HTTP_USER_AGENT']}";
         CCDebug::Log($str);
@@ -216,7 +223,7 @@ class CCUtil
             exit;
     }
 
-    function SendBrowserTo($newurl='')
+    public static function SendBrowserTo($newurl='')
     {
         if( empty($newurl) )
         {
@@ -236,7 +243,7 @@ class CCUtil
         exit;
     }
 
-    function ReturnAjaxData($obj,$inHeader=true)
+    public static function ReturnAjaxData($obj,$inHeader=true)
     {
         require_once('cchost_lib/zend/json-encoder.php');
         $text = CCZend_Json_Encoder::encode($obj);
@@ -247,18 +254,18 @@ class CCUtil
         exit;
     }
 
-    function ReturnAjaxMessage($msg,$type = CC_AJAX_MESSAGE)
+    public static function ReturnAjaxMessage($msg,$type = CC_AJAX_MESSAGE)
     {
         $obj[$type] = $msg;
         CCUtil::ReturnAjaxData($obj);
     }
 
-    function IsHTTP()
+    public static function IsHTTP()
     {
         return( !empty($_SERVER['HTTP_HOST']) );
     }
 
-    function Send404($exit=true,$file='',$line='')
+    public static function Send404($exit=true,$file='',$line='')
     {
         header("HTTP/1.0 404 Not Found");
         if( $exit )
@@ -274,12 +281,12 @@ class CCUtil
         }
     }
 
-    function HashString($str)
+    public static function HashString($str)
     {
         return '' . sprintf('%08X',crc32(trim($str)));
     }
 
-    function MakeSubdirs($pathname,$mode='')
+    public static function MakeSubdirs($pathname,$mode='')
     {
         if( empty($mode) )
             $mode = cc_default_dir_perm();
@@ -309,7 +316,7 @@ class CCUtil
         return false;
     }
 
-    function BaseFile($path)
+    public static function BaseFile($path)
     {
         $base = basename($path);
         $ex = explode('.',$base);
@@ -318,7 +325,7 @@ class CCUtil
         return($base);
     }
 
-    function LegalFileName($name_to_cleans)
+    public static function LegalFileName($name_to_cleans)
     {
         if( strlen($name_to_cleans) > 255 )
         {
@@ -327,8 +334,11 @@ class CCUtil
                 $ext = $m[0];
             $name_to_cleans = substr( $name_to_cleans, 0, 254 - strlen($ext) );
         }
-        $goodchars = preg_quote('a-zA-Z0-9.()-');
-        return( preg_replace( "/[^$goodchars]+/", '_', $name_to_cleans ) );
+        $goodchars = 'a-zA-Z0-9\.\(\)\-';
+        $result = preg_replace( "/[^$goodchars]+/", '_', $name_to_cleans );
+//      $arr = array( "goodchars" => $goodchars, "org" => $name_to_cleans, "result" => $result );
+//      CCDebug::PrintVar($arr);
+        return $result;
     }
 
     /**
@@ -340,7 +350,7 @@ class CCUtil
     * @param $date_str A string with a potentially W3C DTF date.
     * @return A timestamp if parsed successfully or -1 if not.
     */
-    function ParseW3cdtfDate($date_str) 
+    public static function ParseW3cdtfDate($date_str) 
     {
         $regex = '/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(:(\d{2}))?(?:([-+])(\d{2}):?(\d{2})|(Z))?/';
         if( preg_match($regex, $date_str, $match)) 
@@ -373,7 +383,7 @@ class CCUtil
         return false;
     }
 
-    function GetTimeZone()
+    public static function GetTimeZone()
     {
         static $TZ;
         if( !isset($TZ) )
@@ -385,7 +395,7 @@ class CCUtil
         return $TZ;
     }
 
-    function GetGMZone()
+    public static function GetGMZone()
     {
         static $GM;
         if( !isset($GM) )
@@ -397,7 +407,7 @@ class CCUtil
         return $GM;
     }
 
-    function FormatDate($fmt,$date)
+    public static function FormatDate($fmt,$date)
     {
         
         $TZ = CCUtil::GetTimeZone();
@@ -419,7 +429,7 @@ class CCUtil
 
     // rippped from phpBB2
 
-    function EncodeIP($dotquad_ip)
+    public static function EncodeIP($dotquad_ip)
     {
         if( preg_match('/::[0-9]+$/',$dotquad_ip) )
         {
@@ -430,7 +440,7 @@ class CCUtil
         return sprintf('%02x%02x%02x%02x', $ip_sep[0], $ip_sep[1], $ip_sep[2], $ip_sep[3]);
     }
 
-    function DecodeIP($int_ip)
+    public static function DecodeIP($int_ip)
     {
         $hexipbang = explode('.', chunk_split($int_ip, 2, '.'));
         return hexdec($hexipbang[0]). '.' . hexdec($hexipbang[1]) . '.' . hexdec($hexipbang[2]) . '.' . hexdec($hexipbang[3]);
@@ -439,11 +449,11 @@ class CCUtil
     static function SplitPaths($paths, $must_haves='')
     {
         $str = preg_replace('/(.*);?$/U', '\1', $paths);
-        $dirs = split(';',$str);
+        $dirs = cc_split(';',$str);
         if( $must_haves )
         {
             if( !is_array($must_haves) )
-                $must_haves = split(';',$must_haves);
+                $must_haves = cc_split(';',$must_haves);
 
             foreach( $must_haves as $must_have )
             {
@@ -464,7 +474,7 @@ class CCUtil
         return $dirs;
     }
 
-    function SearchPath($target,$look_here_first,$then_here,$real_path=true,$recurs=CC_SEARCH_RECURSE_DEFAULT)
+    public static function SearchPath($target,$look_here_first,$then_here,$real_path=true,$recurs=CC_SEARCH_RECURSE_DEFAULT)
     {
         if( !is_array($target) )
             $target = array($target);
@@ -477,11 +487,11 @@ class CCUtil
             
         $dirs = $look_here_first;
         if( !is_array($dirs) )
-            $dirs = split(';',$dirs);
+            $dirs = cc_split(';',$dirs);
         if( !empty($then_here) )
         {
             if( !is_array($then_here) )
-                $then_here = split(';',$then_here);
+                $then_here = cc_split(';',$then_here);
             $dirs = array_merge($dirs,$then_here);
         }
         $clean_dirs = array();
@@ -508,7 +518,7 @@ class CCUtil
         return null;
     }
 
-    function _inner_search($target,$dir,$recurs)
+    static function _inner_search($target,$dir,$recurs)
     {
         $hit = glob($dir . $target);
         if( !empty($hit) || !$recurs )

@@ -378,7 +378,8 @@ class CCMailerAPI
                 $msg = _('Mail has not been properly configured on this system.') . ' ' . _('Contact your administrator through regular email.');
             }
 
-            CCPage::SystemError( $msg );
+            $page =& CCPage::GetPage();
+            $page->SystemError( $msg );
             return false;
         }
 
@@ -672,11 +673,12 @@ class CCMailerAPI
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
+        $page =& CCPage::GetPage();
         $title = _('Configure Mail');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
         $form = new CCMailAdminForm();
-        CCPage::AddForm( $form->GenerateForm() );
+        $page->AddForm( $form->GenerateForm() );
     }
 
     /**

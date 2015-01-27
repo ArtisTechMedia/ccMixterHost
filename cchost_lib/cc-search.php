@@ -55,11 +55,12 @@ class CCSearch
         CCEvents::Invoke( CC_EVENT_SEARCH_META, array(&$search_meta) );
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle('str_search');
+        $page =& CCPage::GetPage();
+        $page->SetTitle('str_search');
         $form = new CCSearchForm($search_meta,'normal');
-        CCPage::AddForm( $form->GenerateForm() );
+        $page->AddForm( $form->GenerateForm() );
         if( !empty($CC_GLOBALS['show_google_form']) )
-            CCPage::AddMacro('google_search');
+            $page->AddMacro('google_search');
 
     }
 
@@ -127,6 +128,8 @@ class CCSearch
         $search_meta = array();
         CCEvents::Invoke( CC_EVENT_SEARCH_META, array(&$search_meta) );
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
+        
         require_once('cchost_lib/cc-query.php');
 
         if( empty($CC_GLOBALS['use_text_index']) )
@@ -142,7 +145,7 @@ class CCSearch
         // ack
         $gen->_template_vars['html_hidden_fields'] = array();
         //d($gen);
-        CCPage::AddForm($gen);
+        $page->AddForm($gen);
 
         if( $what == 'all')
         {
@@ -182,8 +185,8 @@ class CCSearch
                     'query' => $qs );
             }
 
-            CCPage::SetTitle('str_search_results');
-            CCPage::PageArg('search_results_meta',$results,'search_results_all');
+            $page->SetTitle('str_search_results');
+            $page->PageArg('search_results_meta',$results,'search_results_all');
 
             if( !$grand_total )
                 $this->_eval_miss($search_text);
@@ -194,11 +197,11 @@ class CCSearch
             {
                 if( $meta['group'] != $what )
                     continue;
-                CCPage::AddMacro('search_results_head');
+                $page->AddMacro('search_results_head');
                 // heaven bless global variables
                 global $CC_GLOBALS;
                 $result_limit = 30; // todo: option later
-                CCPage::SetTitle( array( 'str_search_results_from', $meta['title']) );
+                $page->SetTitle( array( 'str_search_results_from', $meta['title']) );
                 $grp_type = $meta['datasource'] == $meta['group'] ? '' : '&type=' . $meta['group'];
                 $q = "search={$search_text}&datasource={$meta['datasource']}{$grp_type}&t={$meta['template']}&limit={$result_limit}";
                 if( !empty($search_type) )
@@ -215,7 +218,7 @@ class CCSearch
                 {
                     $msg = array( 'str_search_viewing', 
                         $query->args['offset'], $query->args['offset'] + count($query->records), '<span>' . $total . '</span>' );
-                    CCPage::PageArg('search_result_viewing',$msg);
+                    $page->PageArg('search_result_viewing',$msg);
                 }
                 break;
             }
@@ -354,8 +357,9 @@ class CCSearch
                                  '<a href="http://dev.mysql.com/doc/refman/5.0/en/fulltext-boolean.html">','</a>' );
             }
         }
-
-        CCPage::PageArg('search_miss_msg',$msg);
+        
+        $page =& CCPage::GetPage();
+        $page->PageArg('search_miss_msg',$msg);
     }
 }
 

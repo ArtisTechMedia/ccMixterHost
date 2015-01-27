@@ -44,7 +44,7 @@ class CCDatabase
     * that have their own connection management.
     *
     */
-    function DBClose()
+    public static function DBClose()
     {
         $link =& CCDatabase::_link();
         if( $link )
@@ -57,7 +57,7 @@ class CCDatabase
     /**
     * Static call to ensure connection to daemon. Can be called multiple times safely.
     */
-    function DBConnect()
+    public static function DBConnect()
     {
         $config_db = CCDatabase::_config_db();
         include($config_db);
@@ -77,7 +77,7 @@ class CCDatabase
     *
     * @param mixed $sql single mySQL query or array of them
     */
-    function Query( $sql )
+    public static function Query( $sql )
     {
         if( is_array($sql) )
         {
@@ -152,7 +152,7 @@ class CCDatabase
     * @param bool   $assoc TRUE means fetch_assoc, FALSE means fetch_row
     * @return array $row Row from database or null if results count greater or less than one.
     */
-    function QueryRow( $sql, $assoc = true )
+    public static function QueryRow( $sql, $assoc = true )
     {
         $qr = CCDatabase::Query($sql);
 
@@ -176,7 +176,7 @@ class CCDatabase
     * @param string $sql mySQL SELECT statement with a single column
     * @return string $item First column results from SELECT statement
     */
-    function QueryItem( $sql )
+    public static function QueryItem( $sql )
     {
         $row = CCDatabase::QueryRow($sql,false);
         return( $row[0] );
@@ -196,7 +196,7 @@ class CCDatabase
     * @param string $sql mySQL SELECT statement with a single column
     * @return array $rows Array of sql rows
     */
-    function QueryItems( $sql )
+    public static function QueryItems( $sql )
     {
         $qr = CCDatabase::Query($sql);
         $results = array();
@@ -220,7 +220,7 @@ class CCDatabase
     * @param bool   $assoc TRUE means fetch_assoc, FALSE means fetch_row
     * @return array $rows Array with database rows inside
     */
-    function & QueryRows( $sql, $assoc = true )
+    public static function & QueryRows( $sql, $assoc = true )
     {
         $qr = CCDatabase::Query($sql);
         $rows = array();
@@ -242,7 +242,7 @@ class CCDatabase
     * Returns the tables in the current database
     * 
     */
-    function ShowTables()
+    public static function ShowTables()
     {
         $qr = CCDatabase::Query("SHOW TABLES");
         $rows = array();
@@ -256,7 +256,7 @@ class CCDatabase
     * Public interface to get the last insert id
     *
     */
-    function LastInsertID()
+    public static function LastInsertID()
     {
         return CCDatabase::_last_insert_id();
     }
@@ -268,7 +268,7 @@ class CCDatabase
     *
     * @access private
     **/
-    function _config_db($file = '')
+    static function _config_db($file = '')
     {
         static $CC_DB_INFO_FILE;
         if( !empty($file) )
@@ -283,7 +283,7 @@ class CCDatabase
     *
     * @access private
     **/
-    function & _link()
+    static function & _link()
     {
         static $_link;
         return $_link;
@@ -294,7 +294,7 @@ class CCDatabase
     *
     * @access private
     **/
-    function & _last_insert_id()
+    static function & _last_insert_id()
     {
         static $_id;
         return $_id;

@@ -235,13 +235,15 @@ class CCForumsAdmin
     
     function ForkThread($topic_id)
     {
+        $page =& CCPage::GetPage();
+    
         $form = new CCForumMoveThreadForm(true); // true means fork
 
         if( empty($_POST['forummovethread']) || !$form->ValidateFields() )
         {
             $title = _('Fork Topic to New Thread');
-            CCPage::SetTitle($title);
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->SetTitle($title);
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -294,6 +296,7 @@ class CCForumsAdmin
 
     function MoveThread($thread_id)
     {
+        $page =& CCPage::GetPage();
         $api = new CCForums();
         $threads =& CCForumThreads::GetTable();
         $threads->AddJoin( new CCTopics(), 'forum_thread_oldest' );
@@ -304,9 +307,9 @@ class CCForumsAdmin
         if( empty($_POST['forummovethread']) || !$form->ValidateFields() )
         {
             $title = sprintf( _('Move topic: %s'), $row['topic_name'] );
-            CCPage::SetTitle($title);
+            $page->SetTitle($title);
 
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -343,20 +346,22 @@ class CCForumsAdmin
 
     function _stick_thread($thread_id)
     {
+        $page =& CCPage::GetPage();
         $threads =& CCForumThreads::GetTable();
         $a['forum_thread_id'] = $thread_id;
         $a['forum_thread_sticky'] = 'forum_thread_sticky ^ 1';
         $threads->Update($a,false);
-        CCPage::SetTitle(_('Change Thread Sticky Flag'));
+        $page->SetTitle(_('Change Thread Sticky Flag'));
         $url = ccl('thread',$thread_id);
         $link1 = "<a href=\"$url\">";
         $link2 = '</a>';
-        CCPage::Prompt(
+        $page->Prompt(
             sprintf(_('Sticky status changed for thread. %sGo back to thread%s'),$link1,$link2) );
     }
 
     function _close_thread($thread_id)
     {   
+        $page =& CCPage::GetPage();
         $threads =& CCForumThreads::GetTable();
         $a['forum_thread_id'] = $thread_id;
         $a['forum_thread_closed'] = 'forum_thread_closed ^ 1';
@@ -369,17 +374,19 @@ class CCForumsAdmin
         $fields['topic_locked'] = $islocked;
         $topics->UpdateWhere($fields,$where);
 
-        CCPage::SetTitle(_('Change Thread Open Status'));
+        $page->SetTitle(_('Change Thread Open Status'));
         $url = ccl('thread',$thread_id);
         $link1 = "<a href=\"$url\">";
         $link2 = '</a>';
-        CCPage::Prompt( 
+        $page->Prompt( 
             sprintf( _('Open status changed for thread. %sGo back to thread%s'), $link1, $link2 ) );
     }
 
 
     function Admin( $param1='', $param2='', $param3='' )
     {
+        $page =& CCPage::GetPage();
+        
         if( $param1 == 'stick' )
         {
             $this->_stick_thread($param2);
@@ -397,14 +404,14 @@ class CCForumsAdmin
 
         if( $param1 == 'newforum' )
         {
-            CCPage::SetTitle('Add Forum');
+            $page->SetTitle('Add Forum');
 
             if( empty($groups) )
             {
                 $href = ccl('admin','forums','newgroup');
                 $link1 = "<a href=\"$href\">";
                 $link2 = '</a>';
-                CCPage::Prompt(
+                $page->Prompt(
                     sprintf( _('You must %sadd groups%s before you can add forums'), $link1, $link2 ) );
                 $param1 = '';
             }
@@ -413,7 +420,7 @@ class CCForumsAdmin
                 $form = new CCForumAddForm($groups);
                 if( empty($_POST['forumadd']) || !$form->ValidateFields() )
                 {
-                    CCPage::AddForm( $form->GenerateForm() );
+                    $page->AddForm( $form->GenerateForm() );
                 }
                 else
                 {
@@ -427,7 +434,7 @@ class CCForumsAdmin
 
         if( ($param1 == 'edit') && !empty($param2) )
         {
-            CCPage::SetTitle( _('Edit Forum Properties') );
+            $page->SetTitle( _('Edit Forum Properties') );
 
             $row = $forums->QueryKeyRow($param2);
             if( empty($row) )
@@ -449,13 +456,13 @@ class CCForumsAdmin
                     CCUtil::SendBrowserTo( ccl('admin','forums') );
                 }
 
-                CCPage::AddForm( $form->GenerateForm() );
+                $page->AddForm( $form->GenerateForm() );
             }
         }
 
         if( ($param1 == 'delete') && !empty($param2) )
         {
-            CCPage::SetTitle( _('Delete Forum') );
+            $page->SetTitle( _('Delete Forum') );
 
             $row = $forums->QueryKeyRow($param2);
             if( empty($row) )
@@ -467,7 +474,7 @@ class CCForumsAdmin
                 if( empty($_POST['forumconfirmdelete']) )
                 {
                     $form = new CCForumConfirmDeleteForm($row['forum_name']);
-                    CCPage::AddForm( $form->GenerateForm() );
+                    $page->AddForm( $form->GenerateForm() );
                 }
                 else
                 {
@@ -481,11 +488,11 @@ class CCForumsAdmin
         
         if( $param1 == 'newgroup' )
         {
-            CCPage::SetTitle( _('Add Forum Group') );
+            $page->SetTitle( _('Add Forum Group') );
             $form = new CCForumAddGroupForm();
             if( empty($_POST['forumaddgroup']) || !$form->ValidateFields() )
             {
-                CCPage::AddForm( $form->GenerateForm() );
+                $page->AddForm( $form->GenerateForm() );
             }
             else
             {
@@ -497,7 +504,7 @@ class CCForumsAdmin
 
         if( ($param1 == 'editgroup') && !empty($param2) )
         {
-            CCPage::SetTitle( _('Edit Forum Group Properties') );
+            $page->SetTitle( _('Edit Forum Group Properties') );
 
             $row = $fgroups->QueryKeyRow($param2);
             if( empty($row) )
@@ -519,13 +526,13 @@ class CCForumsAdmin
                     CCUtil::SendBrowserTo( ccl('admin','forums') );
                 }
 
-                CCPage::AddForm( $form->GenerateForm() );
+                $page->AddForm( $form->GenerateForm() );
             }
         }
 
         if( ($param1 == 'delgroup') && !empty($param2) )
         {
-            CCPage::SetTitle( _('Delete Forum Group') );
+            $page->SetTitle( _('Delete Forum Group') );
 
             $where['forum_group'] = $param2;
             $forums_in_group = $forums->CountRows($where);
@@ -534,7 +541,7 @@ class CCForumsAdmin
             {
                 $link1 = "<a href=\"$href\">";
                 $link2 = '</a>';
-                CCPage::Prompt(
+                $page->Prompt(
                     sprintf( _('Group is not empty. %sReturn to forums.%s'), $link1, $link2 ) );
             }
             else
@@ -569,8 +576,8 @@ class CCForumsAdmin
             $title = _('Forum Admin');
             require_once('cchost_lib/cc-admin.php');
             CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-            CCPage::SetTitle( $title );
-            CCPage::PageArg('fadmin',$args,'forum_admin');
+            $page->SetTitle( $title );
+            $page->PageArg('fadmin',$args,'forum_admin');
         }
     }
 
@@ -590,7 +597,7 @@ class CCForumsAdmin
         $href = ccl('admin','forums');
         $link1 = "<a href=\"$href\">";
         $link2 = '</a>';
-        CCPage::Prompt(
+        $page->Prompt(
             sprintf( _('Forum has been permanantly deleted. %sReturn to forums.%s'), $link1, $link2 ) );
     }
 }

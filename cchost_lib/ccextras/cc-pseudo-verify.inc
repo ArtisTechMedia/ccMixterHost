@@ -287,7 +287,7 @@ class CCPseudoVerifyAPI
             $found = false;
             foreach( $media_ffa as $K2 => $MF )
             {
-                list( $d, $d2, $d3 ) = split('-', $K2);
+                list( $d, $d2, $d3 ) = cc_split('-', $K2);
                 if( ($d2 == $K) || ($d3 == $K) || ($MF['name'] == $K) )
                 {
                     $found = true;
@@ -305,7 +305,7 @@ class CCPseudoVerifyAPI
             }
             else
             {
-                list( ,$group ) = split('-', $info['group']);
+                list( ,$group ) = cc_split('-', $info['group']);
                 $tags = str_replace('-', ',', $info['group']);
             }
 
@@ -334,15 +334,16 @@ class CCPseudoVerifyAPI
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
+        $page =& CCPage::GetPage();
         $title = _('Configure Pseudo Verifier');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
 
         $form = new CCPseudoVerifyAdminForm();
 
         if( empty($_POST['pseudoverifyadmin']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -376,7 +377,7 @@ class CCPseudoVerifyAPI
             $configs =& CCConfigs::GetTable();
             $configs->SaveConfig('pseudo-verify',$save_types,CC_GLOBAL_SCOPE,false);
             
-            CCPage::Prompt(_('New pseudo verification options saved'));
+            $page->Prompt(_('New pseudo verification options saved'));
         }
     }
 

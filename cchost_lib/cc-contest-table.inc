@@ -55,7 +55,7 @@ class CCContests extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $_table;
         if( !isset($_table) )

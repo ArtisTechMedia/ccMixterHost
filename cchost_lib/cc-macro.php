@@ -60,7 +60,7 @@ class CCMacro
     * @param bool $replace_sp Set to true to place spaces with '_'
     * @returns string $expanded Expanded/compiled string
     */
-    function TranslateMask($patterns,$mask,$replace_sp = false)
+    public static function TranslateMask($patterns,$mask,$replace_sp = false)
     {
         $patterns['%%']  = '%';
         $patterns['%Y%'] = date('Y');
@@ -76,7 +76,6 @@ class CCMacro
         }
         
         $result = preg_replace( $regex, $replacements, $mask );
-
         if( $replace_sp )
             $result = str_replace(' ','_',$result);
 

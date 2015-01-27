@@ -52,7 +52,7 @@ class CCSync
     *
     * @param $record Values related to now deleted file include remix parents/children  
     */
-    function Delete($record)
+    public static function Delete($record)
     {
         $upload_ids = array();
         $user_ids[] = $record['upload_user'];
@@ -120,7 +120,7 @@ END;
 
     }
 
-    function Upload($upload_id)
+    public static function Upload($upload_id)
     {
         $sql[] =<<<END
                 UPDATE cc_tbl_uploads SET upload_num_remixes = 
@@ -169,7 +169,7 @@ END;
     * @param $upload_id integer Any file id that belongs to this artist (can be null)
     * @param $user_id   integer User id to sync (can be null if upload_id is present) 
     */
-    function User($upload_id,$user_id)
+    public static function User($upload_id,$user_id)
     {
         if( empty($user_id) )
         {
@@ -242,7 +242,7 @@ END;
     *   affect anything but the user uploader's counts.
     *
     */
-    function NewUpload($upload_id)
+    public static function NewUpload($upload_id)
     {
         CCSync::User($upload_id,0);
     }
@@ -264,7 +264,7 @@ END;
     * @see CCSync::Remix()
     * @see CCRemix::OnPostRemixForm()
     **/
-    function RemixDetach($remix_id)
+    public static function RemixDetach($remix_id)
     {
         $sql = "SELECT tree_parent as upload_id FROM cc_tbl_tree WHERE tree_child = $remix_id";
         $parents = CCDatabase::QueryRows($sql);
@@ -288,7 +288,7 @@ END;
     * @see CCSync::RemixDetach()
     * @see CCRemix::OnPostRemixForm()
     **/
-    function Remix($remix_id,$parents)
+    public static function Remix($remix_id,$parents)
     {
         $sql =<<<END
             SELECT COUNT(*) as upload_num_sources, tree_child as upload_id
@@ -318,7 +318,7 @@ END;
     }
 
 
-    function PoolSourceRemix($pool_sources)
+    public static function PoolSourceRemix($pool_sources)
     {
         $tree = new CCPoolTree();
         $pool_items =& CCPoolItems::GetTable();
@@ -340,7 +340,7 @@ END;
     * @param $record array Upload's record
     * @param $ratings object CCRatings table object
     */
-    function Ratings(&$record,&$ratings)
+    public static function Ratings(&$record,&$ratings)
     {
         global $CC_GLOBALS;
 
@@ -365,7 +365,7 @@ END;
     * Internal helper that actually does the math to calcuate a ranking of 
     * either an upload or a user
     */
-    function _calc_rank(&$C,&$R,$prefix='upload')
+    public static function _calc_rank(&$C,&$R,$prefix='upload')
     {
         if( !empty($C['thumbs_up']) )
         {
@@ -416,7 +416,7 @@ END;
     /**
     * Internal helper to update records in the uploads table
     */
-    function _update_sqls($queries)
+    public static function _update_sqls($queries)
     {
         $quploads = new CCTable('cc_tbl_uploads','upload_id');
         
@@ -438,7 +438,7 @@ END;
     /**
     * Internal helper that counts or subtracts remix counts from the parents of a remix
     */
-    function _update_parent_syncs($parents,$add)
+    public static function _update_parent_syncs($parents,$add)
     {
         $minus = $add ? '' : '- 1';
         $sql = array();

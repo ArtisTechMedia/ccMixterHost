@@ -135,7 +135,7 @@ for( $i = $count-1; $i >= 0; $i--)
             {
                 print "\t* {$U['r']}:\n";
             }
-            $comments = split("\n",$U['c']);
+            $comments = cc_split("\n",$U['c']);
             foreach( $comments as $comment )
             {
                 $comment = trim($comment);

@@ -358,7 +358,8 @@ class CCOpenID
     function OnIDFailed($msg)
     {
 	    require_once('cchost_lib/cc-page.php');
-	    CCPage::Prompt( $msg );
+	    $page =& CCPage::GetPage();
+	    $page->Prompt( $msg );
     }
         
     /**
@@ -381,8 +382,9 @@ class CCOpenID
         if( !$form->ValidateFields() )
         {
             require_once('cchost_lib/cc-page.php');
-            CCPage::SetTitle('str_openid_login_title');
-            CCPage::AddForm($form->GenerateForm());
+            $page =& CCPage::GetPage();
+            $page->SetTitle('str_openid_login_title');
+            $page->AddForm($form->GenerateForm());
         }
         else
         {
@@ -480,7 +482,8 @@ class CCOpenID
         if( empty($row) )
         {
             require_once('cchost_lib/cc-page.php');
-            CCPage::SetTitle('str_openid_login_title');
+            $page =& CCPage::GetPage();
+            $page->SetTitle('str_openid_login_title');
             $args = $sreg;
             $args['openid'] = $openid;
             $user_name = cc_fancy_user_sql('display_name');
@@ -510,7 +513,7 @@ class CCOpenID
               
             require_once('cchost_lib/ccextras/cc-openid-forms.inc');
             $form = new CCOpenIDHookUpForm($args);
-            CCPage::AddForm($form->GenerateForm());
+            $page->AddForm($form->GenerateForm());
         }
         else
         {

@@ -29,7 +29,7 @@ if( !defined('IN_CC_HOST') )
 /**
 */
 require_once('cchost_lib/ccextras/cc-topics.inc');
-
+require_once('cchost_lib/cc-page.php');
 
 /**
 * Wrapper for cc_tbl_forums table
@@ -43,7 +43,7 @@ class CCForum extends CCTable
         $this->SetSort( 'forum_group_weight,forum_weight', 'ASC' );
     }
 
-    function & GetTable()
+    public static function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -65,7 +65,7 @@ class CCForumGroups extends CCTable
         $this->SetSort('forum_group_weight','ASC');
     }
 
-    function & GetTable()
+    public static function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -90,7 +90,7 @@ class CCForumThreads extends CCTable
         $this->SetSort('forum_thread_sticky DESC, forum_thread_date', 'DESC');
     }
 
-    function & GetTable()
+    public static function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -208,8 +208,9 @@ class CCForumAPI
         }
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle('str_forums');
-        CCPage::PageArg('forums',$visible_groups,'forum_index');
+        $page =& CCPage::GetPage();
+        $page->SetTitle('str_forums');
+        $page->PageArg('forums',$visible_groups,'forum_index');
     }
 
     function _add_last_topic_join(&$threads)
@@ -222,6 +223,7 @@ class CCForumAPI
     function _show_forum($forum_id)
     {
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
 
         //
         // Get the forums row and check this
@@ -266,7 +268,7 @@ class CCForumAPI
 EOF;
 
         $wf['forum_thread_forum'] = $forum_id;
-        CCPage::AddPagingLinks($threads,$wf,30);
+        $page->AddPagingLinks($threads,$wf,30);
         $forum_threads =& $threads->QueryRows($wf,$columns);
 
         $topic_counter = new CCTable('cc_tbl_topics','topic_id');
@@ -291,9 +293,9 @@ EOF;
         //
         // Build the page
         //
-        CCPage::SetTitle($forum_row['forum_name']);
-        CCPage::PageArg( 'forum_cmds', $commands );
-        CCPage::PageArg( 'threads', $forum_threads , 'forum_listing' );
+        $page->SetTitle($forum_row['forum_name']);
+        $page->PageArg( 'forum_cmds', $commands );
+        $page->PageArg( 'threads', $forum_threads , 'forum_listing' );
     }
 
     function _add_feed_links( $thread = '', $user = '', $user_real_name='', $thread_name ='')
@@ -340,7 +342,8 @@ EOF;
             }
         }
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
     function _build_bread_crumb_trail2($topic_id, $text)
@@ -358,7 +361,8 @@ EOF;
         $trail[] = array( 'url' => ccl('thread',$thread_id), 'text' => $thread_name );
         $trail[] = array( 'url' => '', 'text' => $text );
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
     function OnPostTopicDelete($deltype,$topic)
@@ -463,14 +467,15 @@ EOF;
         }
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle( 'str_forum_post_new_topic' );
+        $page =& CCPage::GetPage();
+        $page->SetTitle( 'str_forum_post_new_topic' );
         $this->_build_bread_crumb_trail($forum_id,'str_forum_post_new_topic' );
 
         require_once('cchost_lib/ccextras/cc-topics-forms.inc');
         $form = new CCTopicForm( 'str_forum_new_topic_text', 'str_forum_submit_topic', CC_TTF_EDIT );
         if( empty($_POST['topic']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -485,7 +490,7 @@ EOF;
             $values['topic_user'] = CCUser::CurrentUser();
             $values['topic_id'] = $topic_id;
             $values['topic_thread'] = $thread_id;
-            $topics->Insert($values,0);
+            $topics->InsertNewTopic($values,0);
 
             $ftvalues = array();
             $ftvalues['forum_thread_id'] = $thread_id;
@@ -495,6 +500,8 @@ EOF;
             $ftvalues['forum_thread_newest'] = $topic_id;
             $ftvalues['forum_thread_date'] = $values['topic_date'];
             $ftvalues['forum_thread_name'] = $values['topic_name'];
+            if( empty($ftvalues['forum_thread_extra']) )
+                $ftvalues['forum_thread_extra'] = '';
             $threads->Insert($ftvalues);
 
             $this->_on_new_topic($values);
@@ -509,6 +516,8 @@ EOF;
     function ViewThread($thread_id='')
     {
         global $CC_GLOBALS;
+        
+        $page =& CCPage::GetPage();
 
         $api = new CCForums();
 
@@ -516,8 +525,8 @@ EOF;
         if( empty($thread_id) || !$threads->KeyExists($thread_id) )
         {
             $this->_build_bread_crumb_trail(1);
-            CCPage::SetTitle( 'str_forum_thread_missing' );
-            CCPage::Prompt('str_forum_thread_not_there');
+            $page->SetTitle( 'str_forum_thread_missing' );
+            $page->Prompt('str_forum_thread_not_there');
             return;
         }
 
@@ -542,8 +551,8 @@ EOF;
             else
                 $msg = 'str_forum_perm_denied';
             require_once('cchost_lib/cc-page.php');
-            CCPage::SetTitle('str_forum_restricted_access');
-            CCPage::Prompt($msg);
+            $page->SetTitle('str_forum_restricted_access');
+            $page->Prompt($msg);
             return;
         }
 
@@ -552,7 +561,7 @@ EOF;
         if( ($mask & $row['forum_post_access']) != 0 )
             $this->_thread_commands($row,$thread_id);
 
-        CCPage::PageArg('topic_thread_id',$thread_id);
+        $page->PageArg('topic_thread_id',$thread_id);
         
         require_once('cchost_lib/cc-query.php');
         $query = new CCQuery();
@@ -591,7 +600,8 @@ EOF;
                                  'text' => $ctext, 'msg' => 0  );
         }
 
-        CCPage::PageArg('thread_commands',$commands);
+        $page =& CCPage::GetPage();
+        $page->PageArg('thread_commands',$commands);
     }
 
     function User($user_name='')

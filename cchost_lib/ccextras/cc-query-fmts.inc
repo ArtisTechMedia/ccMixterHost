@@ -149,7 +149,7 @@ class CCQueryFormats
                 $page->Call($template,true);
                 if( !empty($paging) && ($paging == 'on') )
                 {
-                    CCPage::AddPagingLinks($queryObj->dataview,'',$limit);
+                    $page->AddPagingLinks($queryObj->dataview,'',$limit);
                 }
             }
             break;
@@ -186,7 +186,7 @@ class CCQueryFormats
                 }
                 
                 require_once('cchost_lib/cc-page.php');
-
+                $page =& CCPage::GetPage();
                 $targs = $CC_GLOBALS;
                 $targs['records']  =& $records;
                 $targs['dochop']   = isset($chop) && $chop > 0;
@@ -195,7 +195,7 @@ class CCQueryFormats
 
                 if( !empty($paging) && ($paging == 'on') )
                 {
-                    CCPage::AddPagingLinks($queryObj->dataview,'',$limit, $skinmac);
+                    $page->AddPagingLinks($queryObj->dataview,'',$limit, $skinmac);
                     $skinmac->AddCustomizations(array( 'paging_style'));
                 }
 

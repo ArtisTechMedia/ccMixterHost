@@ -47,7 +47,7 @@ class CCNotifications extends CCTable
         $this->CCTable('cc_tbl_notifications','notify_id');
     }
 
-    function & GetTable()
+    public static function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -68,8 +68,9 @@ class CCNotifyAPI
     function EditMyNotifications($other_user_name='')
     {
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
 
-        CCPage::SetTitle('str_notify_edit');
+        $page->SetTitle('str_notify_edit');
         $bc[] = array( 'url' => ccl('preferences'), 'text' => 'str_pref_title' );
         CCUser::AddUserBreadCrumbs('str_notify_edit',$bc);
 
@@ -153,7 +154,7 @@ class CCNotifyAPI
                 $notifications->Insert($args);
             }
             
-            CCPage::Prompt('str_notify_updated');
+            $page->Prompt('str_notify_updated');
         }
         else
         {
@@ -179,7 +180,7 @@ class CCNotifyAPI
                 }
             }
 
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
     }
 

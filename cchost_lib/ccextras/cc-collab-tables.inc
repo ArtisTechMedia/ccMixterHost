@@ -41,7 +41,7 @@ class CCCollabs extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -65,7 +65,7 @@ class CCCollabUploads extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -89,7 +89,7 @@ class CCCollabUsers extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $_table;
         if( !isset($_table) )

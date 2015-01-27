@@ -53,7 +53,7 @@ class CCPools extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -106,7 +106,7 @@ class CCPoolItems extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -231,7 +231,7 @@ class CCPool
         }
         else
         {
-            $parts = split(':',$api_url);
+            $parts = cc_split(':',$api_url);
             if( !empty($parts[1]) )
                 require_once($parts[1]);
             $api_url = $parts[0];

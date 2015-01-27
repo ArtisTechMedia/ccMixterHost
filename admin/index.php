@@ -65,7 +65,7 @@ print('</body></html>');
 
 function step_1()
 {
-    $v = split('\.',phpversion());
+    $v = cc_split('\.',phpversion());
     if( intval($v[0]) < 4 )
     {
         $vmsg = "<div class='err'>It doesn't look like you're running on PHP 4, you can't run ccHost until you upgrade.</span>";
@@ -149,7 +149,7 @@ function step_4()
     $configs =& CCConfigs::GetTable();
     $settings = $configs->GetConfig('settings');
     $config   = $configs->GetConfig('config');
-    $admins   = split(',',$settings['admins']);
+    $admins   = cc_split(',',$settings['admins']);
     $admin    = $admins[0];
     $ttags    = $configs->GetConfig('ttag');
     $root_url = $ttags['root-url'];

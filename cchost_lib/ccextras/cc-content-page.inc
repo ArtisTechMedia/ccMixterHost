@@ -308,8 +308,9 @@ class CCContentPage
 {
     function TDelete($topic_id='')
     {
+        $page =& CCPage::GetPage();
         $this->_build_bread_crumb_trail(_('Delete a Content Entry'));
-        CCPage::SetTitle(_('Delete a Content Entry'));
+        $page->SetTitle(_('Delete a Content Entry'));
         if( empty($topic_id) )
             CCUtil::Send404();
         $form = new CCGenericForm();
@@ -319,7 +320,7 @@ class CCContentPage
             $form->SetFormHelp(_('This is permanantly erase this content. There is <b>NO UNDO</b>'));
             $fname = basename($name);
             $form->SetSubmitText(sprintf("Delete '%s' Now",$name));
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -333,8 +334,9 @@ class CCContentPage
     function Edit($topic_id)
     {
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         $this->_build_bread_crumb_trail(_('Edit Content'));
-        CCPage::SetTitle(_('Edit Content'));
+        $page->SetTitle(_('Edit Content'));
         $form = new CCContentPostForm();
         if( empty($_POST['contentpost']) )
         {
@@ -369,18 +371,19 @@ class CCContentPage
             CCUtil::SendBrowserTo($url);
         }
 
-        CCPage::AddForm( $form->GenerateForm() );
+        $page->AddForm( $form->GenerateForm() );
     }
 
     function Post()
     {
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         $this->_build_bread_crumb_trail(_('Post Content'));
-        CCPage::SetTitle(_('Post Content'));
+        $page->SetTitle(_('Post Content'));
         $form = new CCContentPostForm();
         if( empty($_POST['contentpost']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -406,7 +409,7 @@ class CCContentPage
             if( empty($values['topic_date']) )
                 $values['topic_date'] = date('Y-m-d H:i:s',time());
             
-            $topics->Insert($values,0);
+            $topics->InsertNewTopic($values,0);
 
             CCUtil::SendBrowserTo( ccl('admin','content','manage') );
         }
@@ -414,8 +417,9 @@ class CCContentPage
 
     function PageDelete()
     {
+        $page =& CCPage::GetPage();
         $this->_build_bread_crumb_trail(_('Delete a Content Page'));
-        CCPage::SetTitle(_('Delete a Content Page'));
+        $page->SetTitle(_('Delete a Content Page'));
         $page = CCUtil::Strip($_GET['page']);
         if( empty($page) )
             CCUtil::Send404();
@@ -425,7 +429,7 @@ class CCContentPage
             $form->SetFormHelp(_('This is permanantly erase this page. There is <b>NO UNDO</b>'));
             $fname = basename($page);
             $form->SetSubmitText(sprintf("Delete '%s' Now",$fname));
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -436,8 +440,9 @@ class CCContentPage
 
     function PageEdit()
     {
+        $page =& CCPage::GetPage();
         $this->_build_bread_crumb_trail(_('Edit a Content Page'));
-        CCPage::SetTitle(_('Edit a Content Page'));
+        $page->SetTitle(_('Edit a Content Page'));
         $page = CCUtil::Strip($_GET['page']);
         if( empty($page) )
             CCUtil::Send404();
@@ -459,12 +464,13 @@ class CCContentPage
             CCUtil::SendBrowserTo($url);
         }
 
-        CCPage::AddForm( $form->GenerateForm() );
+        $page->AddForm( $form->GenerateForm() );
     }
 
     function Page($cmd='')
     {
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
 
         if( $cmd == 'edit' )
             return $this->PageEdit();
@@ -472,11 +478,11 @@ class CCContentPage
             return $this->PageDelete();
 
         $this->_build_bread_crumb_trail(_('Create a Content Page'));
-        CCPage::SetTitle(_('Create a Content Page'));
+        $page->SetTitle(_('Create a Content Page'));
         $form = new CCContentPageForm();
         if( empty($_POST['contentpage']) || !$form->ValidateFields() || !$this->_valid_target_dir($form,$target) )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -620,7 +626,8 @@ EOF;
     {
         require_once('cchost_lib/cc-page.php');
         $this->_build_bread_crumb_trail(_('Manage Page Content'));
-        CCPage::SetTitle(_('Manage Page Content'));
+        $page =& CCPage::GetPage();
+        $page->SetTitle(_('Manage Page Content'));
 
         require_once('cchost_lib/cc-query.php');
         $query = new CCQuery();
@@ -700,7 +707,8 @@ EOF;
             $trail[] = array( 'url' => '', 'text' => _('Content') );
         }
 
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
     /**

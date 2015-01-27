@@ -41,11 +41,12 @@ class CCPlaylistBrowse
     function User($user)
     {
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         $fancy_name = cc_fancy_user_sql();
         $user_name = CCDatabase::QueryItem('SELECT ' . $fancy_name . ' FROM cc_tbl_user WHERE user_name ="' . $user . '"');
         $title = array('str_pl_browse_user_s',$user_name);
         $q = 't=playlist_2_browse&u='.$user;
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
         require_once('cchost_lib/cc-query.php');
         $query = new CCQuery();
         $args = $query->ProcessAdminArgs($q);
@@ -62,7 +63,8 @@ class CCPlaylistBrowse
         $trail[] = array( 'url' => ccl('people',$user,'playlists'),  'text' => 'str_playlists' );
         $trail[] = array( 'url' => '',  'text' => $title);
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
     function _bbt_user_upload($upload_id, $upload_name, $user, $user_real_name, $title)
@@ -74,7 +76,8 @@ class CCPlaylistBrowse
         $trail[] = array( 'url' => ccl('files',$user,$upload_id),  'text' => $upload_name );
         $trail[] = array( 'url' => '',  'text' => $title);
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
     function _bbt_tags($title)
@@ -85,7 +88,8 @@ class CCPlaylistBrowse
         $trail[] = array( 'url' => ccl('view/media/playlists/browse'),  'text' => 'str_pl_browse_playlists' );
         $trail[] = array( 'url' => '',  'text' => $title);
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
     function _build_bread_crumb_trail($playlist_id,$cmd='',$cmd2='')
@@ -119,7 +123,8 @@ class CCPlaylistBrowse
         }
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
     function OnFilterCartMenu(&$records)

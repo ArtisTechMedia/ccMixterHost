@@ -171,11 +171,12 @@ class CCPlaylistManage
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
+        $page =& CCPage::GetPage();
         $title = 'str_pl_manage';
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
         $form = new CCAdminPlaylistsForm();
-        CCPage::AddForm($form->GenerateForm());
+        $page->AddForm($form->GenerateForm());
     }
 
     /**
@@ -209,8 +210,9 @@ class CCPlaylistManage
         
 
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         $api->_build_bread_crumb_trail($playlist_id,'str_pl_edit_properties');
-        CCPage::SetTitle('str_pl_edit_properties');
+        $page->SetTitle('str_pl_edit_properties');
         $carts =& CCPlaylist::GetTable();
         $row = $carts->QueryKeyRow($playlist_id);
         $form = new CCPlaylistForm($row['cart_dynamic'],$playlist_id,array());
@@ -229,7 +231,7 @@ class CCPlaylistManage
             $tags = $this->_get_suggested_tags($row);
             if( !empty($tags) )
                 $form->SetSuggestedTags($tags);
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -291,7 +293,7 @@ EOF;
         $all_tags = array_unique(preg_split('/,/',join('',$all_tags),0,PREG_SPLIT_NO_EMPTY));
         if( !empty($row['cart_tags']) )
         {
-            $cart_tags = split(',',$row['cart_tags']);
+            $cart_tags = cc_split(',',$row['cart_tags']);
             $all_tags = array_diff($all_tags,$cart_tags);
             if( empty($all_tags) )
                 return;
@@ -314,7 +316,8 @@ EOF;
         $url = ccl('people', CCUser::CurrentUserName(), 'playlists' );
         $link = "<a href=\"$url\">";
         $link2 = '</a>';
-        CCPage::Prompt($msg . ' ' . sprintf(_('Return to %syour playlists%s'),$link,$link2));
+        $page =& CCPage::GetPage();
+        $page->Prompt($msg . ' ' . sprintf(_('Return to %syour playlists%s'),$link,$link2));
     }
 
     function EmptyPL($playlist_id='')
@@ -326,13 +329,14 @@ EOF;
         
 
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         $api->_build_bread_crumb_trail($playlist_id,'str_pl_empty_playlist');
-        CCPage::SetTitle('str_pl_empty_playlist');
+        $page->SetTitle('str_pl_empty_playlist');
         if( empty($_POST['confirmplaylistempty']) )
         {
             require_once('cchost_lib/ccextras/cc-playlist-forms.inc');
             $form = new CCConfirmPlaylistEmptyForm();
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -361,13 +365,14 @@ EOF;
         
 
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         $api->_build_bread_crumb_trail($playlist_id,'str_pl_delete_playist');
-        CCPage::SetTitle('str_pl_delete_playist');
+        $page->SetTitle('str_pl_delete_playist');
         if( empty($_POST['confirmplaylistdelete']) )
         {
             require_once('cchost_lib/ccextras/cc-playlist-forms.inc');
             $form = new CCConfirmPlaylistDeleteForm();
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -383,10 +388,11 @@ EOF;
         global $CC_GLOBALS;
         require_once('cchost_lib/ccextras/cc-playlist-rank.inc');
         $msg = calc_plays();
+        $page =& CCPage::GetPage();
         if( empty($msg) )
-            CCPage::Prompt(_('Playlists rankings recalcuated'));
+           $page->Prompt(_('Playlists rankings recalcuated'));
         else
-            CCPage::Prompt($msg);
+           $page->Prompt($msg);
     }
 }
 

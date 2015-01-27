@@ -63,7 +63,7 @@ class CCReview
             $user_id = $users->QueryKey($qkarg);
             if( empty($user_id) )
             {
-                CCPage::Prompt(_('Cannot find that user'));
+                $page->Prompt(_('Cannot find that user'));
                 CCUtil::Send404(false);
                 return;
             }
@@ -73,7 +73,7 @@ class CCReview
                 $uploads =& CCUploads::GetTable();
                 if( !$uploads->KeyExists($upload_id) )
                 {
-                    CCPage::Prompt(_('Cannot find that upload. It may have been removed by the owner.'));
+                    $page->Prompt(_('Cannot find that upload. It may have been removed by the owner.'));
                     CCUtil::Send404(false);
                     return;
                 }
@@ -96,8 +96,8 @@ class CCReview
                 //
                 // This is just a 'recent review' listing for the whole site
                 //
-                CCPage::SetTitle('str_recent_reviews');
-                CCPage::ViewFile('reviews');
+                $page->SetTitle('str_recent_reviews');
+                $page->ViewFile('reviews');
             }
             else
             {
@@ -131,7 +131,7 @@ class CCReview
                 $leftby_link = array( 'text' => array( $otstr, $user_real_name ),
                                       'url' =>  cc_current_url() . '?qtype=' . $qtype );
 
-                CCPage::PageArg('leftby_link',$leftby_link);
+                $page->PageArg('leftby_link',$leftby_link);
             }
         }
         else
@@ -145,7 +145,7 @@ class CCReview
             $query->Query($args);
 
             // this is so we can display the upload record on the page:
-            CCPage::PageArg('topic_upload',$upload_id);
+            $page->PageArg('topic_upload',$upload_id);
         }
 
         //
@@ -212,7 +212,8 @@ class CCReview
         }
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
     function OnTopicDelete($deltype,$topic_id)

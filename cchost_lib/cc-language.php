@@ -171,7 +171,7 @@ class CCLanguage
      *
      * @return bool true if installation is get_text enabled
      */
-    function IsEnabled()
+    public static function IsEnabled()
     {
         static $_enabled;
         if( !isset($_enabled) )

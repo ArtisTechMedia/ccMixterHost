@@ -1566,11 +1566,11 @@ END;
 
         if( $day_only )
         {
-            list( $year, $month, $today ) = split('-',$value);
+            list( $year, $month, $today ) = cc_split('-',$value);
         }
         else
         {
-            list( $year, $month, $today, $hour, $minute, $ampm ) = split('-',$value);
+            list( $year, $month, $today, $hour, $minute, $ampm ) = cc_split('-',$value);
         }
 
         $month = date('F', mktime(0,0,0,$month));
@@ -1898,7 +1898,8 @@ END;
     function DisableSubmitOnInit()
     {
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddScriptBlock( 'util.php/disable_submit_button', true ); 
+        $page =& CCPage::GetPage();
+        $page->AddScriptBlock( 'util.php/disable_submit_button', true ); 
     }
 
     /**
@@ -2051,6 +2052,7 @@ END;
 
         if( $filesobj['error'] != 0 )
         {
+            CCDebug::PrintVar($filesobj);
             $problems = array( UPLOAD_ERR_INI_SIZE  => 
                                     _('The file is too big.'),
                                UPLOAD_ERR_FORM_SIZE => 
@@ -2163,7 +2165,8 @@ END;
     {
         require_once('cchost_lib/cc-page.php');
         $this->AddTemplateVars(array('hide_on_submit' => true));
-        CCPage::AddScriptBlock( 'hide_upload_form', true ); 
+        $page =& CCPage::GetPage();
+        $page->AddScriptBlock( 'hide_upload_form', true ); 
     }
 
 
@@ -2322,7 +2325,7 @@ class CCGridForm extends CCForm
      * 
      * @returns object $varsname Return $this to make it convienent to add to pages
      */
-    function GenerateForm()
+    function GenerateForm($hiddenonly = false)
     {
         $this->_normalize_fields();
 

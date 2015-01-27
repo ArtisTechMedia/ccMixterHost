@@ -75,7 +75,7 @@ class CCID3Tagger
         $patterns['%title%'] = $record['upload_name'];
         $patterns['%site%']  = $ttags['site-title'];
         $dummy = '';
-        CCEvents::Invoke( CC_EVENT_GET_MACROS, array( &$record, $dummy, &$patterns, $dummy ) );
+        CCEvents::Invoke( CC_EVENT_GET_MACROS, array( &$record, &$dummy, &$patterns, &$dummy ) );
 
         $tagmasks = $configs->GetConfig('id3-tag-masks');
         $tags = array();
@@ -118,7 +118,7 @@ class CCID3Tagger
     /**
     * Internal goody
     */
-    function & _get_standard_tags()
+    static function & _get_standard_tags()
     {
         $standard_tags = array();
 
@@ -225,12 +225,13 @@ class CCID3Tagger
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
+        $page =& CCPage::GetPage();
         $title = _("Configure ID3 Tagger");
         CCAdmin::BreadCrumbs(false,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
         require_once('cchost_lib/cc-filetagger-admin.inc');
         $form = new CCAdminTaggerForm($this);
-        CCPage::AddForm( $form->GenerateForm() );
+        $page->AddForm( $form->GenerateForm() );
     }
 
 }

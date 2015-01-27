@@ -377,7 +377,8 @@ EOF;
         {
             $table = new CCTable('cc_tbl_topics','topic_id');
             $sql_where = "topic_type = '{$type}'";
-            CCPage::AddPagingLinks($table,$sql_where,$limit);
+            $page =& CCPage::GetPage();
+            $page->AddPagingLinks($table,$sql_where,$limit);
         }
     }
 }

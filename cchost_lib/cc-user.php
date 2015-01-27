@@ -28,14 +28,14 @@ if( !defined('IN_CC_HOST') )
 
 class CCUser
 {
-    function IsLoggedIn()
+    public static function IsLoggedIn()
     {
         global $CC_GLOBALS;
 
         return( !empty($CC_GLOBALS['user_name']) );
     }
 
-    function IsSuper($name='')
+    public static function IsSuper($name='')
     {
         if( !CCUtil::IsHTTP() )
             return true;
@@ -52,7 +52,7 @@ class CCUser
         return $ok;
     }
 
-    function IsAdmin($name='')
+    public static function IsAdmin($name='')
     {
         static $checked;
 
@@ -81,7 +81,7 @@ class CCUser
         }
     }
 
-    function CurrentUser()
+    public static function CurrentUser()
     {
         global $CC_GLOBALS;
 
@@ -89,21 +89,21 @@ class CCUser
     }
 
 
-    function CurrentUserName()
+    public static function CurrentUserName()
     {
         global $CC_GLOBALS;
 
         return( CCUser::IsLoggedIn() ? $CC_GLOBALS['user_name'] : '' );
     }
 
-    function CurrentUserField($field)
+    public static function CurrentUserField($field)
     {
         global $CC_GLOBALS;
 
         return( CCUser::IsLoggedIn() ? $CC_GLOBALS[$field] : '' );
     }
 
-    function GetUserName($userid)
+    public static function GetUserName($userid)
     {
         if( $userid == CCUser::CurrentUser() )
             return( CCUser::CurrentUserName() );
@@ -113,7 +113,7 @@ class CCUser
     }
 
 
-    function CheckCredentials($usernameorid)
+    public static function CheckCredentials($usernameorid)
     {
         $id     = CCUser::CurrentUser();
         $argid  = intval($usernameorid);
@@ -125,7 +125,7 @@ class CCUser
         }
     }
 
-    function IDFromName($username)
+    public static function IDFromName($username)
     {
         return CCDatabase::QueryItem(
                   'SELECT user_id FROM cc_tbl_user WHERE user_name = \'' .
@@ -135,7 +135,7 @@ class CCUser
     /**
     * Digs around the cookies looking for an auto-login. If succeeds, populate CC_GLOBALS with user data
     */
-    function InitCurrentUser()
+    public static function InitCurrentUser()
     {
         global $CC_GLOBALS;
 
@@ -160,14 +160,14 @@ class CCUser
         }
     }
 
-    function GetPeopleDir()
+    public static function GetPeopleDir()
     {
         global $CC_GLOBALS;
         return( empty($CC_GLOBALS['user-upload-root']) ? 'content' : 
                             $CC_GLOBALS['user-upload-root'] );
     }
 
-    function GetUploadDir($name_or_row)
+    public static function GetUploadDir($name_or_row)
     {
         if( is_array($name_or_row) )
             $name_or_row = $name_or_row['user_name'];
@@ -181,13 +181,15 @@ class CCUser
     */
     function OnPatchMenu(&$menu)
     {
+        $page =& CCPage::GetPage();
+        
         $current_user_name = $this->CurrentUserName();
 
         // technically this isn't supposed to happen
 
         if( empty($menu['artist']['action']) )
         {
-            CCPage::Prompt(_('Attention: Menus have been corrupted'));
+            $page->Prompt(_('Attention: Menus have been corrupted'));
             return;  
         }
 
@@ -205,7 +207,7 @@ class CCUser
         }
     }
 
-    function AddUserBreadCrumbs($text,$more=array(),$userrec=array())
+    public static function AddUserBreadCrumbs($text,$more=array(),$userrec=array())
     {
         require_once('cchost_lib/cc-page.php');
         $page =& CCPage::GetPage();
@@ -254,7 +256,7 @@ class CCUsers extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $_table;
         if( !isset($_table) )

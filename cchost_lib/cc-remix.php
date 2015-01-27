@@ -38,7 +38,7 @@ class CCRemix
     *
     * @param integer $upload_id Uplaod ID to edit remixes for
     */
-    function EditRemixes($upload_id)
+    public static function EditRemixes($upload_id)
     {
         global $CC_GLOBALS;
 
@@ -46,32 +46,33 @@ class CCRemix
         require_once('cchost_lib/cc-upload.php');
         require_once('cchost_lib/cc-remix-forms.php');
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
 
         CCUpload::CheckFileAccess(CCUser::CurrentUserName(),$upload_id);
 
         $uploads =& CCUploads::GetTable();
         $name = $uploads->QueryItemFromKey('upload_name',$upload_id);
         $msg = array('str_remix_editing',$name);
-        $this->_build_bread_crumb_trail($upload_id,$msg);
-        CCPage::SetTitle($msg);
+        CCRemix::_build_bread_crumb_trail($upload_id,$msg);
+        $page->SetTitle($msg);
 
         $form = new CCEditRemixesForm($upload_id);
         $show = false;
         if( empty($_REQUEST['editremixes']) )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
             // this will do a AddForm if it has to
-            $this->OnPostRemixForm($form, '', '', $upload_id);
+            CCRemix::OnPostRemixForm($form, '', '', $upload_id);
         }
     }
 
     /**
     * @access private
     */
-    function _build_bread_crumb_trail($upload_id,$text)
+    static function _build_bread_crumb_trail($upload_id,$text)
     {
         $trail[] = array( 'url' => ccl(), 
                           'text' => 'str_home');
@@ -95,7 +96,8 @@ class CCRemix
 
         $trail[] = array( 'url' => '', 'text' => $text );
 
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
 
@@ -107,7 +109,7 @@ class CCRemix
     * @param string $ccud System tag to attach to upload
     * @param integer $remixid Upload id of remix editing
     */
-    function OnPostRemixForm(&$form, $relative_dir, $ccud = CCUD_REMIX, $remixid = '')
+    public static function OnPostRemixForm(&$form, $relative_dir, $ccud = CCUD_REMIX, $remixid = '')
     {
         require_once('cchost_lib/cc-pools.php');
         require_once('cchost_lib/cc-sync.php');
@@ -205,7 +207,8 @@ class CCRemix
         }
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddForm( $form->GenerateForm() );
+        $page =& CCPage::GetPage();
+        $page->AddForm( $form->GenerateForm() );
         return false;
     }
 
@@ -213,7 +216,7 @@ class CCRemix
     /**
     * @access private
     */
-    function _update_remix_tree($field, $remixid, $parentf, $childf, &$table)
+    static function _update_remix_tree($field, $remixid, $parentf, $childf, &$table)
     {
         if( empty($_POST[$field]) )
             return;
@@ -238,7 +241,7 @@ class CCRemix
     /**
     * @access private
     */
-    function _check_for_sources( $field, &$table, &$form, &$remix_sources )
+    static function _check_for_sources( $field, &$table, &$form, &$remix_sources )
     {
         if( !empty($_POST[$field]) )
         {
@@ -302,7 +305,7 @@ EOF;
         CCUtil::ReturnAjaxData($row);
     }
 
-    function GetStrictestLicenseForUpload($upload_id)
+    public static function GetStrictestLicenseForUpload($upload_id)
     {
         $remix_sources = CCDatabase::QueryItems('SELECT tree_parent FROM cc_tbl_tree WHERE tree_child = '.$upload_id);
         $remix_sources = empty($remix_sources) ? '' : join(',',$remix_sources);
@@ -316,7 +319,7 @@ EOF;
         return $row;
     }
 
-    function GetStrictestLicense($remix_sources,$pool_sources)
+    public static function GetStrictestLicense($remix_sources,$pool_sources)
     {
         $rows_r = $rows_p = array();
         if( !empty($remix_sources) )

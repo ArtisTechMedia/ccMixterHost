@@ -20,7 +20,7 @@ $text = cc_tpl_parse_file($argv[1],basename($fname));
 
 if( $num )
 {
-    $lines = split("\n",$text);
+    $lines = cc_split("\n",$text);
     $i = 0;
     foreach( $lines as $line )
     {

@@ -75,7 +75,7 @@ if( !empty($A['records']) )
         type="<?= $item['files'][0]['file_format_info']['mime_type'] ?>"/>
 
         <?
-        $tags = split(',',$item['upload_tags']);
+        $tags = cc_split(',',$item['upload_tags']);
         foreach( $tags as $tag )
         { 
             if( !empty($tag) )

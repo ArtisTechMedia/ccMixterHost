@@ -57,7 +57,7 @@ $bw = ccl('search','people','whatilike') . '/';
 $bl = ccl('search','people','whatido') . '/';
 function _um_helper($tags,$url)
 {
-    $tags = split(',',$tags); 
+    $tags = cc_split(',',$tags); 
     $comma = '';
     foreach( $tags as $tag )
     {

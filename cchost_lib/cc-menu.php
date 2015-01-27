@@ -76,7 +76,7 @@ class CCMenu
     *
     * @param boolean $force 
     */
-    function GetMenu($force = false)
+    public static function GetMenu($force = false)
     {
         static $_menu;
         if( $force || !isset($_menu) )
@@ -89,7 +89,7 @@ class CCMenu
     * Occasionally the menu needs to be reset (e.g. a user logs out)
     *
     */
-    function Reset()
+    public static function Reset()
     {
         CCMenu::_menu_data(true);
         CCMenu::GetMenu(true);
@@ -100,13 +100,14 @@ class CCMenu
     *
     * You can invoke by URL: ?ccm=/media/admin/menu/killcache
     */
-    function KillCache()
+    public static function KillCache()
     {
         $configs =& CCConfigs::GetTable();
         $configs->DeleteType('urlmap',CC_GLOBAL_SCOPE);
         CCEvents::GetUrlMap(true);
         CCMenu::Reset();
-        CCPage::Prompt(_('Menu/URL cache has been cleared'));
+        $page =& CCPage::GetPage();
+        $page->Prompt(_('Menu/URL cache has been cleared'));
     }
 
     /**
@@ -122,7 +123,7 @@ class CCMenu
     * @param array $items Array of menu items
     * @param bool $save_now Writes the menu items to current configs
     */
-    function AddItems( $items, $save_now = false )
+    public static function AddItems( $items, $save_now = false )
     {
         global $CC_CFG_ROOT;
 
@@ -158,7 +159,7 @@ class CCMenu
     * @param array $items Array of group
     * @param bool $save_now Writes the menu items to current configs
     */
-    function AddGroups($items,$save_now = false)
+    public static function AddGroups($items,$save_now = false)
     {
         $groups =& CCMenu::_menu_groups();
         $groups = array_merge($groups,$items);
@@ -176,7 +177,7 @@ class CCMenu
     * @param bool   $permanent Write this change to the config
     * @return bool $removed true = menuitem was found and removed, false = menu item not found
     */
-    function RemoveItem( $item_name, $permanent = true )
+    public static function RemoveItem( $item_name, $permanent = true )
     {
         $configs =& CCConfigs::GetTable();
         $menu = $configs->GetConfig( 'menu ');
@@ -195,7 +196,7 @@ class CCMenu
     *
     * @returns integer $mask Mask of CC_ bits (e.g. CC_MUST_BE_LOGGED_IN)
     */
-    function GetAccessMask()
+    public static function GetAccessMask()
     {
         if( CCUser::IsLoggedIn() )
         {
@@ -218,7 +219,7 @@ class CCMenu
     * Internal: go out there and build the main menu
     * @access private
     */
-    function _build_menu()
+    static function _build_menu()
     {
         $mask        =  CCMenu::GetAccessMask();
         $groups      =  CCMenu::_menu_groups();
@@ -253,7 +254,7 @@ class CCMenu
     * Internal: get the menu from the cache and apply dynamic pathes to it
     * @access private
     */
-    function &_menu_data($force = false, $action = CC_MENU_DISPLAY )
+    static function &_menu_data($force = false, $action = CC_MENU_DISPLAY )
     {
         static $_menu_data;
         if( $force || !isset($_menu_data) )
@@ -288,7 +289,7 @@ class CCMenu
     * Internal goody
     * @access private
     */
-    function & _menu_items()
+    static function & _menu_items()
     {
         $data =& CCMenu::_menu_data();
         $items =& $data['items'];
@@ -299,7 +300,7 @@ class CCMenu
     * Internal goody
     * @access private
     */
-    function & _menu_groups()
+    static function & _menu_groups()
     {
         $data =& CCMenu::_menu_data();
         $groups =& $data['groups'];
@@ -409,18 +410,19 @@ class CCMenu
     *
     * This will trigger a re-build the next time somebody requests a menu.
     */
-    function RevertToParent()
+    public static function RevertToParent()
     {
+        $page =& CCPage::GetPage();
         global $CC_CFG_ROOT;
         $configs =& CCConfigs::GetTable();
         $configs->DeleteType('menu',$CC_CFG_ROOT);
         CCMenu::Reset();
-        CCPage::Prompt( sprintf(
+        $page->Prompt( sprintf(
                                  _('Menus have been reset for %s'),  
                                  "<b>$CC_CFG_ROOT</b>"
                               )
                       );
-        CCPage::SetTitle(_('Reset Menus'));
+        $page->SetTitle(_('Reset Menus'));
     }
 
 }
@@ -430,7 +432,7 @@ function cc_sort_user_menu($a, $b)
 {
     if( $a['menu_group'] == $b['menu_group'] )
         return( cc_weight_sorter($a,$b) );
-    return( cc_weight_sorter($a['menu_group'],$b['menu_group']) );
+    return( cc_weight_sorter($a,$b) );
 }
 
 ?>

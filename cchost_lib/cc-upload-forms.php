@@ -111,7 +111,7 @@ class CCNewUploadForm extends CCUploadMediaForm
 
         if( $show_lic && !empty($avail_lics) )
         {
-            $lics = split(',',$avail_lics);
+            $lics = cc_split(',',$avail_lics);
             $lics = "'" . join( "','",$lics) . "'";
             $lics = CCDatabase::QueryRows("SELECT *, 0 as license_checked FROM cc_tbl_licenses WHERE license_id IN ({$lics})");
             $count    = count($lics);

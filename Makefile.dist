@@ -1,0 +1,69 @@
+# Makefile for ccHost
+#
+# Please see Makefile for information about what this file is constructed from.
+#
+# Copyright 2005-2006, Jon Phillips & Paul Howarth.
+# Copyright 2005-2006, Creative Commons.
+#
+# It basically just installs cchost into the
+# right places and also provides a mechanism to remove them.
+#
+# TODO: Need to make this Makefile more robust to install to the proper 
+# locations for standard apache web directories.
+#
+
+APPNAME = cchost
+INSTALLOPTS = -c
+INSTALL = install $(INSTALLOPTS)
+MANCOMPRESS = .gz
+PREFIX = /usr
+EXEC_PREFIX = $(PREFIX)
+BINDIR = $(EXEC_PREFIX)/bin
+MANDIR = $(PREFIX)/man
+MAN1DIR = $(MANDIR)/man1
+WEBDIR=/opt/$(APPNAME)
+DESTDIR =
+
+# The next line includes the vars which contain our needed file names
+include Makefile.include
+
+all:	
+#$(APPNAME).1$(MANCOMPRESS)
+
+install: all 
+	# This next line backs up cchost installed
+	@if test -d $(DESTDIR)$(WEBDIR); then \
+	    mv $(DESTDIR)$(WEBDIR) $(DESTDIR)$(WEBDIR)_`date +%F_%T`; \
+	else :; fi;
+	
+	$(INSTALL) -m 755 -d $(DESTDIR)$(WEBDIR)
+	
+	cp -Rfp $(DIST_FILES_STATIC) $(DIST_FILES_GENERATED) $(DIST_FOLDERS) \
+		$(DESTDIR)$(WEBDIR)
+
+    # copy our langauge stuff over if it exists
+	if [ -e locale ]; then \
+        cp -Rfp locale/ $(DESTDIR)$(WEBDIR); fi
+
+
+uninstall:
+	rm -Rf $(DESTDIR)$(WEBDIR)
+#	rm $(DESTDIR)$(MANDIR)/$(APPNAME).1$(MANCOMPRESS)
+
+uninstall-all:
+	# this removes all folder starting with cchost in $(DESTDIR)
+	rm -Rf $(DESTDIR)$(WEBDIR)*
+
+clean:
+#	rm -f $(APPNAME).1$(MANCOMPRESS)
+
+#$(APPNAME).1: $(APPNAME).man AUTHORS
+#	cat $(APPNAME).man AUTHORS > $(APPNAME).1
+
+#$(APPNAME).1.gz: $(APPNAME).man AUTHORS
+#	cat $(APPNAME).man AUTHORS | gzip -c > $(APPNAME).1.gz
+
+#$(APPNAME).1.bz2: $(APPNAME).man AUTHORS
+#	cat $(APPNAME).man AUTHORS | bzip2 -c > $(APPNAME).1.bz2
+
+.PHONY: all install uninstall uninstall-all clean

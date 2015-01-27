@@ -221,7 +221,7 @@ class CCReviewsHV
                          'id'         => 'commentcommand',
                          'access'     => CC_MUST_BE_LOGGED_IN );
 
-        if( empty($CC_GLOBALS['reviews_enabled']) || !$this->_can_review($record) )
+        if( empty($CC_GLOBALS['reviews_enabled']) || !CCReviewsHV::_can_review($record) )
         {
             $menu['comments']['access'] = CC_DISABLED_MENU_ITEM;
         }
@@ -232,7 +232,7 @@ class CCReviewsHV
     }
 
 
-    function _can_review($row_or_id)
+    public static function _can_review($row_or_id)
     {
         if( CCUser::IsLoggedIn() )
         {

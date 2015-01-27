@@ -178,12 +178,13 @@ class CCUserAdmin
     function DefaultAvatar()
     {
         global $CC_GLOBALS;
+        $page =& CCPage::GetPage();
 
         $upload_dir = $CC_GLOBALS['image-upload-dir'];
         $title = _("Set Default User Avatar");
         require_once('cchost_lib/cc-admin.php');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
         $form  = new CCDefaultAvatarForm( $upload_dir );
 
         if( !empty($_POST['defaultavatar']) && $form->ValidateFields() )
@@ -196,24 +197,25 @@ class CCUserAdmin
                 $args['default_user_image'] = 0;
             $configs =& CCConfigs::GetTable();
             $configs->SaveConfig('config',$args);
-            CCPage::Prompt(_('Default avatar set'));
+            $page->Prompt(_('Default avatar set'));
         }
         else
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
     }
 
     function ChangePassword($user_id ='')
     {
-        CCPage::SetTitle(_("Change a User's Password/E-mail"));
+        $page =& CCPage::GetPage();
+        $page->SetTitle(_("Change a User's Password/E-mail"));
 
         $users =& CCUsers::GetTable();
         $form = new CCChangePasswordForm($user_id);
 
         if( empty($_POST['changepassword']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -327,7 +329,8 @@ EOF;
 
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle(sprintf(_("Manage User Account for %s"), $username ));
+        $page =& CCPage::GetPage();
+        $page->SetTitle(sprintf(_("Manage User Account for %s"), $username ));
 
         switch( $cmd )
         {
@@ -363,7 +366,7 @@ EOF;
         }
 
         if( !empty($msg) )
-            CCPage::Prompt($msg);
+            $page->Prompt($msg);
 
         $spanR = '<span style="color:red">';
         $spanC = '</span>';
@@ -428,7 +431,7 @@ EOF;
                          'menu_text' => sprintf(_("Activity for %s"), $uq ),
                          'help'      => _('See Activity Log for this user.') );
 
-        CCPage::PageArg('client_menu',$args,'print_client_menu');
+        $page->PageArg('client_menu',$args,'print_client_menu');
 
     }
 
@@ -459,7 +462,7 @@ EOF;
         $form = new CCDeleteUserFilesForm($username,$prompt);
         if( empty($_POST['deleteuserfiles']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
             return( false );
         }
         else
@@ -478,12 +481,13 @@ EOF;
 
     function _del_user(&$record)
     {
+        $page =& CCPage::GetPage();
         $username = $record['user_name'];
         $prompt = sprintf(_("Delete Account for user, %s"), $username);
         $form = new CCDeleteUserFilesForm($username,$prompt);
         if( empty($_POST['deleteuserfiles']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -492,7 +496,7 @@ EOF;
             $users =& CCUsers::GetTable();
             $where['user_id'] = $record['user_id'];
             $users->DeleteWhere($where);
-            CCPage::Prompt(sprintf(_("User account for user, %s, has been deleted."), $record['user_name']));
+            $page->Prompt(sprintf(_("User account for user, %s, has been deleted."), $record['user_name']));
         }
     }
 
@@ -514,7 +518,7 @@ EOF;
 
         if( empty($_POST['ipmanage']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {

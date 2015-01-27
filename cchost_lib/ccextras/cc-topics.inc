@@ -27,6 +27,7 @@ if( !defined('IN_CC_HOST') )
    die('Welcome to CC Host');
 
 require_once('cchost_lib/ccextras/cc-extras-events.php'); // for EVENT_TOPIC stuff
+require_once('cchost_lib/cc-page.php');
 
 /**
 */
@@ -51,7 +52,7 @@ class CCTopicsi18n extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $table;
         if( !isset($table) )
@@ -132,7 +133,7 @@ class CCTopics extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $table;
         if( !isset($table) )
@@ -218,7 +219,7 @@ class CCTopics extends CCTable
         $this->Unlock();        
     }
     
-    function Insert(&$values,$parent_id)
+    function InsertNewTopic(&$values,$parent_id)
     {
         // we do a variation of the nested set model discussed here
         // see: http://dev.mysql.com/tech-resources/articles/hierarchical-data.html
@@ -232,6 +233,8 @@ class CCTopics extends CCTable
             $right = CCDatabase::QueryItem($right_sql);
             $values['topic_left'] = $right + 1;
             $values['topic_right'] = $right + 2;
+            if( empty($values['topic_tags']) )
+                $values['topic_tags'] = '';
             $ret = parent::Insert($values);
             return $ret;
         }
@@ -252,6 +255,8 @@ class CCTopics extends CCTable
         CCDatabase::Query($sql);
         $values['topic_left'] = $right;
         $values['topic_right'] = $right + 1;
+        if( empty($values['topic_tags']) )
+            $values['topic_tags'] = '';
         $ret = parent::Insert($values);
         $this->Unlock();
 
@@ -311,11 +316,12 @@ class CCTopic
     function _verify_topic($topic_id,&$topics,&$record,$is_translate=false)
     {
         require_once('cchost_lib/cc-page.php');
-
+        $page =& CCPage::GetPage();
+        
         $topic_id = intval(CCUtil::Strip($topic_id));
         if( empty($topic_id) )
         {
-            CCPage::Prompt(_('no topic specified.'));
+            $page->Prompt(_('no topic specified.'));
             CCUtil::Send404(false,__FILE__,__LINE__); // just a hack
             return false;
         }
@@ -323,7 +329,7 @@ class CCTopic
         $record = CCDatabase::QueryRow('SELECT topic_locked, topic_can_xlat FROM cc_tbl_topics WHERE topic_id='.$topic_id);
         if( empty($record) )
         {
-            CCPage::Prompt(_('Cannot find that topic.') . ' ' . 
+            $page->Prompt(_('Cannot find that topic.') . ' ' . 
                            _('It might have been deleted by the author.'));
             CCUtil::Send404(false,__FILE__,__LINE__);
             return false;
@@ -336,7 +342,7 @@ class CCTopic
         {
             if( !$is_translate || empty($record['topic_can_xlat']) || !$is_logged_in )
             {
-                CCPage::Prompt(_('You are not authorized to post here.'));
+                $page->Prompt(_('You are not authorized to post here.'));
                 return false;
             }
         }
@@ -347,6 +353,7 @@ class CCTopic
     function Translate($topic_id='')
     {
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
 
         if( empty($topic_id) )
         {
@@ -365,7 +372,7 @@ class CCTopic
 
         $topic_name = CCDatabase::QueryItem('SELECT topic_name FROM cc_tbl_topics WHERE topic_id='.$topic_id);
 
-        CCPage::SetTitle( sprintf(_('Translation of "%s"'), $topic_name) );
+        $page->SetTitle( sprintf(_('Translation of "%s"'), $topic_name) );
 
         require_once('cchost_lib/ccextras/cc-topics-forms.inc');
 
@@ -376,7 +383,7 @@ class CCTopic
             $query = new CCQuery();
             $args = $query->ProcessAdminArgs('t=topic_reply&ids='.$topic_id);
             $query->Query($args);
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -399,7 +406,7 @@ class CCTopic
             $values['topic_type']  = 'xlat';
             $values['topic_forum'] = 
             $values['topic_thread'] = 0;
-            $topics->Insert($values,0);
+            $topics->InsertNewTopic($values,0);
 
             CCUtil::SendBrowserTo(); // this will send back to topic
          }
@@ -421,6 +428,7 @@ class CCTopic
         $query->Query($args);
 
         require_once('cchost_lib/ccextras/cc-topics-forms.inc');
+        $page =& CCPage::GetPage();
 
         // this is a round about way of doing form validation
         // but we do this in case we have to shove a 'quote' 
@@ -449,7 +457,7 @@ class CCTopic
             {
                 $title = array('str_topic_reply_to_s',$user_real_name);
             }
-            CCPage::SetTitle($title);
+            $page->SetTitle($title);
 
             if( $is_quote === true && !$did_validation)
             {
@@ -465,7 +473,7 @@ class CCTopic
             CCPage::PageArg('topic_id',$topic_id);
             CCPage::PageArg('topic',$record,'topic_reply' );
             */
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -487,7 +495,7 @@ class CCTopic
             $values['topic_thread'] = $record['topic_thread'];
             $values['topic_upload'] = $record['topic_upload'];
             $values['topic_name']   = $name;
-            $topics->Insert($values,$topic_id);
+            $topics->InsertNewTopic($values,$topic_id);
 
             if( !empty($values['topic_thread']) )
             {
@@ -530,9 +538,10 @@ class CCTopic
         if( $branch && !CCUser::IsAdmin() )
             cc_exit();
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         $this->CheckTopicAccess($topic_id);
         $topics =& CCTopics::GetTable();
-        CCPage::SetTitle(_("Deleting Topic"));
+        $page->SetTitle(_("Deleting Topic"));
         if( empty($_POST['confirmtopicdelete']) )
         {
             $topics =& CCTopics::GetTable();
@@ -541,7 +550,7 @@ class CCTopic
                 $pretty_name = _('Topic');
             require_once('cchost_lib/ccextras/cc-topics-forms.inc');
             $form = new CCConfirmTopicDeleteForm($pretty_name);
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -605,6 +614,7 @@ class CCTopic
 
     function Edit($topic_id)
     {
+        $page =& CCPage::GetPage();
         $this->CheckTopicAccess($topic_id);
         
         global $CC_GLOBALS;
@@ -622,8 +632,8 @@ class CCTopic
 
         if( !$inpost || !$form->ValidateFields() )
         {
-            CCPage::SetTitle(array('str_topic_edit_s',$record['topic_name']));
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->SetTitle(array('str_topic_edit_s',$record['topic_name']));
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -646,14 +656,15 @@ class CCTopic
     function Lock($topic_id)
     {
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle(_('Locking and Unlocking Topic Replies'));
+        $page =& CCPage::GetPage();
+        $page->SetTitle(_('Locking and Unlocking Topic Replies'));
 
         $row =
             CCDatabase::QueryRow('SELECT topic_left, topic_right, topic_locked FROM cc_tbl_topics WHERE topic_id='.$topic_id,false);
 
         if( empty($row) )
         {
-            CCPage::Prompt(_('Topic does not exist'));
+            $page->Prompt(_('Topic does not exist'));
             return;
         }
         list( $left, $right, $topic_locked  ) = $row;
@@ -670,7 +681,7 @@ class CCTopic
                        _('Return to previous page') . '</a>';   
         }
 
-        CCPage::Prompt($prompt);
+       $page->Prompt($prompt);
     }
 
     /**

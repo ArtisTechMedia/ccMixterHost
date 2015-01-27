@@ -85,13 +85,14 @@ class CCLicWaiver
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
+        $page =& CCPage::GetPage();
         $title = _('Configure Upgrade Alternatives');
         $trail1 = array( 'url' => '/license_menu', 'text' => 'Edit System Licenses' );
         $trail2 = array('url'=>'','text'=>$title);
         CCAdmin::BreadCrumbs(true,$trail1,$trail2);
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
         $form = new CCAdminLicWaiverForm();
-        CCPage::AddForm( $form->GenerateForm() );
+        $page->AddForm( $form->GenerateForm() );
     }
     
     function OnMapUrls()

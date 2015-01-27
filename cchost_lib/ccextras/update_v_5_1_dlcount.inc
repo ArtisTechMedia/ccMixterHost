@@ -33,7 +33,8 @@ class v_5_1_dlcount extends CCUpdate
     function Update()
     {
         $this->_check_for_field('cc_tbl_uploads','upload_dl_count', 'INT NOT NULL ');
-        CCPage::Prompt( _('DL counter') );
+        $page =& CCPage::GetPage();
+        $page->Prompt( _('DL counter') );
     }
 }
 

@@ -37,12 +37,12 @@ require_once('cchost_lib/cc-upload-table.php');
 */
 class CCUploadAPI
 {
-    function UpdateCCUD($upload_id,$new_ccud,$replaces_ccud)
+    public static function UpdateCCUD($upload_id,$new_ccud,$replaces_ccud)
     {
         CCUploadAPI::_recalc_upload_tags($upload_id,$new_ccud,$replaces_ccud);
     }
 
-    function UpdateUserTags($upload_id,$new_user_tags)
+    public static function UpdateUserTags($upload_id,$new_user_tags)
     {
         require_once('cchost_lib/cc-tags.php');
         require_once('cchost_lib/cc-tags.inc');
@@ -65,7 +65,7 @@ class CCUploadAPI
         $tags_db->Replace($old_user_tags,$new_user_tags);
     }
 
-    function & _get_record($upload_id)
+    public static function & _get_record($upload_id)
     {
         $sql =<<<EOF
             SELECT upload_id, upload_extra, upload_contest, 
@@ -82,7 +82,7 @@ EOF;
         return $record;
     }
 
-    function DeleteUpload($upload_id)
+    public static function DeleteUpload($upload_id)
     {
         require_once('cchost_lib/cc-sync.php');
         require_once('cchost_lib/cc-tags.inc');
@@ -126,6 +126,7 @@ EOF;
         CCSync::Delete($record);
     }
 
+    public static 
     function PostProcessNewUpload(  $upload_args, 
                                     $current_path,
                                     $new_name,
@@ -254,6 +255,7 @@ EOF;
         return( intval($db_args['file_upload']) );
     }
 
+    public static 
     function PostProcessFileAdd( $record,
                                  $nicname,
                                  $current_path,
@@ -338,7 +340,7 @@ EOF;
         return intval($record['upload_id']);
     }
 
-    function PostProcessFileDelete( $file_id, &$upload_id )
+    public static function PostProcessFileDelete( $file_id, &$upload_id )
     {
         CCEvents::Invoke( CC_EVENT_DELETE_FILE, array( $file_id ) );
         $row = CCDatabase::QueryRow('SELECT file_upload, file_name FROM cc_tbl_files WHERE file_id='.$file_id);
@@ -356,6 +358,7 @@ EOF;
         CCUploadAPI::_recalc_upload_tags( $upload_id );
     }
 
+    public static 
     function PostProcessFileReplace( $overwrite_this,
                                      $nicname,
                                      $current_path,
@@ -430,6 +433,7 @@ EOF;
         CCEvents::Invoke( CC_EVENT_UPLOAD_DONE, array( $upload_id, CC_UF_FILE_REPLACE ) );
     }
 
+    public static 
     function PostProcessEditUpload(  $upload_args, 
                                      $old_record,
                                      $relative_dir) 
@@ -537,7 +541,7 @@ EOF;
         CCEvents::Invoke( CC_EVENT_UPLOAD_DONE, array( $new_args['upload_id'], CC_UF_PROPERTIES_EDIT, array(&$old_record) ) );
     }
 
-    function _do_verify_file_size($current_path)
+    public static function _do_verify_file_size($current_path)
     {
         global $CC_GLOBALS;
         if( empty($CC_GLOBALS['enable_quota']) )
@@ -566,7 +570,7 @@ EOF;
         return( null );
     }
 
-    function _do_verify_file_format($current_path,&$file_args)
+    public static function _do_verify_file_format($current_path,&$file_args)
     {
         require_once('cchost_lib/cc-formatinfo.php');
 
@@ -602,15 +606,16 @@ EOF;
         return( null );
     }
 
-    function _do_get_systags(&$record,&$a_files, $ccud_tags,$user_tags)
+    public static function _do_get_systags(&$record,&$a_files, $ccud_tags,$user_tags)
     {
         $systags = array();
-        $eargs = array( &$record, null, &$systags );
+        $empty = null;
+        $eargs = array( &$record, &$empty, &$systags );
         CCEvents::Invoke( CC_EVENT_GET_SYSTAGS, $eargs );
         $file_ccud = array();
         for( $i = 0; $i < count($a_files); $i++ )
         {
-            $eargs2 = array( null, &$a_files[$i], &$systags );
+            $eargs2 = array( &$empty, &$a_files[$i], &$systags );
             CCEvents::Invoke( CC_EVENT_GET_SYSTAGS, $eargs2 );
             if( !empty($a_files[$i]['file_extra']['ccud']) )
                 $file_ccud[] = $a_files[$i]['file_extra']['ccud'];
@@ -630,9 +635,9 @@ EOF;
         $record['upload_extra']['systags']     = CCUploadAPI::_concat_tags( $systags );
         $all_tags                              = CCUploadAPI::_concat_tags( $ccud_tags, $file_ccud, $systags, $user_tags );
 
-        $tags->Insert($record['upload_extra']['ccud'],     CCTT_SYSTEM );
-        $tags->Insert($record['upload_extra']['systags'],  CCTT_SYSTEM );
-        $tags->Insert($record['upload_extra']['usertags'], CCTT_USER );
+        $tags->InsertNewTags($record['upload_extra']['ccud'],     CCTT_SYSTEM );
+        $tags->InsertNewTags($record['upload_extra']['systags'],  CCTT_SYSTEM );
+        $tags->InsertNewTags($record['upload_extra']['usertags'], CCTT_USER );
 
         // multiple formats can share tags, we reduced them down however
 
@@ -641,7 +646,7 @@ EOF;
         $record['upload_tags'] = implode(',',$all_tags_arr);
     }
 
-    function _do_rename( &$upload_args, &$file_args, $current_path, $relative_dir )
+    public static function _do_rename( &$upload_args, &$file_args, $current_path, $relative_dir )
     {
         $renamer = CCUploadAPI::GetRenamer();
         $newname = '';
@@ -712,7 +717,7 @@ EOF;
         return $msg;
     }
     
-    function _concat_tags()
+    public static function _concat_tags()
     {
         $ts = func_get_args();
         $result = '';
@@ -732,7 +737,7 @@ EOF;
         return( $result);
     }
 
-    function _recalc_upload_tags($upload_id,$new_ccud = '',$replaces_ccud='')
+    public static function _recalc_upload_tags($upload_id,$new_ccud = '',$replaces_ccud='')
     {
         require_once('cchost_lib/cc-tags.php');
 
@@ -775,7 +780,7 @@ EOF;
         $tags->Replace($old_tags,$db_args['upload_tags']);
     }
 
-    function _do_rename_and_tag( &$record, &$file_args, $current_path, $relative_dir )
+    public static function _do_rename_and_tag( &$record, &$file_args, $current_path, $relative_dir )
     {
         // Run the file through the renamer 
         // (this will update $file_args['file_name'])
@@ -794,7 +799,7 @@ EOF;
         return $msg;
     }
 
-    function _move_upload_file(&$current_path,$new_name,&$is_temp)
+    public static function _move_upload_file(&$current_path,$new_name,&$is_temp)
     {
         // sigh
         //
@@ -830,13 +835,13 @@ EOF;
         return $current_path;
     }
 
-    function _cleanup_upload_file(&$current_path,$is_temp)
+    public static function _cleanup_upload_file(&$current_path,$is_temp)
     {
         if( $is_temp && file_exists($current_path) )
             @unlink($current_path);
     }
 
-    function & GetRenamer()
+    public static function & GetRenamer()
     {
         global $CC_UPLOAD_RENAMER;
 
@@ -858,7 +863,7 @@ EOF;
         return $renamer;
     }
 
-    function & GetTagger()
+    public static function & GetTagger()
     {
         global $CC_ID3_TAGGER;
 
@@ -880,7 +885,7 @@ EOF;
         return $tagger;
     }
 
-    function & GetVerifier()
+    public static function & GetVerifier()
     {
         global $CC_UPLOAD_VALIDATOR;
 

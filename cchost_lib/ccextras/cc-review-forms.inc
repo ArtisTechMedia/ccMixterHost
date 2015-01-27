@@ -51,17 +51,18 @@ class CCReviewFormAPI
     function PostReview($upload_id)
     {
         global $CC_GLOBALS, $CC_CFG_ROOT;
-
+        $page =& CCPage::GetPage();
+        
         if( empty($CC_GLOBALS['reviews_enabled']) )
         {
-            CCPage::Prompt(_('Review integration is not enabled.'));
+            $page->Prompt(_('Review integration is not enabled.'));
             return;
         }
 
         $uploads =& CCUploads::GetTable();
         if( !$uploads->KeyExists($upload_id) )
         {
-            CCPage::Prompt(_('Cannot find that upload.'));
+            $page->Prompt(_('Cannot find that upload.'));
             CCUtil::Send404(false);
             return;
         }
@@ -91,7 +92,7 @@ class CCReviewFormAPI
                 CCReview::_build_bread_crumb_trail(array($user_name,$user_real_name),
                                           array( $upload_id, $upload_name), '',_('create new'));
 
-                CCPage::SetTitle(array('str_review_write_s',$upload_name));
+                $page->SetTitle(array('str_review_write_s',$upload_name));
 
                 $args = $query->ProcessAdminArgs('t=list_files&ids=' . $upload_id); 
             }
@@ -102,9 +103,9 @@ class CCReviewFormAPI
 
             $query->Query($args);
 
-            CCPage::PageArg('review_upload',$upload_id);
+            $page->PageArg('review_upload',$upload_id);
             
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -112,7 +113,7 @@ class CCReviewFormAPI
             {
                 // submit was hit twice
                 require_once('cchost_lib/cc-page.php');
-                CCPage::Prompt(_("You have already reviewed this upload."));
+                $page->Prompt(_("You have already reviewed this upload."));
             }
             else
             {
@@ -126,7 +127,7 @@ class CCReviewFormAPI
                 $user_real = CCUser::CurrentUserField('user_real_name');
                 $values['topic_name'] = sprintf(_("Review of '%s' by '%s'"), 
                                                 $upload_name, $user_real);
-                $reviews->Insert($values,0);
+                $reviews->InsertNewTopic($values,0);
                 CCReview::Sync($upload_id,$values['topic_user']);
 
                 $row = $reviews->QueryKeyRow($values['topic_id']);

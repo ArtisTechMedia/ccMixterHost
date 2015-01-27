@@ -47,11 +47,12 @@ class CCChannels
 {
     function Admin()
     {
-        CCPage::SetTitle(_('Configure Radio Template'));
+        $page =& CCPage::GetPage();
+        $page->SetTitle(_('Configure Radio Template'));
         $form = new CCChannelsAdminForm();
         if( empty($_POST['channelsadmin']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -66,7 +67,7 @@ class CCChannels
             $b['site_promo_tag'] = $_POST['site_promo_tag'];
             $configs->SaveConfig('config',$b,CC_GLOBAL_SCOPE,true);
 
-            CCPage::Prompt(_('Channel information saved'));
+            $page->Prompt(_('Channel information saved'));
         }
 
     }

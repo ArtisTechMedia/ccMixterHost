@@ -132,9 +132,10 @@ class CCPageAdmin
     *
     * @see CCPage::ViewFile()
     */
-    function ViewFile($template='')
+    public static function ViewFile($template='')
     {
-        CCPage::ViewFile($template);
+        $page =& CCPage::GetPage();
+        $page->ViewFile($template);
     }
 
     /**
@@ -226,7 +227,7 @@ class CCPage extends CCSkin
     * Returns the a singleton instance of the page that will be displayed
     * 
     */
-    function & GetPage($force = false)
+    public static function & GetPage($force = false)
     {
         static $_page;
         if( empty($_page) || $force )
@@ -234,7 +235,7 @@ class CCPage extends CCSkin
         return($_page);
     }
 
-    function GetPageQueryLimit()
+    public static function GetPageQueryLimit()
     {
         $configs =& CCConfigs::GetTable();
         $settings = $configs->GetConfig('skin-settings');
@@ -257,19 +258,14 @@ class CCPage extends CCSkin
         if( empty($template) )
             CCUtil::SendBrowserTo(ccl());
 
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-           $page =& CCPage::GetPage();
-         else
-           $page =& $this;
-           
-        if( !($file = $page->GetViewFile($template)) && !preg_match('/\.xml$/',$template) )
+        if( !($file = $this->GetViewFile($template)) && !preg_match('/\.xml$/',$template) )
         {
-            $file = $page->GetViewFile($template . '.xml');
+            $file = $this->GetViewFile($template . '.xml');
         }
 
         if( empty($file) )
         {
-            $page->Prompt( sprintf(_("Can't find %s template"),$template) );
+            $this->Prompt( sprintf(_("Can't find %s template"),$template) );
             CCUtil::Send404(false);
         }
         else
@@ -280,20 +276,20 @@ class CCPage extends CCSkin
             if( empty($props['page_title']) )
             {
                 // see notes in CCPage::Show for why this is important
-                if( empty($page->vars['page-title']) )
+                if( empty($this->vars['page-title']) )
                 {
                     $contents = file_get_contents($file);
-                    $page->_check_for_title($contents);
+                    $this->_check_for_title($contents);
                 }
             }
             else
             {
-                $page->SetTitle( $props['page_title'] );
+                $this->SetTitle( $props['page_title'] );
             }
 
-            $page->_add_template_bread_crumbs($props);
+            $this->_add_template_bread_crumbs($props);
             
-            $page->_body_template = $file;
+            $this->_body_template = $file;
         }
     }
 
@@ -306,22 +302,12 @@ class CCPage extends CCSkin
     */
     function PageArg($name, $value='', $macroname='')
     {
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-           $page =& CCPage::GetPage();
-         else
-           $page =& $this;
-
-        $page->SetArg($name,$value,$macroname);
+        $this->SetArg($name,$value,$macroname);
     }
 
     function AddMacro($macroname)
     {
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-           $page =& CCPage::GetPage();
-         else
-           $page =& $this;
-
-        $page->_add_macro($macroname);
+        $this->_add_macro($macroname);
     }
 
     function _add_macro($macroname)
@@ -337,13 +323,8 @@ class CCPage extends CCSkin
     */
     function GetPageArg($name)
     {
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-           $page =& CCPage::GetPage();
-         else
-           $page =& $this;
-
-        if( isset($page->vars[$name]) )
-            return $page->vars[$name];
+        if( isset($this->vars[$name]) )
+            return $this->vars[$name];
 
         return '';
     }
@@ -355,14 +336,9 @@ class CCPage extends CCSkin
     */
     function SetTitle( $title )
     {
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-           $page =& CCPage::GetPage();
-         else
-           $page =& $this;
-
         $arg = func_num_args() == 1 ? $title : func_get_args();
-        $page->SetArg('page-title', $arg );
-        $page->SetArg('page-caption', $arg );
+        $this->SetArg('page-title', $arg );
+        $this->SetArg('page-caption', $arg );
     }
 
     /**
@@ -372,16 +348,11 @@ class CCPage extends CCSkin
     */
     function GetTitle()
     {
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-           $page =& CCPage::GetPage();
-         else
-           $page =& $this;
-
-        $arg = $page->GetArg('page-title');
+        $arg = $this->GetArg('page-title');
         if( empty($arg) )
-            $arg = $page->SetArg('page-caption' );
+            $arg = $this->SetArg('page-caption' );
         if( !empty($arg) )
-            $arg = $page->String($arg);
+            $arg = $this->String($arg);
         return $arg;
     }
 
@@ -392,8 +363,8 @@ class CCPage extends CCSkin
     */
     function PrintPage( & $body )
     {
-        CCPage::AddContent($body);
-        CCPage::Show();
+        $this->AddContent($body);
+        $this->Show();
     }
 
     /**
@@ -404,12 +375,7 @@ class CCPage extends CCSkin
     */
     function SetStyleSheet( $css, $title = '' )
     {
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-           $page =& CCPage::GetPage();
-         else
-           $page =& $this;
-
-        $page->vars['style_sheets'][] = $css;
+        $this->vars['style_sheets'][] = $css;
     }
 
     /**
@@ -420,13 +386,8 @@ class CCPage extends CCSkin
     */
     function ShowHeaderFooter( $show_header, $show_footer )
     {
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-           $page =& CCPage::GetPage();
-         else
-           $page =& $this;
-
-        $page->vars['show_body_header'] = $show_header;
-        $page->vars['show_body_footer'] = $show_footer;
+        $this->vars['show_body_header'] = $show_header;
+        $this->vars['show_body_footer'] = $show_footer;
     }
 
     /**
@@ -437,26 +398,23 @@ class CCPage extends CCSkin
     {
         global $CC_GLOBALS;
 
+        CCDebug::Enable(true);
+        
         if( !CCUtil::IsHTTP() )
             return;
 
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-            $page =& CCPage::GetPage();
-        else
-            $page =& $this;
+        $this->vars['menu_groups'] = CCMenu::GetMenu();
 
-        $page->vars['menu_groups'] = CCMenu::GetMenu();
-
-        if( !empty($page->_body_template) )
+        if( !empty($this->_body_template) )
         {
-            $page->AddMacro($page->_body_template);
+            $this->AddMacro($this->_body_template);
         }
 
         if( empty($CC_GLOBALS['hide_sticky_tabs']) && 
-            empty($page->vars['tab_info']) )
+            empty($this->vars['tab_info']) )
         {
             $naviator_api = new CCNavigator();
-            $naviator_api->ShowTabs($page);
+            $naviator_api->ShowTabs($this);
         }
 
         /*
@@ -464,33 +422,33 @@ class CCPage extends CCSkin
             go to great lengths to make sure there is something 
             relevant there.
         */
-        if( empty($page->vars['page-caption']) )
+        if( empty($this->vars['page-caption']) )
         {
-            if( empty($page->vars['page-title']) )
+            if( empty($this->vars['page-title']) )
             {
-                if( !empty($page->vars['html_content']) )
+                if( !empty($this->vars['html_content']) )
                 {
-                    foreach( $page->vars['html_content'] as $contents )
+                    foreach( $this->vars['html_content'] as $contents )
                     {
-                        $page->_check_for_title($contents);
-                        if( !empty($page->vars['page-caption']) )
+                        $this->_check_for_title($contents);
+                        if( !empty($this->vars['page-caption']) )
                             break;
                     }
                 }
             }
             else
             {
-                $page->vars['page-caption'] = $page->vars['page-title'];
+                $this->vars['page-caption'] = $this->vars['page-title'];
             }
         }
 
-        CCEvents::Invoke(CC_EVENT_RENDER_PAGE, array( &$page ) );
+        CCEvents::Invoke(CC_EVENT_RENDER_PAGE, array( &$this ) );
 
         // did anyone add a feed to page 'manually'?
-        if( empty($page->vars['feed_links']) )
+        if( empty($this->vars['feed_links']) )
         {
             // no, is there a defaul query that ran to fill the page?
-            if( empty($page->vars['qstring']) )
+            if( empty($this->vars['qstring']) )
             {
                 // no, is there an admin set 'default feed query'?
                 $config =& CCConfigs::GetTable();
@@ -500,7 +458,7 @@ class CCPage extends CCSkin
             }
             else
             {
-                $defq = $page->vars['qstring'];
+                $defq = $this->vars['qstring'];
             }
 
             if( !empty($defq) )
@@ -519,35 +477,35 @@ class CCPage extends CCSkin
                 }
                 else
                 {
-                    $title = $page->String($defq_args['title']);
+                    $title = $this->String($defq_args['title']);
                 }
-                $page->AddFeedLink($defq, $title, $title);
+                $this->AddFeedLink($defq, $title, $title);
                 // Set this flag incase a template adds a feed link midway through render
-                $page->_using_default_feeds = true;
+                $this->_using_default_feeds = true;
             }
         }
 
         if( !empty($_REQUEST['dump_page']) && CCUser::IsAdmin() )
-             CCDebug::PrintVar($page->vars,false);
+             CCDebug::PrintVar($this->vars,false);
 
         if( !empty($CC_GLOBALS['no-cache']) )
             cc_send_no_cache_headers();
 
         if( $print )
-            $page->SetAllAndPrint(array());
+            $this->SetAllAndPrint(array());
         else
-            return $page->SetAllAndParse(array());
+            return $this->SetAllAndParse(array());
 
     }
 
-    function GetViewFile($filename,$real_path=true)
+    public static function GetViewFile($filename,$real_path=true)
     {
         global $CC_GLOBALS;
         $files = CCSkin::GetFilenameGuesses($filename);
         return CCUtil::SearchPath( $files, $CC_GLOBALS['files-root'], 'ccskins/shared', $real_path, true );
     }
 
-    function GetViewFilePath()
+    public static function GetViewFilePath()
     {
         global $CC_GLOBALS;
         return CCUtil::SplitPaths( $CC_GLOBALS['files-root'], 'ccskins/shared/' );
@@ -560,7 +518,7 @@ class CCPage extends CCSkin
     */
     function PhpError($err_msg)
     {
-        CCPage::AddPrompt('php_error_message',$err_msg);
+        $this->AddPrompt('php_error_message',$err_msg);
     }
 
     /**
@@ -576,7 +534,7 @@ class CCPage extends CCSkin
         }
         else
         {
-            CCPage::AddPrompt('system_error_message',$err_msg);
+            $this->AddPrompt('system_error_message',$err_msg);
         }
     }
 
@@ -588,7 +546,7 @@ class CCPage extends CCSkin
     function Prompt($prompt)
     {
         $prompt = func_num_args() == 1 ? $prompt : func_get_args();
-        CCPage::AddPrompt('system_prompt', $prompt );
+        $this->AddPrompt('system_prompt', $prompt );
     }
 
 
@@ -601,18 +559,13 @@ class CCPage extends CCSkin
     */
     function AddForm($form)
     {
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-           $page =& CCPage::GetPage();
-         else
-           $page =& $this;
-
-        $page->vars['forms'][] = array(
+        $this->vars['forms'][] = array(
                                     $form->GetTemplateMacro(),
                                     $form->GetTemplateVars() );
-        if( !$page->_have_forms )
+        if( !$this->_have_forms )
         {
-            $page->vars['macro_names'][] = 'print_forms';
-            $page->_have_forms = true;
+            $this->vars['macro_names'][] = 'print_forms';
+            $this->_have_forms = true;
         }
     }
 
@@ -623,15 +576,10 @@ class CCPage extends CCSkin
     */
     function AddContent($html_text)
     {
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-           $page =& CCPage::GetPage();
-         else
-           $page =& $this;
+        $this->vars['html_content'][] = $html_text;
 
-        $page->vars['html_content'][] = $html_text;
-
-        if( empty($page->vars['macro_names']) || !in_array( 'print_html_content', $page->vars['macro_names'] ) )
-            $page->vars['macro_names'][] = 'print_html_content';
+        if( empty($this->vars['macro_names']) || !in_array( 'print_html_content', $this->vars['macro_names'] ) )
+            $this->vars['macro_names'][] = 'print_html_content';
     }
 
     /**
@@ -647,15 +595,10 @@ class CCPage extends CCSkin
     */
     function AddScriptBlock($script_macro_name,$place_at_end = false)
     {
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-            $page =& CCPage::GetPage();
-        else
-            $page =& $this;
-
         $group = $place_at_end ? 'end_script_blocks' : 'script_blocks';
 
-        if( empty($page->vars[$group]) || !in_array($script_macro_name,$page->vars[$group]) )
-            $page->vars[$group][] = $script_macro_name;
+        if( empty($this->vars[$group]) || !in_array($script_macro_name,$this->vars[$group]) )
+            $this->vars[$group][] = $script_macro_name;
     }
 
     /**
@@ -666,20 +609,12 @@ class CCPage extends CCSkin
     */
     function AddScriptLink($script_url,$top=true)
     {
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-            $page =& CCPage::GetPage();
-        else
-            $page =& $this;
-
-        //if( substr($script_url,0,7) != 'http://' )
-        //    $script_url = ccd( CCSkin::Search($script_url) );
-
         $arr = array();
         $arr_name = $top ? 'script_links' : 'end_script_links';
-        if( !empty($page->vars[$arr_name]) )
-            $arr = $page->vars[$arr_name];
+        if( !empty($this->vars[$arr_name]) )
+            $arr = $this->vars[$arr_name];
         $arr[] = $script_url;
-        $page->vars[$arr_name] = array_unique($arr);
+        $this->vars[$arr_name] = array_unique($arr);
     }
 
     /**
@@ -688,15 +623,10 @@ class CCPage extends CCSkin
     * @param array &$tab_info Array of meta data for tabs
     * @param string $macro Name of macro to invoke
     */
-    function AddTabNaviator(&$tab_info,$macro)
+    function AddTabNavigator(&$tab_info,$macro)
     {
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-            $page =& CCPage::GetPage();
-        else
-            $page =& $this;
-
-        $page->vars['tab_info'] = $tab_info;
-        $page->vars['page_tabs'] = $macro;
+        $this->vars['tab_info'] = $tab_info;
+        $this->vars['page_tabs'] = $macro;
     }
 
 
@@ -715,13 +645,8 @@ class CCPage extends CCSkin
     */
     function AddBreadCrumbs($trail,$overwrite=false)
     {
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-            $page =& CCPage::GetPage();
-        else
-            $page =& $this;
-
-        if( empty($page->vars['bread_crumbs']) || $overwrite )
-            $page->vars['bread_crumbs'] = $trail;
+        if( empty($this->vars['bread_crumbs']) || $overwrite )
+            $this->vars['bread_crumbs'] = $trail;
     }
 
     /**
@@ -731,12 +656,7 @@ class CCPage extends CCSkin
     */
     function GetBreadCrumbs()
     {
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-            $page =& CCPage::GetPage();
-        else
-            $page =& $this;
-            
-        return $page->GetArg('bread_crumbs');
+        return $this->GetArg('bread_crumbs');
     }
     
     /**
@@ -753,12 +673,7 @@ class CCPage extends CCSkin
     function AddLink($placement, $rel, $type, $href, $title, $link_text = '', $id = '')
     {
 
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-           $page =& CCPage::GetPage();
-         else
-           $page =& $this;
-
-        $page->vars[$placement][] = array(   'rel'       => $rel,
+        $this->vars[$placement][] = array(   'rel'       => $rel,
                                                    'type'      => $type,
                                                    'href'      => str_replace('&','&amp;',$href),
                                                    'title'     => str_replace('"',"'",$title),
@@ -778,18 +693,13 @@ class CCPage extends CCSkin
     function AddFeedLink($query, $title, $link_text = '', $id = '', $datasource='uploads')
     {
         
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-           $page =& CCPage::GetPage();
-         else
-           $page =& $this;
-
-        if( !empty($page->_using_default_feeds) )
+        if( !empty($this->_using_default_feeds) )
         {
             // it seems we are already in the middle of a render
             // nuke the default feed links and let the caller
             // override all
-            $page->var['feed_links'] = array();
-            $page->_using_default_feeds = false;
+            $this->var['feed_links'] = array();
+            $this->_using_default_feeds = false;
         }
 
         $feed_info = array(  'query'      => $query, 
@@ -798,7 +708,7 @@ class CCPage extends CCSkin
                            'id'        => $id,
                            'datasource'=> $datasource,
                         );
-        CCEvents::Invoke( CC_EVENT_ADD_PAGE_FEED, array( &$page, $feed_info ) );
+        CCEvents::Invoke( CC_EVENT_ADD_PAGE_FEED, array( &$this, $feed_info ) );
     }
 
     /**
@@ -809,18 +719,13 @@ class CCPage extends CCSkin
     */
     function AddPrompt($name,$value)
     {
-        if( empty($this) || (strtolower(get_class($this)) != 'ccpage') )
-           $page =& CCPage::GetPage();
-         else
-           $page =& $this;
-
-        $page->vars['prompts'][] = array(  'name' => $name,
+        $this->vars['prompts'][] = array(  'name' => $name,
                                            'value' => $value );
 
-        if( empty($page->vars['macro_names']) )
-            $page->vars['macro_names'][] = 'print_prompts';
-        elseif( !in_array( 'print_prompts', $page->vars['macro_names'] ) )
-            array_unshift($page->vars['macro_names'],'print_prompts');
+        if( empty($this->vars['macro_names']) )
+            $this->vars['macro_names'][] = 'print_prompts';
+        elseif( !in_array( 'print_prompts', $this->vars['macro_names'] ) )
+            array_unshift($this->vars['macro_names'],'print_prompts');
     }
 
     function _check_for_title($contents)
@@ -927,19 +832,19 @@ class CCPage extends CCSkin
         }
 
         if( empty($template) )        
-            CCPage::PageArg('paging_stats',$args);
+            $this->PageArg('paging_stats',$args);
         else
             $template->SetArg('paging_stats',$args);
 
         if( !empty($template) )
         {
             // this is all deprecated since 5.1
-            CCPage::PageArg('more_text', _('More') . ' >>>');
-            CCPage::PageArg('back_text','<<< ' . _('Back'));
+            $this->PageArg('more_text', _('More') . ' >>>');
+            $this->PageArg('back_text','<<< ' . _('Back'));
             if( !empty($args['prev_link']) )
-              CCPage::PageArg('prev_link',$args['prev_link']);
+              $this->PageArg('prev_link',$args['prev_link']);
             if( !empty($args['next_link']) )
-              CCPage::PageArg('next_link',$args['next_link']);
+              $this->PageArg('next_link',$args['next_link']);
         }
         
         return $args;
@@ -952,7 +857,7 @@ class CCPage extends CCSkin
             
         $breadcrumbs = $props['breadcrumbs'];
         $bc = array();
-        $args = split(',',$breadcrumbs);
+        $args = cc_split(',',$breadcrumbs);
         foreach( $args as $arg )
         {
             $arg = trim($arg);

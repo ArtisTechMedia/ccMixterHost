@@ -271,7 +271,7 @@ class CCTable
     * Where CCUploads is a derivation of CCTable.
     * @return object $table Returns a singleton instance of this object.
     */
-    function GetTable()
+    static function & GetTable()
     {
     }
 

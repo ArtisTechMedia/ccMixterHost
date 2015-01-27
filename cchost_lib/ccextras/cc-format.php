@@ -141,8 +141,7 @@ function _cc_format_format($text)
     $attrs = '(b|i|u|red|green|blue|big|small|right|left)';
     $text = strip_tags($text);
     $map = array(
-                  "#\[var=([^\]]+)]\[/var\]#e" => '_cc_format_template_tag(\'\1\',$page)', 
-                  "#\[define=([^\]]+)\]\[/define\]#e" => '\1', 
+                  
                   "/\[$attrs\]/" => '<span class="\1">', 
                   "#\[/$attrs\]#" => '</span>', 
                   "/\[quote=?([^\]]+)?\]/" => '<span class="quote"><span>'. $quote . ' $1</span>', 
@@ -155,16 +154,34 @@ function _cc_format_format($text)
                   "#\[/box\]#" => '</div>', 
                   "/\[indent=([0-9]+)]/" => '<div class="format_indent" style="padding-left:$1px">',
                   "#\[/indent\]#" => '</div>', 
-                  "#\[cmdurl=([^\]]+)\]\[/cmdurl\]#e" => 'ccl(\'\1\')', 
-                  "/\[cmd=([^\]]+)\]/e" => '"<a rel=\"nofollow\" href=\"" . ccl(\'\1\') . "\">"', 
-                  "#\[/cmd\]#" => '</a>', 
-                  "#\[skinimg=([^\]]+)\]\[/skinimg\]#e" =>
-                     '\'<img class="format_image" src="\' . ccd($page->Search(array("$1","images/$1"))) . \'" />\'', 
                   "#\[img=([^\]]+)\]\[/img\]#" => '<img class="format_image" src="$1" />', 
-                );
+                  );
     $text = preg_replace( array_keys($map), 
                           array_values($map), 
                           $text );
+
+    $text = preg_replace_callback( "#\[var=([^\]]+)]\[/var\]#",
+                        function($M) { return _cc_format_template_tag($M[1],$page); },
+                        $text ); 
+
+    $text = preg_replace_callback( "#\[define=([^\]]+)\]\[/define\]#", function($M) { return $M[1]; }, $text );
+
+    $text = preg_replace_callback( "#\[cmdurl=([^\]]+)\]\[/cmdurl\]#",
+                            function($M) { return ccl($M[1] ); },
+                            $text );
+
+    $text = preg_replace_callback(
+                  "/\[cmd=([^\]]+)\]/", 
+                  function($M) { return "<a rel=\"nofollow\" href=\"" . ccl($M[1]) . "\">"; },
+                  $text );
+
+    $text = preg_replace( "#\[/cmd\]#", '</a>', $text );
+    
+    $text = preg_replace_callback( 
+                    "#\[skinimg=([^\]]+)\]\[/skinimg\]#",
+                    function($M) { return '<img class="format_image" src="' . ccd($page->Search(array("$M[1]","images/$M[1]"))) . '" />'; },
+                    $text );
+                    
     $text = SmartyPants($text);
 
     $urls = array( '@(?:^|[^">=\]])(http://[^\s$]+)@m',

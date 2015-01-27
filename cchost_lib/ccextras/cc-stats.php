@@ -43,7 +43,7 @@ function cc_stats_on_user_row(&$rows)
     //$title = urlencode(sprintf(_('Remixes of %s'),$row['user_real_name']));
     // here's a hack
     require_once('cchost_lib/cc-page.php');
-    $page = CCPage::GetPage();
+    $page =& CCPage::GetPage();
     $title = urlencode($page->String(array('str_remixes_of_s',$row['user_real_name'])));
 
     $rurl = url_args( ccl('api','query'), 'remixesof=' . $row['user_name'] . '&title=' . $title );

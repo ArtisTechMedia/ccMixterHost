@@ -151,7 +151,7 @@ class CCEvents
     * @param array  $args Array of parameters to pass along to event listeners.
     * @see AddHandler
     */
-    function Invoke($eventname,$args=array())
+    public static function Invoke($eventname,$args=array())
     {
         //CCDebug::Log("Invoking: $eventname");
 
@@ -230,19 +230,19 @@ class CCEvents
     * @access private
     */
 
-    function & _watch()
+    static function & _watch()
     {
         static $watch = false;
         return $watch;
     }
 
-    function SetWatch($bool)
+    public static function SetWatch($bool)
     {
         $w =& CCEvents::_watch();
         $w = $bool;
     }
 
-    function & _hooks()
+    static function & _hooks()
     {
         static $_hook_list;
         return $_hook_list;
@@ -255,7 +255,7 @@ class CCEvents
     *
     * @param string $func Name of function callback
     */
-    function AddHook( $func )
+    public static function AddHook( $func )
     {
         $hook_list =& CCEvents::_hooks();
         $hook_list[] = $func;
@@ -355,7 +355,7 @@ class CCEvents
     * @param string $doc_summary Brief descriptions of the functionality of the handler
     * @param string $doc_group Documenation category to use for this handler
     */
-    function MapCommand( $params=array( 'url'         => '',
+    public static function MapCommand( $params=array( 'url'         => '',
                                         'callback'    => '',
                                         'module'      => '',
                                         'permissions' => '',
@@ -379,6 +379,7 @@ class CCEvents
         $paths[$url] = $action;
     }
 
+    public static 
     function MapUrl( $url, $callback, $permissions, $module='', $doc_param='',
                                                                 $doc_summary='',
                                                                 $doc_group = '' )
@@ -398,7 +399,7 @@ class CCEvents
     * @param string $this_url Incoming URL 
     * @param string $becomes_this Outgoing aliases URL
     */
-    function AddAlias( $this_url, $becomes_this )
+    public static function AddAlias( $this_url, $becomes_this )
     {
         $aliases =& CCEvents::_aliases();
         $aliases[$this_url] = $becomes_this;
@@ -409,7 +410,7 @@ class CCEvents
     *
     * @param object $action a CCAction object (empty means perform the current url)
     */
-    function PerformAction($action = null )
+    public static function PerformAction($action = null )
     {
         if( !isset($action) )
         {
@@ -471,7 +472,7 @@ class CCEvents
         }
     }
 
-    function _load_event_handler($handler)
+    static function _load_event_handler($handler)
     {
         if( empty($handler[1]) )
         {
@@ -489,7 +490,7 @@ class CCEvents
         return true;
     }
 
-    function _load_action($action)
+    static function _load_action($action)
     {
         if( empty($action->md) )
         {
@@ -507,7 +508,7 @@ class CCEvents
         }
     }
 
-    function CheckAccess($url)
+    public static function CheckAccess($url)
     {
         static $_accmap;
         static $_urlmap;
@@ -534,7 +535,7 @@ class CCEvents
     /**
     * @access private
     */
-    function _get_action_perms($action)
+    static function _get_action_perms($action)
     {
         $configs =& CCConfigs::GetTable();
         $accmap = $configs->GetConfig('accmap');
@@ -559,7 +560,7 @@ class CCEvents
     * 
     * @param string $url Internal url to execute (empty means the currently calling URL)
     */
-    function ResolveUrl($url='')
+    public static function ResolveUrl($url='')
     {
         global $CC_GLOBALS;
 
@@ -624,7 +625,7 @@ class CCEvents
         }
     }
 
-    function _get_home_page()
+    static function _get_home_page()
     {
         global $CC_CFG_ROOT;
 
@@ -638,7 +639,7 @@ class CCEvents
     *
     * @param bool $force false: use cached version if available; true: always generate a new map
     */
-    function & GetUrlMap($force = false)
+    public static function & GetUrlMap($force = false)
     {
         $paths =& CCEvents::_paths();
         $configs =& CCConfigs::GetTable();
@@ -661,7 +662,7 @@ class CCEvents
     /**
     * @access private
     */
-    function & _paths()
+    static function & _paths()
     {
         static $_paths;
         if( !isset($_paths) )
@@ -683,7 +684,7 @@ class CCEvents
     /**
     * @access private
     */
-    function & _current_action()
+    static function & _current_action()
     {
         static $_current_action;
         return( $_current_action );
@@ -692,7 +693,7 @@ class CCEvents
     /**
     * @access private
     */
-    function & _aliases()
+    static function & _aliases()
     {
         static $_aliases;
         if( !isset($_aliases) )

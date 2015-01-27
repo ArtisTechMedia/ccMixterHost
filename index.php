@@ -17,7 +17,9 @@
 * $Id: index.php 13849 2009-12-27 22:47:13Z fourstones $
 *
 */
+
 libxml_disable_entity_loader(true);
+
 if( !empty($_GET['ccm']) && preg_match('/\.(gif|png|ico|jpg|mp3|jpeg|___)$/i',$_GET['ccm']) )
 {
     header("HTTP/1.0 404 Not Found");
@@ -26,7 +28,7 @@ if( !empty($_GET['ccm']) && preg_match('/\.(gif|png|ico|jpg|mp3|jpeg|___)$/i',$_
 
 $CC_GLOBALS   = array();
 $CC_CFG_ROOT  = '';
-$cc_error_level = E_ALL;
+$cc_error_level = E_ALL; //  & ~E_STRICT;
 $_sql_time = 0;
 
 error_reporting($cc_error_level); 
@@ -90,6 +92,8 @@ CCDebug::LogErrors( $cc_error_level );
 *  We catch errors and handle them according log file settings
 */
 CCDebug::InstallErrorHandler(true);     
+
+        CCDebug::Enable(true);
 
 /*
 *  Internaitionalization requires (for now) that gettext be 
@@ -163,7 +167,8 @@ CCEvents::PerformAction();
 *  Show the resulting page
 */
 require_once('cchost_lib/cc-page.php');
-CCPage::Show();           
+$page =& CCPage::GetPage();
+$page->Show();           
 
 /*
 *  Shut down the session

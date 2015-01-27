@@ -631,7 +631,7 @@ class CCLogin
             exit;
         $ord  = ord($hash[$offset]);
         require_once('cchost_lib/cc-template.php');
-        $fname = CCTemplate::Search( sprintf("images/hex/f%x.png",$ord) );
+        $fname = CCTemplate::SearchStatic( sprintf("images/hex/f%x.png",$ord) );
         header ("Content-Type: image/png");
         readfile($fname);
         exit;

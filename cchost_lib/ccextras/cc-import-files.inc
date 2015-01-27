@@ -120,12 +120,13 @@ class CCImportFiles
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
+        $page =& CCPage::GetPage();
         $page_title = _('Import files');
         CCAdmin::BreadCrumbs(true,array('url' => '','text'=>$page_title));
         $tags = CCUD_ORIGINAL;
         $form_help = _('Use this form to import files already on your server into this ccHost system. WARNING: This form will <b>MOVE</b> your file from its original location to one specified by this ccHost system.');
 
-        CCPage::SetTitle($page_title);
+        $page->SetTitle($page_title);
         if( empty($username) )
         {
             $uid = CCUser::CurrentUser();
@@ -180,7 +181,7 @@ return;
                     $uploads =& CCUploads::GetTable();
                     $record = $uploads->GetRecordFromID($upload_id);
                     $url = $media_host->_get_file_page_url($record);
-                    CCPage::Prompt(sprintf(_("Import succeeded. Click %s to see results."), "<a href=\"$url\">here</a>"));
+                    $page->Prompt(sprintf(_("Import succeeded. Click %s to see results."), "<a href=\"$url\">here</a>"));
                     return;
                 }
             }
@@ -189,7 +190,7 @@ return;
         if( !empty($form_help) )
             $form->SetFormHelp($form_help);
 
-        CCPage::AddForm( $form->GenerateForm() );
+        $page->AddForm( $form->GenerateForm() );
     }
 
 }

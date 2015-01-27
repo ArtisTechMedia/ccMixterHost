@@ -34,7 +34,8 @@ function cc_set_if_modified()
 {
     global $CC_GLOBALS;
 
-    $time = gmmktime(); 
+    // TODO: Veriify that this is right (probably not)
+    $time = time(); // gmmktime(); 
     if( !isset($CC_GLOBALS[CC_IF_MOD_FLAG]) || ($CC_GLOBALS[CC_IF_MOD_FLAG] != $time) )
     {
         $cfg =& CCConfigs::GetTable();

@@ -42,7 +42,7 @@ class CCFlagContentForm extends CCSecurityVerifierForm
 
         $this->CCSecurityVerifierForm();
         require_once('cchost_lib/cc-page.php');
-        $page = CCPage::GetPage();
+        $page =& CCPage::GetPage();
         $type = $page->String('str_flag_' . $type);
 
         $fields = array( 
@@ -157,7 +157,8 @@ class CCFlag
         $trail[] = array( 'url' => '', 'text' => 'str_flag' );
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
     function Flag($type='',$id='')
@@ -244,11 +245,11 @@ END;
             $ok = $mailer->Send();
             if( !$ok )
             {
-                CCPage::Prompt('str_flag_err');
+                $page->Prompt('str_flag_err');
             }
             else
             {
-                CCPage::Prompt('str_flag_thank_you');
+               $page->Prompt('str_flag_thank_you');
             }
         }
     }
