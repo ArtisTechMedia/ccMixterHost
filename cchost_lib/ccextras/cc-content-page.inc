@@ -420,20 +420,20 @@ class CCContentPage
         $page =& CCPage::GetPage();
         $this->_build_bread_crumb_trail(_('Delete a Content Page'));
         $page->SetTitle(_('Delete a Content Page'));
-        $page = CCUtil::Strip($_GET['page']);
-        if( empty($page) )
+        $pagePath = CCUtil::Strip($_GET['page']);
+        if( empty($pagePath) )
             CCUtil::Send404();
         $form = new CCGenericForm();
         if( empty($_POST['generic']) )
         {
             $form->SetFormHelp(_('This is permanantly erase this page. There is <b>NO UNDO</b>'));
-            $fname = basename($page);
+            $fname = basename($pagePath);
             $form->SetSubmitText(sprintf("Delete '%s' Now",$fname));
             $page->AddForm( $form->GenerateForm() );
         }
         else
         {
-            unlink($page);
+            unlink($pagePath);
             CCUtil::SendBrowserTo( ccl('admin','content','manage') );
         }
     }
@@ -443,15 +443,15 @@ class CCContentPage
         $page =& CCPage::GetPage();
         $this->_build_bread_crumb_trail(_('Edit a Content Page'));
         $page->SetTitle(_('Edit a Content Page'));
-        $page = CCUtil::Strip($_GET['page']);
-        if( empty($page) )
+        $pagePath = CCUtil::Strip($_GET['page']);
+        if( empty($pagePath) )
             CCUtil::Send404();
         require_once('cchost_lib/cc-file-props.php');
         $fp = new CCFileProps();
-        $props = $fp->GetFileProps($page);
+        $props = $fp->GetFileProps($pagePath);
         $props['type'] = $props['topic_type'];
         $props['title'] = $props['desc'];
-        $short_page = str_replace('.php','',basename($page));
+        $short_page = str_replace('.php','',basename($pagePath));
         $form = new CCContentPageForm($short_page);
         if( empty($_POST['contentpage']) )
         {
@@ -495,7 +495,7 @@ class CCContentPage
     function _valid_target_dir(&$form,&$target_dir) 
     {
         global $CC_GLOBALS;
-        list( $target_dir ) = array_filter(split( ';', $CC_GLOBALS['files-root'] ));
+        list( $target_dir ) = array_filter(cc_split( ';', $CC_GLOBALS['files-root'] ));
         if( !empty($target_dir) )
             $target_dir = trim($target_dir);
         if( empty($target_dir) || !file_exists($target_dir) )

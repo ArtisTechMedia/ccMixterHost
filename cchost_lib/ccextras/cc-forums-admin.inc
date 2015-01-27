@@ -597,6 +597,7 @@ class CCForumsAdmin
         $href = ccl('admin','forums');
         $link1 = "<a href=\"$href\">";
         $link2 = '</a>';
+        $page =& CCPage::GetPage();
         $page->Prompt(
             sprintf( _('Forum has been permanantly deleted. %sReturn to forums.%s'), $link1, $link2 ) );
     }

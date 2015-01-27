@@ -73,7 +73,7 @@ function cc_temp_dir()
 
 function cc_split( $a, $b )
 {
-    CCDebug::LogVar("split key", $a);
+    //CCDebug::LogVar("split key", $a);
     return explode( $a, $b );
 }
 

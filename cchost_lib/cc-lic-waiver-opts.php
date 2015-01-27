@@ -71,7 +71,7 @@ class CCAdminLicWaiverForm extends CCEditConfigForm
         $this->SetFormHelp( _('For example, if a remix would result in a ShareAlike license and the user is offered to license the remix as Attribution, that would be a violation of the source\'s ShareAlike license.'));
     }
 
-    function PopulateValues(&$vals)
+    function PopulateValues($vals)
     {
         $vals['licenses'] = empty($vals['licenses']) ? '' : join(',',array_keys( $vals['licenses']));
         $vals['waivers'] = empty($vals['waivers']) ? '' : join(',',array_keys( $vals['waivers']));

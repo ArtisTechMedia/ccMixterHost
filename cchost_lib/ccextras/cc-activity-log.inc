@@ -144,7 +144,7 @@ class CCActivityLogTemp extends CCTable
         $this->CCTable($name,'activity_log_id');
     }
 
-    function _tname() 
+    static function _tname() 
     {
         return 'cc_tbl_activity_log_' . CCUser::CurrentUserName();
     }

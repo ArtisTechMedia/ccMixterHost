@@ -179,7 +179,11 @@ function _cc_format_format($text)
     
     $text = preg_replace_callback( 
                     "#\[skinimg=([^\]]+)\]\[/skinimg\]#",
-                    function($M) { return '<img class="format_image" src="' . ccd($page->Search(array("$M[1]","images/$M[1]"))) . '" />'; },
+                    function($M) { 
+                                    $page =& CCPage::GetPage();
+                                    $url = ccd($page->Search(array("$M[1]","images/$M[1]")));
+                                    return "<img class=\"format_image\" src=\"{$url}\" />";
+                                    },
                     $text );
                     
     $text = SmartyPants($text);

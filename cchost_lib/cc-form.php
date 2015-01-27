@@ -2052,11 +2052,10 @@ END;
 
         if( $filesobj['error'] != 0 )
         {
-            CCDebug::PrintVar($filesobj);
             $problems = array( UPLOAD_ERR_INI_SIZE  => 
-                                    _('The file is too big.'),
+                                    _('The file is too big (ini).'),
                                UPLOAD_ERR_FORM_SIZE => 
-                                    _('The file is too big.'),
+                                    _('The file is too big (form).'),
                                UPLOAD_ERR_PARTIAL   => 
                                     _('The file was not fully uploaded.'),
                                UPLOAD_ERR_NO_FILE   => 
