@@ -111,6 +111,12 @@ class CCTags extends CCTable
         $this->TagDelete($tossed);
     }
 
+    function Insert(&$values)
+    {
+        print('Use CCTags::InsertNewTags');
+        exit();
+    }
+    
     function InsertNewTags($tags,$type,$update_type = true)
     {
         if( !is_array($tags) )

@@ -219,6 +219,13 @@ class CCTopics extends CCTable
         $this->Unlock();        
     }
     
+    function Insert($values)
+    {
+        print('Use CCTopics::InsertNewTopic');
+        CCDebug::StackTrace();
+        exit();        
+    }
+    
     function InsertNewTopic(&$values,$parent_id)
     {
         // we do a variation of the nested set model discussed here
@@ -475,45 +482,52 @@ class CCTopic
             */
             $page->AddForm( $form->GenerateForm() );
         }
-        else
+       else
         {
-            $record = CCDatabase::QueryRow('SELECT topic_name,topic_forum,topic_thread,topic_user,topic_type,topic_upload,topic_id FROM cc_tbl_topics WHERE topic_id='.$topic_id);
-
-            $replang = _('Reply');
-            if( strstr($record['topic_name'],$replang) === false )
-                $name = sprintf( '%s (%s)', $record['topic_name'], $replang );
-            else
-                $name = $record['topic_name'];
             $form->GetFormValues($values);
-            $topics = new CCTopics();
-            $next_id = $topics->NextID();
-            $values['topic_id']    = $next_id;
-            $values['topic_date']  = date('Y-m-d H:i:s',time());
-            $values['topic_user']  = CCUser::CurrentUser();
-            $values['topic_type']  = 'reply';
-            $values['topic_forum'] = $record['topic_forum'];
-            $values['topic_thread'] = $record['topic_thread'];
-            $values['topic_upload'] = $record['topic_upload'];
-            $values['topic_name']   = $name;
-            $topics->InsertNewTopic($values,$topic_id);
-
-            if( !empty($values['topic_thread']) )
-            {
-                // err, this should be in forums.inc no?
-                require_once('cchost_lib/ccextras/cc-forums.inc');
-                $threads =& CCForumThreads::GetTable();
-                $tvalues['forum_thread_id']   = $record['topic_thread'];
-                $tvalues['forum_thread_newest'] = $next_id;
-                $tvalues['forum_thread_date'] = $values['topic_date'];
-                $threads->Update($tvalues);
-            }
-
+            $record = array();
+            $this->_do_reply($topic_id,$values,$record);
             CCEvents::Invoke( CC_EVENT_TOPIC_REPLY, array( &$values, &$record ) );
-
             CCUtil::SendBrowserTo();
         }
     }
 
+    function _do_reply($topic_id,&$values,&$record)
+    {
+        $record = CCDatabase::QueryRow('SELECT topic_name,topic_forum,topic_thread,topic_user,topic_type,topic_upload,topic_id FROM cc_tbl_topics WHERE topic_id='.$topic_id);
+
+        $replang = _('Reply');
+        if( strstr($record['topic_name'],$replang) === false )
+            $name = sprintf( '%s (%s)', $record['topic_name'], $replang );
+        else
+            $name = $record['topic_name'];
+        $topics = new CCTopics();
+        $next_id = $topics->NextID();
+        $values['topic_id']    = $next_id;
+        $values['topic_date']  = date('Y-m-d H:i:s',time());
+        $values['topic_user']  = CCUser::CurrentUser();
+        $values['topic_type']  = 'reply';
+        $values['topic_forum'] = $record['topic_forum'];
+        $values['topic_thread'] = $record['topic_thread'];
+        $values['topic_upload'] = $record['topic_upload'];
+        $values['topic_name']   = $name;
+        $values['topic_tags'] = '';
+        $topics->InsertNewTopic($values,$topic_id);
+
+        if( !empty($values['topic_thread']) )
+        {
+            // err, this should be in forums.inc no?
+            require_once('cchost_lib/ccextras/cc-forums.inc');
+            $threads =& CCForumThreads::GetTable();
+            $tvalues['forum_thread_id']   = $record['topic_thread'];
+            $tvalues['forum_thread_newest'] = $next_id;
+            $tvalues['forum_thread_date'] = $values['topic_date'];
+            $threads->Update($tvalues);
+        }
+        
+        return array( $values['topic_thread'], $next_id );
+    }
+    
     function Quote($topic_id)
     {
         $this->Reply($topic_id,true);
