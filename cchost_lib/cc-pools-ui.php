@@ -829,13 +829,13 @@ EOF;
     * @param array &$items Menu items go here
     * @param string $scope One of: CC_GLOBAL_SCOPE or CC_LOCAL_SCOPE
     */
-    function OnAdminMenu($items,$scope)
+    function OnAdminMenu(&$items,$scope)
     {
         if( $scope == CC_LOCAL_SCOPE )
             return;
 
         global $CC_GLOBALS;
-
+        
         $enabled = empty($CC_GLOBALS['allow-pool-ui']) ? false : $CC_GLOBALS['allow-pool-ui'];
 
         if( $enabled )
@@ -849,6 +849,7 @@ EOF;
                                  'action' =>  ccl('admin','pools')
                                  ),
                     );
+                    
         }
     }
 

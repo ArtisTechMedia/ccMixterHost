@@ -378,7 +378,6 @@ class CCAdmin
         $global_items = array();
         CCEvents::Invoke(CC_EVENT_ADMIN_MENU, array( &$global_items, CC_GLOBAL_SCOPE ) );
         uasort($global_items,'cc_weight_sorter');
-        //CCDebug::PrintVar($global_items,false);
         $args['global_title'] = ''; // _('Global Site Settings');
         $args['global_help']  = null; // _('These settings affect the entire site');
         $args['global_items'] = $this->_check_access($global_items);
