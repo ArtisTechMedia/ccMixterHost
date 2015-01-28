@@ -111,9 +111,10 @@ class CCTags extends CCTable
         $this->TagDelete($tossed);
     }
 
-    function Insert(&$values)
+    function Insert($values)
     {
         print('Use CCTags::InsertNewTags');
+        CCDebug::StackTrace();
         exit();
     }
     
