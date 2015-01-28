@@ -100,6 +100,8 @@ class CCTrackBack
         require_once('cchost_lib/snoopy/Snoopy.class.php');
         $snoopy = new Snoopy();
         @$snoopy->fetch($link);
+        // TODO: make this a global var
+        $snoopy->$curl_path = "/usr/bin/curl";
         if( !empty($snoopy->error) )
         {
             $text1 = _('There was an error trying to validate the web address. Test it in your %sbrowser%s to make sure.');
@@ -132,7 +134,9 @@ EOF;
 
     function _clean_url($text)
     {
-        if( substr($text,0,7) != 'http://' )
+        $text = trim($text);
+        $matches = array();
+        if( preg_match("/^https?:\/\//", $text, $matches) !== 1 )
             $text = 'http://' . $text;
         return trim($text);
     }

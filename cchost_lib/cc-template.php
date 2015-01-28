@@ -897,8 +897,6 @@ class CCSkin
     
     function Search($file, $real_path = false)
     {
-        CCDebug::LogVar('search',$file);
-
         $sfile = is_array($file) ? md5(join('',$file)) : md5($file);
         if( !isset($this->search_cache[$sfile]) )
         {
@@ -996,8 +994,7 @@ class CCSkin
 
     function _inner_include($path,$funcname='',$forceParse=false)
     {
-        CCDebug::Log("_inner call: $path / $funcname");
-
+//      CCDebug::Log("_inner call: $path / $funcname");
         $this->_push_path($path);
         $this->_parse($path,$forceParse);
         if( !empty($funcname) )

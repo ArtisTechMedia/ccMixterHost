@@ -337,7 +337,7 @@ EOF;
         $page->PageArg('records',$records,'pool_approvals');
     }
 
-    function GetWebSamplePool()
+    public static function GetWebSamplePool()
     {
         $pool_id = CCDatabase::QueryItem('SELECT pool_id FROM cc_tbl_pools WHERE pool_short_name = \'_web\'');
         if( empty($pool_id) )
