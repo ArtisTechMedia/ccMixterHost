@@ -1,0 +1,20 @@
+<html>
+<head>
+<style>
+        body {
+            font-size: 11px;
+            font-family: Verdana, sans-serif;
+            background-color: #F99;
+            margin: 4%;
+           text-align: center;
+    }
+</style>
+</head>
+<body>
+    <h3>wups, ccMixter is experiencing technical difficulties...</h3>
+    <p>If you were in the middle of an upload or posting a message it probably worked OK
+    but you should click <a href="/">here</a> to get back to the site's home page or 
+    use your browser's BACK button to return to the site and make sure.</p>
+    <p>The admins have been notified of the problem and will look into it very shortly.</p>
+</body>
+</head>
