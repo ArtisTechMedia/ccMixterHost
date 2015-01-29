@@ -1,0 +1,113 @@
+Installation notes for ccHost 5.1
+====================================
+
+Please check the project website/wiki to see if there are updates to any of 
+these steps: http://wiki.creativecommons.org/CcHost#Install
+
+
+New Install (Simple or Hosted Environment)
+------------------------------------------
+
+If you are using a shared server or other hosted site (like Dreamhost, etc.) 
+then your hosting service probably provided you with a web interface for 
+creating a database, doing file uploads and setting permissions for files and 
+directories. 
+
+    1. Create a new database for ccHost using whatever means your hosting
+       environment makes available to you. During the creation take note
+       of the following information:
+
+     - database name
+	 - database user
+	 - database user's password
+	 - database's server location (typically, but not always, 'localhost')
+
+    2. Unzip the ccHost ZIP archive on your local system and copy the files to 
+       your server retaining the the directory structure so that the file
+       'index.php' is in your root directory
+
+    3. Browse to http://where_you_installed/ccadmin and follow all the 
+       instructions from then on. 
+
+
+New Install (Advanced)
+----------------------
+
+If you have basic knowledge of using FTP and you are comfortable
+at a Unix/Linux command line you can use these steps to install: 
+
+    1. Unzip the ccHost ZIP archive on your local system 
+       and copy the files (retaining the directory structure) to your web 
+       server.
+
+       For example:
+
+       cp -a cchost-4.0.0 /var/www/localhost/htdocs/cchost
+       chgrp -R apache /var/www/localhost/htdocs/cchost
+       chmod g+w /var/www/localhost/htdocs/cchost/
+
+   2. Install getID3.  Unpack the package, and then copy the getid3 directory 
+      to the location it will be accessed.  For example:
+
+      tar xzf getid3.tar.gz
+      cp -a getid3/getid3 /var/www/localhost/htdocs/cchost/
+
+   3. Create a database instance and users to access it.  For example:
+
+      mysql -p -u root
+
+      mysql> CREATE DATABASE cchost;
+      mysql> GRANT SELECT,INSERT,UPDATE,DELETE,CREATE ON cchost.* 
+      ->     TO 'cchost'@'localhost' IDENTIFIED BY 'password';
+
+      Make sure to change 'password' (and maybe cchost) to something
+      unique to your site.
+
+   4. Create directory /var/log/cchost or other location to store log files.  
+      Must be writable by apache.  For example:
+
+      mkdir /var/log/cchost
+      chown apache:apache /var/log/cchost
+
+   5. Browse to http://where_you_installed_cchost/ccadmin 
+
+   6. Follow the instructions from there on...
+
+Upgrading from 5.0 or higher to 5.1
+---------------------------------------
+
+   1. Unzip ccHost ZIP archive to a local machine
+   2. Delete the ccadmin directory
+   3. Copy all 5.0.1 file over your existing site
+   4. While logged in as admin, browse to http://<your_installation_root>?update=1
+
+Upgrading from 3.1 or higher to 5.0
+-----------------------------------
+
+  -1. Make a backup of your database.
+
+   1. Unzip cchost ZIP archive to a local machine.
+
+   2. Copy ALL the 5.1 files over your existing site
+
+   3. Browse to http://where_you_installed_cchost
+
+   4. Importing phpTal Templates
+
+      None of your version 4 skins, pages, etc. work anymore as is. You can 
+      try to import your old phpTAL XML templates using:
+
+          bin/cc-host-import-v4-template.php 
+
+      Many imported templates (like your home page) might "just work" 
+      but many will need tweaking, assuming you are familiar with PHP.
+
+Upgrading from 3.0 or lower to 5.0 or higher
+--------------------------------------------
+
+Upgrading from 3.0 or lower installation has not been tested. 
+It should theoritically work the same as upgrading from 
+a ccHost 4.x installation. 
+
+
+$Id: INSTALL.TXT 12729 2009-06-06 05:42:01Z fourstones $
