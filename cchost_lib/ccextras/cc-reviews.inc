@@ -181,7 +181,7 @@ class CCReview
         $page->AddFeedLink($query, $title, $title, 'feed_reviews', 'topics' );
     }
 
-    function _build_bread_crumb_trail($user=array(),$upload=array(),$cmd_url='',$cmd_text='')
+    static function _build_bread_crumb_trail($user=array(),$upload=array(),$cmd_url='',$cmd_text='')
     {
         $trail = array();
         $trail[] = array( 'url' => ccl(), 'text' => 'str_home');

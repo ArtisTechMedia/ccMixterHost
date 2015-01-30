@@ -161,7 +161,10 @@ function _cc_format_format($text)
                           $text );
 
     $text = preg_replace_callback( "#\[var=([^\]]+)]\[/var\]#",
-                        function($M) { return _cc_format_template_tag($M[1],$page); },
+                        function($M) { 
+                            $page =& CCPage::GetPage();
+                            return _cc_format_template_tag($M[1],$page); 
+                            },
                         $text ); 
 
     $text = preg_replace_callback( "#\[define=([^\]]+)\]\[/define\]#", function($M) { return $M[1]; }, $text );
