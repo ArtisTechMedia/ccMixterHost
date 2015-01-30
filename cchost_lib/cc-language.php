@@ -436,7 +436,7 @@ class CCLanguage
     {
         if( !CCLanguage::IsEnabled() )
         {
-            //CCDebug::Log('Language is disabled, no init');
+            //language_log('Language is disabled, no init');
             return;
         }
 
@@ -452,7 +452,7 @@ class CCLanguage
 
         if ( false == @putenv("LANGUAGE=" . $this->_language ) )
         {
-            CCDebug::Log(sprintf("Could not set the ENV variable LANGUAGE = %s",
+            language_log(sprintf("Could not set the ENV variable LANGUAGE = %s",
                              $this->_language));
             $err = 1;
         }                             
@@ -460,7 +460,7 @@ class CCLanguage
         // set the LANG environmental variable
         if ( ($err === 0) && false == @putenv("LANG=" . $this->_language ) )
         {
-            CCDebug::Log(sprintf("Could not set the ENV variable LANG = %s", 
+            language_log(sprintf("Could not set the ENV variable LANG = %s", 
                              $this->_language));
             $err = 2;
         }                             
@@ -494,7 +494,7 @@ class CCLanguage
             if ( ( $locale_set != $this->_language && CC_LANG == $locale_set) || 
                  empty($locale_set) )
             {
-                CCDebug::Log(
+                language_log(
                     sprintf("Tried: setlocale to '%s', but could only set to '%s'.",                        
                             $this->_language, $locale_set) );
                 $err = 3;                                                
@@ -507,7 +507,7 @@ class CCLanguage
                                       CC_LANG_LOCALE . "/" . $this->_locale_pref );
             if ( empty($bindtextdomain_set) )
             {
-                CCDebug::Log(
+                language_log(
                     sprintf("Tried: bindtextdomain, '%s', to directory, '%s', " . 
                             "but received '%s'",
                             $this->_domain, CC_LANG_LOCALE . "/" . $this->_locale_pref,
@@ -519,7 +519,7 @@ class CCLanguage
         // This is the magic key to not being bound by a system locale
         if ( ($err === 0) && "UTF-8" != bind_textdomain_codeset($this->_domain, "UTF-8") )
         {
-            CCDebug::Log(
+            language_log(
                 sprintf("Tried: bind_textdomain_codeset '%s' to 'UTF-8'",
                         $this->_domain));
             $err = 5;                        
@@ -530,13 +530,13 @@ class CCLanguage
             $textdomain_set = textdomain($this->_domain);
             if ( empty($textdomain_set) )
             {
-                CCDebug::Log(sprintf("Tried: set textdomain to '%s', but got '%s'",
+                language_log(sprintf("Tried: set textdomain to '%s', but got '%s'",
                                      $this->_domain, $textdomain_set));
                 $err = 6;                                     
             }
             else
             {
-                // CCDebug::LogVar( 'lang', $this->_language );
+                // language_logVar( 'lang', $this->_language );
             }
         }
         
@@ -591,4 +591,8 @@ class CCLanguage
     }
 } // end of CCLanguage class
 
+function language_log($s)
+{
+//    CCDebug::Log($s);
+}
 ?>
