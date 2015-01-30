@@ -28,7 +28,7 @@ if( !empty($_GET['ccm']) && preg_match('/\.(gif|png|ico|jpg|mp3|jpeg|___)$/i',$_
 
 $CC_GLOBALS   = array();
 $CC_CFG_ROOT  = '';
-$cc_error_level = E_ALL; //  & ~E_STRICT;
+$cc_error_level = E_ALL | E_STRICT; //  & ~E_STRICT;
 $_sql_time = 0;
 
 error_reporting($cc_error_level); 
@@ -93,7 +93,7 @@ CCDebug::LogErrors( $cc_error_level );
 */
 CCDebug::InstallErrorHandler(true);     
 
-        CCDebug::Enable(true);
+require_once('mixter-lib/d.inc'); // turns on debugging and shuts off mail
 
 /*
 *  Internaitionalization requires (for now) that gettext be 

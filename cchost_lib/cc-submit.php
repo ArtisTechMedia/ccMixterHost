@@ -408,7 +408,7 @@ class CCSubmit
                     unset($types[$key]['logo']);
                 }
             }
-            $weight = $types[$key]['weight'];
+            $weight = (integer)$types[$key]['weight'];
             while( array_key_exists( $weight, $sorted ) )
                $weight .= '1';
             $sorted[ $weight ] = $types[$key];
