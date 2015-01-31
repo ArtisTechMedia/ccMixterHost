@@ -40,7 +40,7 @@ class CCPlaylists
         global $CC_GLOBALS;
 
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPageGetPage();
+        $page =& CCPage::GetPage();
         
         require_once('cchost_lib/cc-query.php');
         require_once('cchost_lib/zend/json-encoder.php');
