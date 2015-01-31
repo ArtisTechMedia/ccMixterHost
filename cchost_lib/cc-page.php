@@ -615,7 +615,6 @@ class CCPage extends CCSkin
             $arr = $this->vars[$arr_name];
         $arr[] = $script_url;
         $this->vars[$arr_name] = array_unique($arr);
-        CCDebug::LogVar('script link', $this->vars[$arr_name]);
     }
 
     /**
