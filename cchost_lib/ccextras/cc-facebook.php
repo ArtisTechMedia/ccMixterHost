@@ -158,7 +158,7 @@ class CCFacebook
                 {
                     $users->SetExtaField('facebook-account',$user_id,1);
                 }
-                $login->_do_login_redirect('');
+                CCUtil::SendBrowserTo( ccl('people',$row['user_name']) );
             }
         }
     }
