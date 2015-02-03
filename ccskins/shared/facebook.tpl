@@ -1,19 +1,56 @@
 
 %macro(fb_login_script)%
 <script>
+    function post(path, params, method) {
+        method = method || "post"; // Set method to post by default if not specified.
+
+        // The rest of this code assumes you are not using a library.
+        // It can be made less wordy if you use one.
+        var form = document.createElement("form");
+        form.setAttribute("method", method);
+        form.setAttribute("action", path);
+
+        for(var key in params) {
+            if(params.hasOwnProperty(key)) {
+                var hiddenField = document.createElement("input");
+                hiddenField.setAttribute("type", "hidden");
+                hiddenField.setAttribute("name", key);
+                hiddenField.setAttribute("value", params[key]);
+
+                form.appendChild(hiddenField);
+             }
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function fb_on_status_check_for_create(response)
+    {
+        var authResponse = response.authResponse;
+        var url = home_url + 'fbcreate';
+        var params = { 'fbaccessid': authResponse.accessToken,
+                        'fbuserid':  authResponse.userID };
+        post( url, params );
+    }
+    
     function fb_on_login_response(response)
     {
         console.log('ccm login response');
         console.log(response);
         response = eval(response.response);
-        if( response.num_users == 1 )
+        if( response.num_users == 0 )
         {
-            var url = home_url + '/people/' + response.user_name;
+            FB.getLoginStatus(fb_on_status_check_for_create);
+        }
+        else if( response.num_users == 1 )
+        {
+            var url = home_url + 'people/' + response.user_name;
             document.location = url;
         }
         else if( response.num_users > 1 )
         {
-            var url = home_url + '/fbattach/' + response.users[0].user_id;
+            var url = home_url + 'fbattach/' + response.users[0].user_id;
             document.location = url;
         }
     }
@@ -45,7 +82,6 @@
 %end_macro%
 
 %macro(facebook_login)%
-%call('facebook.tpl/fb_login_script')%
 <fb:login-button scope="public_profile,email" onlogin="fb_check_login_state();">
 </fb:login-button>
 %end_macro%

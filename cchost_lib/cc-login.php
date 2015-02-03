@@ -101,69 +101,71 @@ class CCNewUserForm extends CCUserForm
         $this->SetSubmitText('str_login_register');
     }
 
-    /**
-     * Handles generation of &lt;input type='text' HTML field 
-     * 
-     * 
-     * @param string $varname Name of the HTML field
-     * @param string $value   value to be published into the field
-     * @param string $class   CSS class (rarely used)
-     * @returns string $html HTML that represents the field
-     */
-    function generator_newusername($varname,$value='',$class='')
-    {
-        return( $this->generator_textedit($varname,$value,$class) );
-    }
+}
 
-    /**
-    * Handles validator for HTML field, called during ValidateFields()
-    * 
-    * Validates uniqueness of name as well as character checks and length.
-    * 
-    * @see CCForm::ValidateFields()
-    * 
-    * @param string $fieldname Name of the field will be passed in.
-    * @returns bool $ok true means field validates, false means there were errors in user input
-    */
-    function validator_newusername($fieldname)
+/**
+ * Handles generation of &lt;input type='text' HTML field 
+ * 
+ * 
+ * @param string $varname Name of the HTML field
+ * @param string $value   value to be published into the field
+ * @param string $class   CSS class (rarely used)
+ * @returns string $html HTML that represents the field
+ */
+function generator_newusername($form, $varname,$value='',$class='')
+{
+    return( $form->generator_textedit($varname,$value,$class) );
+}
+
+
+/**
+* Handles validator for HTML field, called during ValidateFields()
+* 
+* Validates uniqueness of name as well as character checks and length.
+* 
+* @see CCForm::ValidateFields()
+* 
+* @param string $fieldname Name of the field will be passed in.
+* @returns bool $ok true means field validates, false means there were errors in user input
+*/
+function validator_newusername($form, $fieldname)
+{
+    if( $form->validator_must_exist($fieldname) )
     {
-        if( $this->validator_must_exist($fieldname) )
+        $value = $form->GetFormValue($fieldname);
+
+        if( preg_match('/[^A-Za-z0-9_]/', $value) )
         {
-            $value = $this->GetFormValue($fieldname);
-
-            if( preg_match('/[^A-Za-z0-9_]/', $value) )
-            {
-                $this->SetFieldError($fieldname, array('str_login_this_must_letters') );
-                return(false);
-            }
-
-            if( strlen($value) > 25 )
-            {
-                $this->SetFieldError($fieldname, array('str_login_this_must_be_less') );
-                return(false);
-            }
-
-            $user = CCDatabase::QueryItem('SELECT user_id FROM cc_tbl_user WHERE user_name=\''.$value.'\'');
-
-            if( empty($user) )
-            {
-                require_once('cchost_lib/cc-tags.inc');
-                $tags =& CCTags::GetTable();
-                $user = $tags->QueryKeyRow($value);
-            }
-
-            if( $user )
-            {
-                $this->SetFieldError($fieldname,array('str_login_that_username_is'));
-                return(false);
-            }
-
-
-            return( true );
+            $form->SetFieldError($fieldname, array('str_login_this_must_letters') );
+            return(false);
         }
 
-        return( false );
+        if( strlen($value) > 25 )
+        {
+            $form->SetFieldError($fieldname, array('str_login_this_must_be_less') );
+            return(false);
+        }
+
+        $user = CCDatabase::QueryItem('SELECT user_id FROM cc_tbl_user WHERE user_name=\''.$value.'\'');
+
+        if( empty($user) )
+        {
+            require_once('cchost_lib/cc-tags.inc');
+            $tags =& CCTags::GetTable();
+            $user = $tags->QueryKeyRow($value);
+        }
+
+        if( $user )
+        {
+            $form->SetFieldError($fieldname,array('str_login_that_username_is'));
+            return(false);
+        }
+
+
+        return( true );
     }
+
+    return( false );
 }
 
 /**

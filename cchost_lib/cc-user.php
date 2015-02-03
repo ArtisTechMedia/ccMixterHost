@@ -267,9 +267,9 @@ class CCUsers extends CCTable
     function SetExtraField($user_id,$name,$data)
     {
         $extra = $this->QueryItemFromKey('user_extra',$user_id);
-        $args['extra'] = unserialize($extra);
-        $args['extra'][$name] = $data;
-        $args['extra'] = serialize($args['extra']);
+        $args['user_extra'] = unserialize($extra);
+        $args['user_extra'][$name] = $data;
+        $args['user_extra'] = serialize($args['user_extra']);
         $args['user_id'] = $user_id;
         $this->Update($args);
     }
@@ -283,12 +283,12 @@ class CCUsers extends CCTable
 
     function UnsetExtraField($user_id,$name)
     {
-        $extra = $this->QueryItemFromKey($user_id);
+        $extra = $this->QueryItemFromKey('user_extra',$user_id);
         $extra = unserialize($extra);
         if( !isset($extra[$name]) )
             return;
         unset($extra[$name]);
-        $args['extra'] = serialize($extra);
+        $args['user_extra'] = serialize($extra);
         $args['user_id'] = $user_id;
         $this->Update($args);
     }

@@ -21,10 +21,7 @@
 if( !defined('IN_CC_HOST') )
    die('Welcome to CC Host');
 
-//CCEvents::AddHandler(CC_EVENT_ADMIN_MENU,  array( 'CCFacebook',    'OnAdminMenu');
 CCEvents::AddHandler(CC_EVENT_GET_CONFIG_FIELDS,  array( 'CCFacebook' , 'OnGetConfigFields' ));
-
-CCEvents::AddHandler(CC_EVENT_FORM_FIELDS,    array( 'CCFacebook', 'OnFormFields'));
 CCEvents::AddHandler(CC_EVENT_MAP_URLS,       array( 'CCFacebook',  'OnMapUrls'));
 
 define('FB_BASE_DIR','cchost_lib/facebook/src/');
@@ -59,6 +56,7 @@ use Facebook\GraphUser;
 
 require_once('cchost_lib/cc-page.php');
 require_once('cchost_lib/cc-form.php');
+require_once('cchost_lib/cc-login.php');
 
 class CCFacebook
 {
@@ -80,44 +78,27 @@ class CCFacebook
                        'value'      => '',
                        'formatter'  => 'checkbox',
                        'flags'      => CCFF_POPULATE );
+                       
+            $fields['facebook-appid'] =                                    
+                array( 'label'  => 'Facebook app id',
+                       'form_tip'   => '',
+                       'formatter'  => 'textedit',
+                       'flags'      => CCFF_POPULATE);
+                               
+            $fields['facebook-secret'] =                                    
+                array( 'label'  => 'Facebook app secret',
+                       'form_tip'   => '',
+                       'formatter'  => 'textedit',
+                       'flags'      => CCFF_POPULATE);
         }
     }
     
-    /**
-    * Event handler for {@link CC_EVENT_FORM_FIELDS}
-    *
-    * @param object &$form CCForm object
-    * @param object &$fields Current array of form fields
-    */
-    function OnFormFields(&$form,&$fields)
-    {
-        global $CC_GLOBALS;
-
-        if( empty($CC_GLOBALS['facebook_allow_login']) )
-            return;
-        
-        if( is_a($form,'CCUserLoginForm') || is_subclass_of($form,'CCUserLoginForm') ||
-                    is_subclass_of($form,'ccuserloginform') )
-        {
-
-            if( empty($fields['facebook-login']) )
-            {
-                $fields['facebook-login'] = 
-                            array( 'label'  => 'facebook login',
-                                   'form_tip'   => 'log in using your FaceBook account',
-                                   'formatter'  => 'metalmacro',
-                                   'macro'      => 'facebook.tpl/facebook_login',
-                                   'flags'      => CCFF_NOUPDATE);
-            }
-        }
-    }
-
     function _get_fb_user_object()
     {
         $accesstoken = $_REQUEST['fbaccessid'];
         $userid = $_REQUEST['fbuserid'];
-        
-        FacebookSession::setDefaultApplication('1550961735160190','73058a34237d6e42e7a8ac3d07e1b055');
+        global $CC_GLOBALS;
+        FacebookSession::setDefaultApplication($CC_GLOBALS['facebook-appid'], $CC_GLOBALS['facebook-secret']);
         $session = new FacebookSession($accesstoken);
         $request = new FacebookRequest($session, 'GET', '/' . $userid);
         $response = $request->execute();
@@ -135,31 +116,73 @@ class CCFacebook
         $email = $users->QueryItemFromKey( 'user_email', $model_id);
         $rows = $users->QueryRows( array( 'user_email' => $email ) );
         $form = new CCFBAssociateAccount($rows);
-        
+
         if( empty($_POST['fbassociateaccount']) )
         {
             $page->AddForm( $form->GenerateForm() );
         }
         else
         {
-            if( $form->ValidateFields() )
+            foreach( $rows as $R )
             {
-                foreach( $rows as $R )
-                {
-                    $users->UnsetExtraField('facebook-account',$R['user_id']);
-                }
-                $form->GetFormValues($fields);
-                $user_id = $fields['user_id'];
-                $row = $users->QueryKeyRow($user_id);
-                require_once('cchost_lib/cc-login.php');
-                $login = new CCLogin();
-                $login->_create_login_cookie(true,$row['user_name'],$row['user_password']);
-                if( $fields['make_perm'] == 1 )
-                {
-                    $users->SetExtaField('facebook-account',$user_id,1);
-                }
-                CCUtil::SendBrowserTo( ccl('people',$row['user_name']) );
+                $users->UnsetExtraField($R['user_id'],'facebook-account');
             }
+            $form->GetFormValues($fields);
+            $user_id = $fields['user_id'];
+            $row = $users->QueryKeyRow($user_id);
+            require_once('cchost_lib/cc-login.php');
+            $login = new CCLogin();
+            $login->_create_login_cookie(true,$row['user_name'],$row['user_password']);
+            if( $fields['make_perm'] == 1 )
+            {
+                $users->SetExtraField($user_id,'facebook-account',1);
+            }
+            CCUtil::SendBrowserTo( ccl('people',$row['user_name']) );
+        }
+    }
+    
+    function CreateAccount()
+    {
+        global $CC_GLOBALS;
+        
+        $page =& CCPage::GetPage();
+
+        $form = new CCFBCreateAccountForm("",'');
+        
+        if( empty($_POST['fbcreateaccount']) || !$form->ValidateFields() )
+        {
+            $userObject = $this->_get_fb_user_object();    
+            $firstname = $userObject->getFirstName();
+            $lastname = $userObject->getLastName();
+        
+            $name = strtolower( $firstname . $lastname );
+            $name = preg_replace('/[^A-Za-z0-9]/', '_', $name);
+            $email = $userObject->getEmail();
+            $rname = $firstname . ' ' . $lastname;
+            $form->SetHiddenField( 'user_real_name', $rname, CCFF_HIDDEN  );
+            $form->SetHiddenField( 'user_email', $email, CCFF_HIDDEN  );
+            $form->PopulateValues( array( 'user_name' => $name, 
+                                          'user_email' => $email, 
+                                          'user_real_name' => $rname ) );
+            $page->AddForm($form->GenerateForm());
+        }
+        else
+        {
+            $form->GetFormValues($values);
+            $login = new CCLogin();
+            $users =& CCUsers::GetTable();
+            $args = array(
+                'user_real_name' => $_REQUEST['user_real_name'],
+                'user_email' => $_REQUEST['user_email'],
+                'user_name' => $values['user_name'],
+                'user_password' => $login->_make_new_password(),
+                'user_registered' => date( 'Y-m-d H:i:s' )
+            );
+            $args['user_id'] = $users->NextID();
+            $users->Insert($args);
+            $users->SetExtraField($args['user_id'],'facebook-account',1);
+            $login->_create_login_cookie(true,$args['user_name'],$args['user_password']);
+            CCUtil::SendBrowserTo( $CC_GLOBALS['home-url'] );
         }
     }
     
@@ -171,38 +194,49 @@ class CCFacebook
         
         $users =& CCUsers::GetTable();
         $rows = $users->QueryRows( array( 'user_email' => $email ) );
+        if( count($rows) > 1 )
+        {
+            foreach( $rows as $R )
+            {
+                if( $users->GetExtraField($R['user_id'], 'facebook-account') )
+                {
+                    $rows = array( $R );
+                    break;
+                }
+            }
+        }
+        $ret = array();
         if( empty($rows) )
         {
             $ret['status'] = 'error';
             $ret['problem'] = 'no such user';
             $ret['email'] = $email;
+            $ret['fbaccessid'] = $_REQUEST['fbaccessid'];
+            $ret['fbuserid'] = $_REQUEST['fbuserid'];
             $ret['num_users'] = 0;
+        }
+        else if( count($rows) > 1 )
+        {
+            $ret['num_users'] = count($rows);                
+            $ret['users'] = array();
+            foreach( $rows as $R)
+            {
+                $ret['users'][] = array( 'user_id' => $R['user_id'],
+                                         'user_name' => $R['user_name'] );
+            }
+            $ret['status'] = 'action required';
+            $ret['problem'] = 'multiple matches';
         }
         else
         {
-            if( count($rows) == 1 )
-            {
-                $row = $rows[0];
-                require_once('cchost_lib/cc-login.php');
-                $login = new CCLogin();
-                $login->_create_login_cookie(true,$row['user_name'],$row['user_password']);
-                $ret['num_users'] = 1;
-                $ret['user_id'] = $row['user_id'];
-                $ret['user_name'] = $row['user_name'];            
-                $ret['status'] = 'OK';
-            }
-            else
-            {
-                $ret['num_users'] = count($rows);
-                $ret['users'] = array();
-                foreach( $rows as $R)
-                {
-                    $ret['users'][] = array( 'user_id' => $R['user_id'],
-                                             'user_name' => $R['user_name'] );
-                }
-                $ret['status'] = 'action required';
-                $ret['problem'] = 'multiple matches';
-            }
+            $row = $rows[0];
+            require_once('cchost_lib/cc-login.php');
+            $login = new CCLogin();
+            $login->_create_login_cookie(true,$row['user_name'],$row['user_password']);
+            $ret['num_users'] = 1;
+            $ret['user_id'] = $row['user_id'];
+            $ret['user_name'] = $row['user_name'];            
+            $ret['status'] = 'OK';
         }
         
         return CCUtil::ReturnAjaxData($ret);
@@ -221,23 +255,47 @@ class CCFacebook
                           ' POST args: fbaccessid, fbuserid', 
                           _('Log in a Facebook authenticated user'),
                           CC_AG_USER );
-        CCEvents::MapUrl( ccp('fbconnect'), array('CCFacebook','API'), 
+        CCEvents::MapUrl( ccp('fbcreate'), array('CCFacebook','CreateAccount'), 
                           CC_DONT_CARE_LOGGED_IN, ccs(__FILE__), 
-                          '[attemptlogin/{email}],[])', 
+                          '', 
                           _('Facebook login flow'),
                           CC_AG_USER );
         CCEvents::MapUrl( ccp('fbattach'), array('CCFacebook','Attach'), 
                           CC_DONT_CARE_LOGGED_IN, ccs(__FILE__), 
-                          '/users_id_like_this', 
+                          '/{users_id_like_this}', 
                           _('Facebook login flow'),
                           CC_AG_USER );
     }
 
 }
 
-class CCFBAssociateAccount extends CCForm
+class CCFBCreateAccountForm extends CCForm
 {
-    function CCFBAssociateAccount($rows)
+    /**
+    * Constructor
+    */
+    function CCFBCreateAccountForm()
+    {
+        global $CC_GLOBALS;
+
+        $this->CCForm();
+
+        $fields = array( 
+                    'user_name' =>
+                        array( 'label'  => 'Profile URL name',
+                               'formatter'  => 'newusername',
+                               'formatter_module' => 'cchost_lib/cc-login.php',
+                               'form_tip' => 'This name will be used for your profile page: for example: ' .
+                                    $CC_GLOBALS['home-url'] . 'people/yournamehere',
+                               'flags'      => CCFF_REQUIRED | CCFF_POPULATE )                               
+                               );
+                               
+        $this->AddFormFields($fields);
+    }
+}
+class CCFBAssociateAccountForm extends CCForm
+{
+    function CCFBAssociateAccountForm($rows)
     {
         $this->CCForm();
         
