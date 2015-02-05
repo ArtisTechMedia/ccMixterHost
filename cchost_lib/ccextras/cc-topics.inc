@@ -507,9 +507,9 @@ class CCTopic
         $values['topic_date']  = date('Y-m-d H:i:s',time());
         $values['topic_user']  = CCUser::CurrentUser();
         $values['topic_type']  = 'reply';
-        $values['topic_forum'] = $record['topic_forum'];
-        $values['topic_thread'] = $record['topic_thread'];
-        $values['topic_upload'] = $record['topic_upload'];
+        $values['topic_forum'] = (integer)$record['topic_forum'];
+        $values['topic_thread'] = (integer)$record['topic_thread'];
+        $values['topic_upload'] = (integer)$record['topic_upload'];
         $values['topic_name']   = $name;
         $values['topic_tags'] = '';
         $topics->InsertNewTopic($values,$topic_id);

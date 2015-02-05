@@ -224,7 +224,7 @@ class CCReview
         if( empty($upload_id) ) // never mind, it wasn't a review
             return;
         $reviewer = $row['topic_user'];
-        $this->Sync($upload_id,$reviewer,-1);
+        CCReview::Sync($upload_id,$reviewer,-1);
     }
 
     function _can_review($row_or_id)
@@ -232,7 +232,7 @@ class CCReview
         return CCReviewsHV::_can_review($row_or_id);
     }
 
-    function Sync($upload_id,$reviewer,$add=0)
+    public static function Sync($upload_id,$reviewer,$add=0)
     {
         $count = CCDatabase::QueryItem("SELECT COUNT(*) FROM cc_tbl_topics WHERE topic_type='review' AND topic_upload=$upload_id");
         $count += $add;
@@ -277,7 +277,7 @@ class CCReview
         {
             $topic_id = $row['topic_id'];
             $reviewer = $row['topic_user'];
-            $this->Sync($upload_id,$reviewer,-1);
+            CCReview::Sync($upload_id,$reviewer,-1);
             $reviews->DeleteKeyRow($topic_id);
         }
     }
