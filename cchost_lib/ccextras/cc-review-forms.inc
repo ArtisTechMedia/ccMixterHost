@@ -73,6 +73,7 @@ class CCReviewFormAPI
         {
             $form->RemoveFormField( 'user_confirm' );
             $form->RemoveFormField( 'user_mask' );
+            
             $form->SetTemplateVar('form_submit_trap', 'ccReviewFormHook' ); 
         }
 
