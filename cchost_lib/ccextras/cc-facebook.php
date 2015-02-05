@@ -115,7 +115,7 @@ class CCFacebook
         $users =& CCUsers::GetTable();
         $email = $users->QueryItemFromKey( 'user_email', $model_id);
         $rows = $users->QueryRows( array( 'user_email' => $email ) );
-        $form = new CCFBAssociateAccount($rows);
+        $form = new CCFBAssociateAccountForm($rows);
 
         if( empty($_POST['fbassociateaccount']) )
         {
@@ -128,7 +128,7 @@ class CCFacebook
                 $users->UnsetExtraField($R['user_id'],'facebook-account');
             }
             $form->GetFormValues($fields);
-            $user_id = $fields['user_id'];
+            $user_id = $_REQUEST['user_id'];
             $row = $users->QueryKeyRow($user_id);
             require_once('cchost_lib/cc-login.php');
             $login = new CCLogin();
@@ -161,9 +161,14 @@ class CCFacebook
             $rname = $firstname . ' ' . $lastname;
             $form->SetHiddenField( 'user_real_name', $rname, CCFF_HIDDEN  );
             $form->SetHiddenField( 'user_email', $email, CCFF_HIDDEN  );
+            $form->SetHiddenField( 'fbaccessid', $_REQUEST['fbaccessid'], CCFF_HIDDEN  );
+            $form->SetHiddenField( 'fbuserid', $_REQUEST['fbuserid'], CCFF_HIDDEN  );
+            
             $form->PopulateValues( array( 'user_name' => $name, 
                                           'user_email' => $email, 
-                                          'user_real_name' => $rname ) );
+                                          'user_real_name' => $rname,
+                                          'fbaccessid' => $_REQUEST['fbaccessid'],
+                                           'fbuserid' => $_REQUEST['fbuserid']) );
             $page->AddForm($form->GenerateForm());
         }
         else

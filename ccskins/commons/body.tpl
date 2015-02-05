@@ -1,4 +1,5 @@
 <body>
+%if_not_empty(facebook-appid)%
 <script>
     window.fbAsyncInit = function() {
     // facebook
@@ -17,6 +18,7 @@
         fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
 </script>
+%end_if%
 
 %if_not_empty(site-disabled)%
     <div id="site_disabled_message" style="position:absolute">%text(str_site_disabled)%</div>

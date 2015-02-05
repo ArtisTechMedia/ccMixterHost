@@ -1,0 +1,66 @@
+<html>
+<head>
+<script>
+var musicPos;
+var howItWorksPos;
+var scrollTimer;
+
+function scrollToHowItWorks()
+{
+    window.scroll( 0, howItWorksPos );
+    if( howItWorksPos > 624 )
+    {
+        window.clearInterval(scrollTimer);
+    }
+    else
+    {
+        howItWorksPos += 20;
+    }
+}
+
+function scrollToMusic()
+{
+    window.scroll( 0, musicPos );
+    if( musicPos > 1490 )
+    {
+        window.clearInterval(scrollTimer);
+    }
+    else
+    {
+        musicPos += 25;
+    }
+}
+
+function buttonhit(buttonid)
+{
+    if( buttonid == "music" )
+    {
+       musicPos = 0;
+       scrollTimer = window.setInterval( scrollToMusic, 15 );
+    }
+    else if( buttonid == "howitworks" )
+    {
+        howItWorksPos = 0;
+        scrollTimer = window.setInterval( scrollToHowItWorks, 18 );
+    }
+}
+</script>
+</head>
+<body style="margin: 0; padding: 0; background-color: black;">
+<div style="text-align: center;">
+<img src="mixter-files/splash/images/splash-1000.png" />
+</div>
+<div onclick="javascript:return buttonhit(this.id);" id="music" style="position:absolute; top: 15px; left: 325px; width: 55px; height: 30px; border: 1px solid blue;">
+</div> 
+<div onclick="javascript:return buttonhit(this.id);" id="howitworks" style="position:absolute; top: 15px; left: 395px; width: 95px; height: 30px; border: 1px solid red;">
+</div> 
+<div onclick="javascript:return buttonhit(this.id);" id="signup" style="position:absolute; top: 15px; left: 850px; width: 75px; height: 30px; border: 1px solid white;">
+</div> 
+<div onclick="javascript:return buttonhit(this.id);" id="login" style="position:absolute; top: 15px; left: 935px; width: 65px; height: 30px; border: 1px solid yellow;">
+</div> 
+<div onclick="javascript:return buttonhit(this.id);" id="searchselect" style="position:absolute; top: 15px; left: 758px; width: 48px; height: 30px; border: 1px solid orange;">
+</div> 
+<div onclick="javascript:return buttonhit(this.id);" id="search" style="position:absolute; top: 15px; left: 806px; width: 28px; height: 30px; border: 1px solid orange;">
+</div> 
+</body>
+</html>

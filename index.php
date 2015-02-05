@@ -61,7 +61,8 @@ if( !file_exists('cc-host-db.php') )
 *  All ccHost includes require this define to prevent direct 
 *  web access to them.
 */
-define('IN_CC_HOST', true);
+if( !defined('IN_CC_HOST') )
+    define('IN_CC_HOST', true);
 
 /*
 *  The .cc-ban.txt file is written by doing 'Account Management' 
