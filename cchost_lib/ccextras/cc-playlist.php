@@ -90,7 +90,7 @@ class CCPlaylistHV
         elseif( $row['cart_dynamic'] )
         {
             parse_str($row['cart_dynamic'],$cargs);
-            $args += $cargs;
+            $args = array_merge($args, $cargs);
             $args['title'] = $row['cart_name'];
             if( !empty($args['limit']) && ($args['limit'] == 'default') )
             {

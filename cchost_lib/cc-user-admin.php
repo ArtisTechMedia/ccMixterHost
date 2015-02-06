@@ -118,7 +118,7 @@ class CCDeleteUserFilesForm extends CCUserForm
                                'formatter'  => 'statictext',
                                'value'   => $username,
                                'flags'      => CCFF_NOUPDATE | CCFF_STATIC ),
-
+/*
                     'user_mask' =>
                        array( 'label'       => '',
                                'formatter'  => 'securitykey',
@@ -130,6 +130,7 @@ class CCDeleteUserFilesForm extends CCUserForm
                                'class'      => 'cc_form_input_short',
                                'form_tip'   => CCSecurityVerifierForm::GetSecurityTipStr(),
                                'flags'      => CCFF_REQUIRED | CCFF_NOUPDATE),
+*/                               
                         );
 
         $this->AddFormFields( $fields );
