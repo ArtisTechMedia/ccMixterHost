@@ -64,4 +64,22 @@ var user_name = %if_not_null(logged_in_as)% '%(logged_in_as)%'; %else% null; %en
     </style>
 %end_loop%
 
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script type="text/javascript">
+	var $j = jQuery.noConflict();
+  	$j( document ).ready(LoadCCPlusBlock);
+  	function LoadCCPlusBlock()
+  	{
+		if (!$j("div.taglinks").length){return;}
+  		if ($j("div.taglinks").html().indexOf("ccplus") > -1)
+  		{
+  			var NavURL = "http://tunetrack.net/license/" + window.location.host + window.location.pathname;
+  			var AppendString = '<div class="box"><h2>CCPlus Licensing</h2><p>Like this song? Click <a href="' + NavURL + '">here to license this media</a> for commercial use.</p></div>';
+  			//get existing license box
+  			var lBox = $j('#license_info').parent().html();
+  			$j('#license_info').parent().html(lBox + AppendString);
+  		}
+  		
+  	}
+  </script>
 </head>
