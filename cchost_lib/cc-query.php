@@ -229,6 +229,25 @@ class CCQuery
         return $this->args;
     }
 
+    /**
+    * Helper function for formats during CC_EVENT_QUERY_SETUP
+    *
+    */
+    function GetURIArg($arg,$value=null)
+    {
+        return (empty($this->_uri_args) || empty($this->_uri_args[$arg])) ? $value : $this->_uri_args[$arg] ;
+    }
+
+
+    /**
+    * Helper function for formats during CC_EVENT_QUERY_SETUP
+    *
+    */
+    function AddJoin($sql)
+    {
+        return $this->sql_p['joins'][] = $sql;
+    }
+
     /** 
     * Helper function for formats during CC_EVENT_QUERY_SETUP
     *
