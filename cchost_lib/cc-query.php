@@ -705,27 +705,48 @@ class CCQuery
 
     function _gen_lic()
     {
-        $translator = array( 
-            'by' => 'attribution',
-            'nc' => 'noncommercial', 
-            'sa' => 'share-alike'   , 
-            'nod' => 'noderives'   , 
-            'byncsa' => 'by-nc-sa'   , 
-            'byncnd' => 'by-nc-nd'   , 
-            'by-nc-sa' => 'by-nc-sa'   , 
-            'by-nc-nd' => 'by-nc-nd'   , 
-            's' => 'sampling'   , 
-            'splus' => 'sampling+',
-            'ncsplus' =>   'nc-sampling+',
-            'pd' =>  'publicdomain' ,
+       if( empty($this->args['lic']) )
+        {
+            return;
+        }
+
+        $T = array(
+            'by'       =>  array('attribution','attribution_3'),
+            'sa'       =>  array('share-alike','share-alike_3'),
+            'nd'       =>  array('noderives','noderives_3'),
+            's'        =>  array('sampling'),
+            'splus'    =>  array('sampling+'),
+            'nc'       =>  array('noncommercial','noncommercial_3'),
+            'ncsa'     =>  array('by-nc-sa','by-nc-sa_3'),
+            'ncnd'     =>  array('by-nc-nc','by-nc-nd_3'),
+            'ncsplus'  =>  array('nc-sampling+'),
+            'pd'       =>  array('publicdomain','cczero') ,
+            'zero'     =>  array('cczero') ,
             );
 
-        if( !array_key_exists( $this->args['lic'], $translator ) )
-            die('invalid license argument');
+        // available for commercial use, even ads
+        $T['open']  = array_merge( $T['by'], $T['pd'], $T['nd'], $T['sa'] );
 
-        $license = $translator[$this->args['lic']];
+        // available for commercial use, except ads
+        $T['safe']  = array_merge( $T['open'], $T['s'], $T['splus'] );
+
+        // requires supra-nc for commercial use
+        $T['allnc'] = array_merge( $T['nc'], $T['ncsa'], $T['ncnd'], $T['ncsplus'] );
+
+        $lics =explode(',',trim($this->args['lic']));
+
+        $license_ids = array();
+
+        foreach( $lics as $lic )
+        {
+            if( !array_key_exists( $lic, $T ) )
+                die('invalid license argument');
+            $license_ids = array_merge($license_ids,$T[$lic]);
+        }
+        
         $field = $this->_make_field('license');
-        $this->where[] = "($field = '$license')";
+        $license_ids = join( "', '", $license_ids );
+        $this->where[] = "($field IN ('$license_ids'))";
     }
 
     function _gen_limit()
