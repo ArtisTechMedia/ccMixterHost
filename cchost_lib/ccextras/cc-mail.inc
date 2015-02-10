@@ -321,20 +321,26 @@ class CCContactMailerForm extends CCSecurityVerifierForm
                             'formatter'   => 'textarea',
                             'maxlength'   => 1000,
                             'form_tip'    => 'str_email_msg_limited', 
-                            'flags'      => CCFF_REQUIRED ),
-                    'user_mask' =>
-                       array( 'label'       => '',
-                               'formatter'  => 'securitykey',
-                               'autocomp'   => 'off',
-                               'form_tip'   => '',
-                               'flags'      => CCFF_NOUPDATE),
-                    'user_confirm' =>
-                       array( 'label'       => 'str_security_key',
-                               'formatter'  => 'securitymatch',
-                               'class'      => 'cc_form_input_short',
-                               'form_tip'   => CCSecurityVerifierForm::GetSecurityTipStr(),
-                               'flags'      => CCFF_REQUIRED | CCFF_NOUPDATE)
-            );
+                            'flags'      => CCFF_REQUIRED )
+                            );
+                            
+        if( !CCUser::IsLoggedIn() )
+        {
+            $fields += array(                            
+                        'user_mask' =>
+                           array( 'label'       => '',
+                                   'formatter'  => 'securitykey',
+                                   'autocomp'   => 'off',
+                                   'form_tip'   => '',
+                                   'flags'      => CCFF_NOUPDATE),
+                        'user_confirm' =>
+                           array( 'label'       => 'str_security_key',
+                                   'formatter'  => 'securitymatch',
+                                   'class'      => 'cc_form_input_short',
+                                   'form_tip'   => CCSecurityVerifierForm::GetSecurityTipStr(),
+                                   'flags'      => CCFF_REQUIRED | CCFF_NOUPDATE)
+                );
+        }
 
         $this->AddFormFields($fields);
     }
@@ -535,7 +541,7 @@ class CCMailerAPI
         require_once('cchost_lib/cc-page.php');
         $page =& CCPage::GetPage();
         $page->SetTitle($title);
-        CCUser::AddUserBreadCrumbs($title,null,$userto);
+        CCUser::AddUserBreadCrumbs($title,null,$user_to);
 
         $verify = $this->_ok_to_contact($userto);
 
