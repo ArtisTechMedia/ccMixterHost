@@ -94,7 +94,7 @@ CCDebug::LogErrors( $cc_error_level );
 */
 CCDebug::InstallErrorHandler(true);     
 
-require_once('mixter-lib/d.inc'); // turns on debugging and shuts off mail
+// require_once('mixter-lib/d.inc'); // turns on debugging and shuts off mail
 
 /*
 *  Internaitionalization requires (for now) that gettext be 
