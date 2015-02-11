@@ -70,6 +70,9 @@ class CCPlaylistHV
             }
         }
 
+        if( $args['format'] == 'playlist' )
+            $queryObj->GetSourcesFromTemplate($args['template']);
+
         if( empty($args['playlist']) ) 
             return;
         
@@ -80,6 +83,7 @@ class CCPlaylistHV
             $row = CCDatabase::QueryRow('SELECT * FROM cc_tbl_cart WHERE cart_id='.$id);
             $ok = !empty($row);
         }
+        
         if( !$ok )
             CCUtil::Send404(true,'Invalid playlist id');
 

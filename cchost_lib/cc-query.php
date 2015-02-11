@@ -204,8 +204,9 @@ class CCQuery
         $this->_arg_alias_ref($req); // convert short to long
         $this->_uri_args = $req;     // store for later
 
-        $this->args = array_merge($this->GetDefaultArgs($req),$req,$extra_args);
-
+        $defargs = $this->GetDefaultArgs($req);
+        $this->args = array_merge($defargs,$req,$extra_args);
+        
         // get the '+' out of the tag str
         if( !empty($this->args['tags']) )
             $this->args['tags'] = str_replace( ' ', ',', urldecode($this->args['tags']));
@@ -344,6 +345,7 @@ class CCQuery
     function _trigger_setup_event()
     {
         CCEvents::Invoke( CC_EVENT_API_QUERY_SETUP, array( &$this->args, &$this, !empty($this->_from_url)) );
+
         // ugh, sql_p['columns'] is a string, it should have been an array
         // all along. We hack it into a string here so we don't break
         // anybody else that depends on it being a string.

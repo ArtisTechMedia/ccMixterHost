@@ -81,7 +81,8 @@ class CCPlaylists
         {
             require_once('cchost_lib/cc-query.php');
             $query = new CCQuery();
-            $qargs = array_filter($query->ProcessUriArgs());
+            $pargs = $query->ProcessUriArgs(array( 'format' => 'playlist' ) );
+            $qargs = array_filter($pargs);
             $qargs = $query->SerializeArgs($qargs);
             $up['cart_id'] = $playlist_id;
             $up['cart_dynamic'] = $qargs;
