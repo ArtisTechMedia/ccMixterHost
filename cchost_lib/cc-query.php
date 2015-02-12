@@ -220,7 +220,7 @@ class CCQuery
         for( $i = 0; $i < $n; $i++)
         {
             $tt = $this->args[$k[$i]];
-            if( is_string($tt) && (strpos($tt,'\'') === (strlen($tt)-1) ) )
+            if( is_string($tt) && preg_match('/(\'\"|\')$/', $tt) )
                 die('Illegal value in query');
         }
 

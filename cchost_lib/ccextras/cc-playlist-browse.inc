@@ -267,6 +267,7 @@ EOF;
                 // upload 
                 //
                 $upload_id = sprintf('%0d',CCUtil::Strip($args['upload']));
+
                 if( empty($upload_id) || ($upload_id < 1) )
                     CCUtil::Send404();
                 $sql =<<<EOF
