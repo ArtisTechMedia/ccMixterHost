@@ -283,7 +283,7 @@ class CCSubmit
                 $submit_types[$typekey] = $typeinfo['submit_type'];
             $lics[] = $typeinfo['licenses'];
         }
-        $lics = "'" . join("','",array_unique(split(',',join(',',$lics)))) . "'";
+        $lics = "'" . join("','",array_unique(cc_split(',',join(',',$lics)))) . "'";
         $lics = CCDatabase::QueryRows(
             "SELECT license_id,license_name FROM cc_tbl_licenses WHERE license_id IN ({$lics})");
 
