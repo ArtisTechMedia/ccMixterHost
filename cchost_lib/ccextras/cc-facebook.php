@@ -24,6 +24,7 @@ if( !defined('IN_CC_HOST') )
 CCEvents::AddHandler(CC_EVENT_GET_CONFIG_FIELDS,  array( 'CCFacebook' , 'OnGetConfigFields' ));
 CCEvents::AddHandler(CC_EVENT_MAP_URLS,       array( 'CCFacebook',  'OnMapUrls'));
 
+/*
 define('FB_BASE_DIR','cchost_lib/facebook/src/');
 
 require_once( FB_BASE_DIR . 'Facebook/HttpClients/FacebookHttpable.php' );
@@ -42,6 +43,9 @@ require_once( FB_BASE_DIR . 'Facebook/FacebookRequestException.php' );
 require_once( FB_BASE_DIR . 'Facebook/FacebookAuthorizationException.php' );
 require_once( FB_BASE_DIR . 'Facebook/GraphObject.php' );
 require_once( FB_BASE_DIR . 'Facebook/GraphUser.php' );
+*/
+
+require_once( 'cchost_lib/facebook/autoload.php');
 
 use Facebook\HttpClients\FacebookHttpable;
 use Facebook\HttpClients\FacebookCurl;
