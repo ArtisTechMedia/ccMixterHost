@@ -36,7 +36,7 @@ class CCHowIDidItForm extends CCForm
     {
         $this->CCForm();
         $hidi = new CCHowIDidIt();
-        $this->AddFormFields($this->_get_fields());
+        $this->AddFormFields($hidi->_get_fields());
     }
 }
 
