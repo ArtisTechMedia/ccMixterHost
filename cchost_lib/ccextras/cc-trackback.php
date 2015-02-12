@@ -102,7 +102,8 @@ class CCTrackBack
         @$snoopy->fetch($link);
         // This closes #5 (ad hoc)
         // TODO: make this a global var
-        $snoopy->$curl_path = "/usr/bin/curl" ;
+
+        $snoopy->curl_path = "/usr/bin/curl" ;
         if( !empty($snoopy->error) )
         {
             $text1 = _('There was an error trying to validate the web address. Test it in your %sbrowser%s to make sure.');
