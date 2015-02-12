@@ -31,7 +31,6 @@ require_once( FB_BASE_DIR . 'Facebook/HttpClients/FacebookCurl.php' );
 require_once( FB_BASE_DIR . 'Facebook/HttpClients/FacebookCurlHttpClient.php' );
 
 require_once( FB_BASE_DIR . 'Facebook/Entities/AccessToken.php' );
-require_once( FB_BASE_DIR . 'Facebook/Entities/AccessToken.php' );
 require_once( FB_BASE_DIR . 'Facebook/Entities/SignedRequest.php' );
 
 require_once( FB_BASE_DIR . 'Facebook/FacebookSession.php' );
@@ -44,6 +43,13 @@ require_once( FB_BASE_DIR . 'Facebook/FacebookAuthorizationException.php' );
 require_once( FB_BASE_DIR . 'Facebook/GraphObject.php' );
 require_once( FB_BASE_DIR . 'Facebook/GraphUser.php' );
 
+use Facebook\HttpClients\FacebookHttpable;
+use Facebook\HttpClients\FacebookCurl;
+use Facebook\HttpClients\FacebookCurlHttpClient;
+
+use Facebook\Entities\AccessToken;
+use Facebook\Entities\SignedRequest;
+
 use Facebook\FacebookSession;
 use Facebook\FacebookRedirectLoginHelper;
 use Facebook\FacebookRequest;
@@ -53,9 +59,6 @@ use Facebook\FacebookRequestException;
 use Facebook\FacebookAuthorizationException;
 use Facebook\GraphObject;
 use Facebook\GraphUser;
-use Facebook\HttpClients\FacebookHttpable;
-use Facebook\HttpClients\FacebookCurl;
-use Facebook\HttpClients\FacebookCurlHttpClient;
 
 require_once('cchost_lib/cc-page.php');
 require_once('cchost_lib/cc-form.php');
