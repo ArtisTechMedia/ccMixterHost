@@ -26,6 +26,14 @@ CCEvents::AddHandler(CC_EVENT_MAP_URLS,       array( 'CCFacebook',  'OnMapUrls')
 
 define('FB_BASE_DIR','cchost_lib/facebook/src/');
 
+require_once( FB_BASE_DIR . 'Facebook/HttpClients/FacebookHttpable.php' );
+require_once( FB_BASE_DIR . 'Facebook/HttpClients/FacebookCurl.php' );
+require_once( FB_BASE_DIR . 'Facebook/HttpClients/FacebookCurlHttpClient.php' );
+
+require_once( FB_BASE_DIR . 'Facebook/Entities/AccessToken.php' );
+require_once( FB_BASE_DIR . 'Facebook/Entities/AccessToken.php' );
+require_once( FB_BASE_DIR . 'Facebook/Entities/SignedRequest.php' );
+
 require_once( FB_BASE_DIR . 'Facebook/FacebookSession.php' );
 require_once( FB_BASE_DIR . 'Facebook/FacebookRedirectLoginHelper.php' );
 require_once( FB_BASE_DIR . 'Facebook/FacebookRequest.php' );
@@ -35,13 +43,6 @@ require_once( FB_BASE_DIR . 'Facebook/FacebookRequestException.php' );
 require_once( FB_BASE_DIR . 'Facebook/FacebookAuthorizationException.php' );
 require_once( FB_BASE_DIR . 'Facebook/GraphObject.php' );
 require_once( FB_BASE_DIR . 'Facebook/GraphUser.php' );
-require_once( FB_BASE_DIR . 'Facebook/Entities/AccessToken.php' );
-
-require_once( FB_BASE_DIR . 'Facebook/HttpClients/FacebookHttpable.php' );
-require_once( FB_BASE_DIR . 'Facebook/HttpClients/FacebookCurl.php' );
-require_once( FB_BASE_DIR . 'Facebook/HttpClients/FacebookCurlHttpClient.php' );
-require_once( FB_BASE_DIR . 'Facebook/Entities/AccessToken.php' );
-require_once( FB_BASE_DIR . 'Facebook/Entities/SignedRequest.php' );
 
 use Facebook\FacebookSession;
 use Facebook\FacebookRedirectLoginHelper;
