@@ -47,6 +47,6 @@ if( CCUser::IsLoggedIn() )
     show_main_home_page();
 }
 
-require_once( 'mixter-files/splash/ccmixter_splash.html' );
+require_once( 'mixter-files/splash/splash.html' );
 
 ?>
