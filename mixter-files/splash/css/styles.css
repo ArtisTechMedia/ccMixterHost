@@ -112,6 +112,7 @@ html a:hover {
     width: 100;
     height: 200;
     background-color: white;
+    border: 1px solid #909090
     display: none;
 }
 
@@ -119,7 +120,6 @@ html a:hover {
     display: block;
     margin: 1px 7px 1px 7px;
     padding: 3px 5px 3px 5px;
-    font-size: 12px;
 	text-decoration: none;
 }
 .search-popup img {
@@ -127,7 +127,7 @@ html a:hover {
 }
 
 .search-popup a:hover {
-    background-color: #CFF;
+    background-color: #eaf4ef;
 	text-decoration: none;
 }
 .search-popup-hint {
@@ -313,7 +313,6 @@ html a:hover {
 	background-image: -o-linear-gradient(bottom, #309200, #6dca00 74%, #b4ce02);
 	background-image: -ms-linear-gradient(bottom, #309200, #6dca00 74%, #b4ce02);
 	background-image: linear-gradient(to top, #309200, #6dca00 74%, #b4ce02);
-	margin-top: 40px;
 	padding: 8px 60px 9px 60px;
 }
 .signB:hover {
@@ -330,7 +329,6 @@ html a:hover {
 	background-image: -o-linear-gradient(bottom, #309200, #309200 74%, #309200);
 	background-image: -ms-linear-gradient(bottom, #309200, #309200 74%, #309200);
 	background-image: linear-gradient(to top, #309200, #309200);
-	margin-top: 40px;
 	padding: 8px 60px 9px 60px;
 }
 .signB a, .signB2 a {
@@ -374,6 +372,7 @@ html a:hover {
 	padding: 0 200px 0 0;
 	display: block;
 	position: relative;
+	margin-top: 40px;
 }
 .signF:hover {
 	width: 270px;
@@ -392,6 +391,7 @@ html a:hover {
 	background-image: -ms-linear-gradient(bottom, #004176, #004176 74%, #004176);
 	background-image: linear-gradient(to top, #004176, #004176);
 	padding: 0 200px 0 0;
+	margin-top: 40px;
 }
 img#faceLogo {
 	margin: 3px 9px 12px 1px;

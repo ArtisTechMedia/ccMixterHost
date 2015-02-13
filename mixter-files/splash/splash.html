@@ -97,19 +97,18 @@ elements and media queries -->
 </div>
 
 <div class="search-popup">
-    <a id="dig"><img src="mixter-files/splash/images/checked.png"> dig.ccMixter - <span class="search-popup-hint">Free music</span></a>
+    <a id="dig"><img src="mixter-files/splash/images/checked.png">dig.ccMixter - <span class="search-popup-hint">Free music</span></a>
     <a id="ccm"><img src="mixter-files/splash/images/check-none.png">ccMixter - <span class="search-popup-hint">Samples, a cappellas</span></a>
     <a id="tt"><img src="mixter-files/splash/images/check-none.png">TuneTrack - <span class="search-popup-hint">Royalty free licenses</span></a>
 </div>
-
 <div id="heroImg" >
   <div class="heroText">
     <h1>MUSIC CONNECTS US</h1>
     <h4>Collaborate with 45,000 musicians. Around the world.</h4>
     <div id="sign">
-      <div class="signB"><a>Sign Up Now</a></div>
-      <div id="orSection"> <img src="mixter-files/splash/images/separator-white.png" /> <a id="or">or</a> <img src="mixter-files/splash/images/separator-white.png" /> </div>
       <div class="signF">  <a href="#" onclick="fb_custom_fb_login()"><img id="faceLogo" src="mixter-files/splash/images/facebook-logo.png" /> <img id="faceDiv" src="mixter-files/splash/images/facebook-div.png" /> <span id="faceText">Sign in with Facebook</span> </a></div>
+      <div id="orSection"> <img src="mixter-files/splash/images/separator-white.png" /> <a id="or">or</a> <img src="mixter-files/splash/images/separator-white.png" /> </div>
+      <div class="signB"><a href="/login">Sign Up Now</a></div>
     </div>
   </div>
 </div>
@@ -220,22 +219,24 @@ elements and media queries -->
 <script>
 	$("id_or_class").css("min-height",$(window).height());
 	
-	(function() {
+	(function(){
         var offset = $('#search-popup-pos').offset();
         var posY = offset.top - $(window).scrollTop();
         var posX = offset.left - $(window).scrollLeft(); 	
         var size = $('#search-popup-pos').height();
         
-        var css ={ 'position': 'fixed', 'top': posY + size + 12, 'left': posX, 'z-index': 1000, 'cursor': 'pointer' };
+        var css ={ 'display': 'none', 'position': 'fixed', 'top': posY + size + 12, 'left': posX, 'z-index': 1000, 'cursor': 'pointer' };
         $(".search-popup").css( css );
-        })();
+    })();
 	
 	$(".search-select").click( function() {
+	    event.stopPropagation();
         $(".search-popup").toggle({ duration: 600 });
 	});
 	
 	$(".search-popup a").click( function() {
 	    event.preventDefault();
+	    //event.stopPropagation();
 	    $(".search-popup a img").attr( 'src', 'mixter-files/splash/images/check-none.png' );
 	    $(this).find(">:first-child").attr( 'src', 'mixter-files/splash/images/checked.png' );
 	    searchType = this.id;
@@ -244,6 +245,7 @@ elements and media queries -->
 	
 	$('#search-term').click( function() {
 	   $(this).val('');
+	    //event.stopPropagation();
 	});
 	
 	$(".myMagnifier").click( function() {
@@ -265,6 +267,10 @@ elements and media queries -->
         }
         document.location = url;
 	});
+
+	$(this).click( function() {
+       $(".search-popup").toggle(false);
+	}); 
 </script>
 </body>
 </html>
