@@ -107,7 +107,7 @@ class CCCCPlus
             if( empty($fields['upload_ccplus']) )
                 $fields['upload_ccplus'] = 
                             array( 'label'  => _('CC Plus'),
-                                   'form_tip'   => _('Add CC Plus license'),
+                                   'form_tip'   => _('Add CC Plus license (<a href="http://tunetrack.net/mnodes/29673/download/">terms</a>)'),
                                     'class'     => '',
                                    'formatter'  => 'checkbox',
                                    'flags'      => CCFF_NOUPDATE);
