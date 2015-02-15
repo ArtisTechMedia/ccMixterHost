@@ -30,7 +30,7 @@ if( !defined('IN_CC_HOST') )
 */
 require_once('cchost_lib/ccextras/cc-topics.php');
 
-function _generator_cc_format($form, $fieldname, $value, $class )
+function  _generator_cc_format($form, $fieldname, $value, $class )
 {
     $textarea = $form->generator_textarea($fieldname,$value,$class);
 
