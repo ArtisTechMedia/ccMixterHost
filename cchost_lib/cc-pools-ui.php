@@ -204,7 +204,7 @@ END;
         }
     }
 
-    function ApproveTrackback($pool_item_id,$upload_id=0)
+    public static function ApproveTrackback($pool_item_id,$upload_id=0)
     {
         //
         // for approval the trackbacks are pool items with the pool_item_approved set to 0
