@@ -305,6 +305,39 @@ EOF;
         CCUtil::ReturnAjaxData($row);
     }
 
+    function RemixRequiredTag()
+    {
+        $tag = $_GET['tag'];
+        $remix_sources = $_GET['remix_sources'];
+        $result = array( 'remixAllowed' => $this->AreAllSourcesTaggedWith( $tag, $remix_sources ) );
+        CCUtil::ReturnAjaxData($result);        
+    }
+    
+    public static function AreAllSourcesTaggedWith( $tag, $remix_sources )
+    {
+        if( is_array($remix_sources) )
+        {
+            $rows = $remix_sources;
+        }
+        else
+        {
+            $sql = 'SELECT upload_tags FROM cc_tbl_uploads WHERE upload_id IN (' . $remix_sources . ')';
+            $rows = CCDatabase::QueryItems($sql);
+        }
+        if( empty($rows) )
+            return false;
+        require_once('cchost_lib/cc-tags.php');
+        $result = array( 'remixAllowed' => !empty($rows) );
+        foreach( $rows as $tags )
+        {
+            if( !CCTag::InTag( $tag, $tags ) )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     public static function GetStrictestLicenseForUpload($upload_id)
     {
         $remix_sources = CCDatabase::QueryItems('SELECT tree_parent FROM cc_tbl_tree WHERE tree_child = '.$upload_id);
@@ -369,6 +402,8 @@ EOF;
             CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '{upload_id}', _("Displays 'Manage Remixes' for upload"), CC_AG_UPLOAD );
         CCEvents::MapUrl( ccp('remixlicenses'), array( 'CCRemix', 'RemixLicenses'), 
             CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '{upload_id}', _("Ajax callback to calculate licenses"), CC_AG_UPLOAD );
+        CCEvents::MapUrl( ccp('remixrequiredtag'), array( 'CCRemix', 'RemixRequiredTag'), 
+            CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '', _("Ajax callback to restrict remixes by tag"), CC_AG_UPLOAD );
     }
 
 

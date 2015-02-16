@@ -186,6 +186,20 @@ class CCUpload
                                    'flags'      => CCFF_REQUIRED  );
     }
 
+    public static function IsRemix($upload_id_or_record)
+    {
+        return CCUpload::HasTag($upload_id_or_record,'remix');
+    }
+
+    public static function HasTag($upload_id_or_record,$tag)
+    {
+        $upload_id = is_array($upload_id_or_record) ? $upload_id_or_record['upload_id'] : $upload_id_or_record;
+        $uploads =& CCUploads::GetTable();
+        $tags = $uploads->QueryItemFromKey( 'upload_tags', $upload_id );
+        require_once('cchost_lib/cc-tags.php');
+        return CCTag::InTag($tag,$tags);
+    }
+    
     public static function GetTagFields(&$form,$tag_field_name='upload_tags',$insert_how = 'before',$insert_where = 'upload_description')
     {
         require_once('cchost_lib/cc-tags.inc');

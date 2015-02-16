@@ -105,12 +105,14 @@ class CCCCPlus
             *  Add CCPLus to file uploads
             */
             if( empty($fields['upload_ccplus']) )
+            {
                 $fields['upload_ccplus'] = 
                             array( 'label'  => _('CC Plus'),
                                    'form_tip'   => _('Add CC Plus license (<a href="http://tunetrack.net/mnodes/29673/download/">terms</a>)'),
                                     'class'     => '',
                                    'formatter'  => 'checkbox',
                                    'flags'      => CCFF_NOUPDATE);
+            }
         }
     }
 
@@ -137,17 +139,15 @@ class CCCCPlus
     }
 
 
-    /**
-    * Event handler for {@link CC_EVENT_FORM_VERIFY}
-    * 
-    * @param object &$form CCForm object
-    * @param boolean &$retval Set this to false if fields fail to verify
-    */
-    function OnFormVerify(&$form,&$retval)
+    function OnSourcesChanged($remixid,&$remix_sources)
     {
-        global $CC_GLOBALS;
-
-        return true;
+        if( CCUpload::HasTag($remixid,'ccplus') )
+        {
+            if( !CCRemix::AreAllSourcesTaggedWith('ccplus',$remix_sources) )
+            {
+                CCUploadAPI::UpdateCCUD($remixid,'','ccplus');
+            }            
+        }
     }
 
 }

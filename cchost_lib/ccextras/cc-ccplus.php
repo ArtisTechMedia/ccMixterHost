@@ -30,7 +30,7 @@ CCEvents::AddHandler(CC_EVENT_GET_CONFIG_FIELDS,  array( 'CCCCPlus' , 'OnGetConf
 
 CCEvents::AddHandler(CC_EVENT_FORM_FIELDS,    array( 'CCCCPlus', 'OnFormFields'), 'cchost_lib/ccextras/cc-ccplus.inc' );
 CCEvents::AddHandler(CC_EVENT_FORM_POPULATE,  array( 'CCCCPlus', 'OnFormPopulate'), 'cchost_lib/ccextras/cc-ccplus.inc'  );
-CCEvents::AddHandler(CC_EVENT_FORM_VERIFY,    array( 'CCCCPlus', 'OnFormVerify'), 'cchost_lib/ccextras/cc-ccplus.inc'  );
+CCEvents::AddHandler(CC_EVENT_SOURCES_CHANGED,    array( 'CCCCPlus', 'OnSourcesChanged'), 'cchost_lib/ccextras/cc-ccplus.inc'  );
 
 CCEvents::AddHandler(CC_EVENT_UPLOAD_DONE,    array( 'CCCCPlus', 'OnUploadDone'), 'cchost_lib/ccextras/cc-ccplus.inc'  );
 
