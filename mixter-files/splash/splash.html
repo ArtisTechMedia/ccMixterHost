@@ -28,7 +28,7 @@
 <script>
 var $jq = jQuery.noConflict();
 
-function scrollTo(element,incNav)
+function myScrollTo(element,incNav)
 {
     var offset = incNav ? $jq('#myNav_div').height() : 0;
     $jq('html,body').animate({ scrollTop: $jq(element).offset().top - offset },
@@ -82,11 +82,11 @@ div.search {
 
 <div class="myNav" id="myNav_div">
     <div class="container">
-                <div class="navbar-header"> <a href="javascript: //" onclick="scrollTo('#heroImg',false);" class="navbar-brand"></a> </div>
+                <div class="navbar-header"> <a href="javascript: //" onclick="myScrollTo('#heroImg',false);" class="navbar-brand"></a> </div>
                 <div class="collapse navbar-collapse">
                               <ul class="nav navbar-nav">
-                                <li><a href="javascript: //" id="music" onclick="scrollTo('#music_div',true);">Music</a></li>
-                                <li><a href="javascript: //" id="howitworks" onclick="scrollTo('#howitworks_div',true)">How it Works</a></li>
+                                <li><a href="javascript: //" id="music" onclick="myScrollTo('#music_div',true);">Music</a></li>
+                                <li><a href="javascript: //" id="howitworks" onclick="myScrollTo('#howitworks_div',true)">How it Works</a></li>
                               </ul>
                               <div class="search">
                                 <div class="search-input">
