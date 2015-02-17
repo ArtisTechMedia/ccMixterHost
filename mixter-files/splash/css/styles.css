@@ -622,3 +622,32 @@ span#faceText {
 	font-weight: 300;
 	padding: 20px;
 }
+
+/*
+@media screen and (min-width: 992px){
+.desc {
+       background-image: url(/ccMixter/img/mixer-image.jpg);
+       width: 100%;
+       min-height: 490px;
+       height:100%;
+       background-size: cover;
+       background-repeat: no-repeat;
+       text-align: center;
+       color: #ffffff;
+       padding-bottom:150px;
+}
+}
+ 
+@media screen and (max-width: 992px){
+.desc {
+       background-image: none;
+       background-color:#3C3F44;
+       width: 100%;
+       min-height: 490px;
+       height:100%;
+       text-align: center;
+       color: #ffffff;
+       padding-bottom:150px;
+}
+}
+*/
