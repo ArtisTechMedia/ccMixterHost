@@ -60,6 +60,7 @@ class CCPageAdmin
     {
         extract($args);
 
+        $original_limit = $limit;
         if( ($limit == 'page') || ($format == 'page')  )
         {
             $page =& CCPage::GetPage();
@@ -80,6 +81,11 @@ class CCPageAdmin
 
         $queryObj->GetSourcesFromTemplate($args['template']);
 
+        if( $queryObj->args['datasource'] == 'topics' )
+        {
+            $args['limit'] = !empty($original_limit) && is_numeric($original_limit) ? $original_limit : 1000;
+        }
+        
         // why is this needed again?
         if( !empty($_GET['offset']) )
             $args['offset'] = sprintf('%0d',$_GET['offset']);

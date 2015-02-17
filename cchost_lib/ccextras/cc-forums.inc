@@ -576,7 +576,9 @@ EOF;
         $query = new CCQuery();
         $args = $query->ProcessAdminArgs('limit=0&sort=left&paging=off&f=page&t=topic_thread&&title=' . 
             urlencode($row['topic_name']) . '&match='. $thread_id );
+                        
         $query->Query($args);
+        
         $name = $row['forum_name'] . '::' . $row['topic_name'];
         $this->_add_feed_links( $thread_id, '', '', $name );
         $this->_build_bread_crumb_trail($row['forum_id'],$row['topic_name']);
