@@ -81,6 +81,7 @@ class CCCCPlus
                 $newtag = '';
                 $oldtag = 'ccplus';
             }
+            require_once('cchost_lib/cc-uploadapi.php');
             CCUploadAPI::UpdateCCUD($upload_id,$newtag,$oldtag);
         }
     }
