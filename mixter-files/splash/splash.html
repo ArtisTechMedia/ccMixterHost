@@ -26,11 +26,12 @@
 <link rel="stylesheet" type="text/css" href="mixter-files/splash/css/styles.css"/>
 
 <script>
+var $jq = jQuery.noConflict();
 
 function scrollTo(element,incNav)
 {
-    var offset = incNav ? $('#myNav_div').height() : 0;
-    $('html,body').animate({ scrollTop: $(element).offset().top - offset },
+    var offset = incNav ? $jq('#myNav_div').height() : 0;
+    $jq('html,body').animate({ scrollTop: $jq(element).offset().top - offset },
             { duration: 'slow', easing: 'swing'});
 }
 
@@ -226,39 +227,39 @@ div.search {
 
 <!-- Stretch the hero Image --> 
 <script>
-	$("id_or_class").css("min-height",$(window).height());
+	$jq("id_or_class").css("min-height",$jq(window).height());
 	
 	(function(){
-        var offset = $('#search-popup-pos').offset();
-        var posY = offset.top - $(window).scrollTop();
-        var posX = offset.left - $(window).scrollLeft(); 	
-        var size = $('#search-popup-pos').height();
+        var offset = $jq('#search-popup-pos').offset();
+        var posY = offset.top - $jq(window).scrollTop();
+        var posX = offset.left - $jq(window).scrollLeft(); 	
+        var size = $jq('#search-popup-pos').height();
         
         var css ={ 'display': 'none', 'position': 'fixed', 'top': posY + size + 12, 'left': posX, 'z-index': 1000, 'cursor': 'pointer' };
-        $(".search-popup").css( css );
+        $jq(".search-popup").css( css );
     })();
 	
-	$(".search-select").click( function() {
+	$jq(".search-select").click( function() {
 	    event.stopPropagation();
-        $(".search-popup").toggle({ duration: 600 });
+        $jq(".search-popup").toggle({ duration: 600 });
 	});
 	
-	$(".search-popup a").click( function() {
+	$jq(".search-popup a").click( function() {
 	    event.preventDefault();
 	    //event.stopPropagation();
-	    $(".search-popup a img").attr( 'src', 'mixter-files/splash/images/check-none.png' );
-	    $(this).find(">:first-child").attr( 'src', 'mixter-files/splash/images/checked.png' );
+	    $jq(".search-popup a img").attr( 'src', 'mixter-files/splash/images/check-none.png' );
+	    $jq(this).find(">:first-child").attr( 'src', 'mixter-files/splash/images/checked.png' );
 	    searchType = this.id;
-        $(".search-popup").toggle( { duration: 600 });
+        $jq(".search-popup").toggle( { duration: 600 });
 	});
 	
-	$('#search-term').click( function() {
-	   $(this).val('');
+	$jq('#search-term').click( function() {
+	   $jq(this).val('');
 	    //event.stopPropagation();
 	});
 	
-	$(".myMagnifier").click( function() {
-	    var text = $('#search-term').val();
+	$jq(".myMagnifier").click( function() {
+	    var text = $jq('#search-term').val();
 	    if( text == '' )
 	    {
 	        alert("Enter a search term!");
@@ -277,8 +278,8 @@ div.search {
         document.location = url;
 	});
 
-	$(this).click( function() {
-       $(".search-popup").toggle(false);
+	$jq(this).click( function() {
+       $jq(".search-popup").toggle(false);
 	}); 
 </script>
 </body>
