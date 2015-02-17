@@ -303,8 +303,13 @@ class CCQueryAdmin
             if( !empty($_POST['new']) )
                 $this->_proc_qopts($_POST['new'],$new_opts,$names,$counter);
             $configs->SaveConfig('query-browser-opts',$new_opts,CC_GLOBAL_SCOPE,false);
+            CCUtil::SendBrowserTo();
+            /*
+                not sure what this was... but it's not there now.
+                
             $page->SetArg('query-browser-opts',$new_opts,'qbrowser_edit_aftermath');
             $page->Prompt(_('Query options sets saved.'));
+            */
         }
     }
 

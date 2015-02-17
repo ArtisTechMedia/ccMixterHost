@@ -125,7 +125,7 @@ ccQueryBrowserFilters.prototype = {
                                                ]
                           };
 
-        var limits = [  [ 1 ], [ 5 ], [ 10 ], [ 15 ], [ 25 ], [ 50 ] ];
+        var limits = [  [ 1 ], [ 5 ], [ 10 ], [ 15 ], [ 25 ], [ 50 ], [ 100 ] ];
 
         this.limit = { name: str_filter_limit, fmt: 'dropdown', param: 'limit', value: 25, vals: limits };
 
