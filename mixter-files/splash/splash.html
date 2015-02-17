@@ -53,7 +53,7 @@ div.search {
 }
 </style>
 </head>
-<body>
+<body data-spy="scroll" data-target=".navbar-collapse">
 <script>
     window.fbAsyncInit = function() {
     // facebook
@@ -75,11 +75,11 @@ div.search {
 
 <div class="myNav" id="myNav_div">
     <div class="container">
-                <div class="navbar-header"> <a href="#" onclick="scrollTo('#heroImg',false);" class="navbar-brand"></a> </div>
+                <div class="navbar-header"> <a href="javascript: //" onclick="scrollTo('#heroImg',false);" class="navbar-brand"></a> </div>
                 <div class="collapse navbar-collapse">
                               <ul class="nav navbar-nav">
-                                <li><a href="#" id="music" onclick="scrollTo('#music_div',true);">Music</a></li>
-                                <li><a href="#" id="howitworks" onclick="scrollTo('#howitworks_div',true)">How it Works</a></li>
+                                <li><a href="javascript: //" id="music" onclick="scrollTo('#music_div',true);">Music</a></li>
+                                <li><a href="javascript: //" id="howitworks" onclick="scrollTo('#howitworks_div',true)">How it Works</a></li>
                               </ul>
                               <div class="search">
                                 <div class="search-input">
@@ -94,7 +94,7 @@ div.search {
                                       </div>
                                 </div><!-- .search-input -->
                               </div><!-- .search -->
-                      <div class="signUp"><a href="/login">Sign Up</a></div>
+                      <div class="signUp"><a href="/register">Sign Up</a></div>
                       <div class="signUp2"> OR <fb:login-button scope="public_profile,email" onlogin="fb_check_login_state();"></fb:login-button></div>
                 </div><!-- .collapse navbar-collapse -->
       </div><!-- .container -->
@@ -113,7 +113,7 @@ div.search {
     <div id="sign">
       <div class="signF">  <a href="#" onclick="fb_custom_fb_login()"><img id="faceLogo" src="mixter-files/splash/images/facebook-logo.png" /> <img id="faceDiv" src="mixter-files/splash/images/facebook-div.png" /> <span id="faceText">Sign in with Facebook</span> </a></div>
       <div id="orSection"> <img src="mixter-files/splash/images/separator-white.png" /> <a id="or">or</a> <img src="mixter-files/splash/images/separator-white.png" /> </div>
-      <div class="signB"><a href="/login">Sign Up Now</a></div>
+      <button class="signB"><a href="/register">Sign Up Now</a></button>
     </div>
   </div>
 </div>
@@ -147,9 +147,9 @@ div.search {
       <div class="col-md-6">
         <h1>A UNIVERSE OF POSSIBILITIES</h1>
         <div class="underline"></div>
-        <p>Learn what it's like to be part of a unique community of musicians by watching a video that was assembled by
-        members of that community using pieces by that same community.</p>
-        <div class="signB2"><a href="/login">Sign Up Now</a></div>
+        <p>Being part of the ccMixter Music Community opens a universe of possibilities.
+            <br />Watch this video, a collaboration by ccMixter artists, and learn how.</p>
+        <button class="signB2"><a href="/register">Sign Up Now</a></button>
       </div>
       <div class="col-md-6">
         <iframe src="//player.vimeo.com/video/108180600" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
@@ -161,7 +161,7 @@ div.search {
   <div class="row">
     <div class="col-md-4 desc2"> <img src="mixter-files/splash/images/logo-ccmixter.png">
       <p>Musicians post and share samples and a cappellas - all free!</p>
-      <div class="getStarted"><a href="/view/media/pells">Get Started</a></div>
+      <div class="getStarted"><a href="/view/media">Get Started</a></div>
     </div>
     <div class="col-md-4 desc2"> <img src="mixter-files/splash/images/logo-dig.png">
       <p>Discover free music for games, videos, podcasts, etc.</p>
@@ -169,7 +169,7 @@ div.search {
     </div>
     <div class="col-md-4 desc2"> <img src="mixter-files/splash/images/logo-tune.png">
       <p>Licence royalty-free music for commercial projects.</p>
-      <div class="getStarted"><a href="http://tunetrack.net">Get Started</a></div>
+      <div class="getStarted"><a href="http://tunetrack.net/artistech/pages/licensing/">Get Started</a></div>
     </div>
   </div>
 </div>
@@ -179,40 +179,37 @@ div.search {
       <h1>ABOUT</h1>
       <div class="separator2"></div>
       <ul>
-        <li>Who is ccMixter?</li>
-        <li>Is it Legal?</li>
-        <li>FAQ</li>
-        <li>Tags</li>
-        <li>About ccHost</li>
-        <li>How to Attribute</li>
-        <li>Contact</li>
+        <li><a href="/about">Who is ccMixter?</a></li>
+        <li><a href="/about">Is it Legal? (FAQ)</a></li>
+        <li><a href="/tags">Tags</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/CcHost">About ccHost</a></li>
+        <li><a href="https://www.youtube.com/playlist?list=PLql6A7vhyQummK2o2exONi4w4RhK0SnK4">Video Tutorials</a></li>
+        <li><a href="/media/people/contact/admin">Contact</a></li>
       </ul>
     </div>
     <div class="col-md-4 footer1">
       <h1>RESOURCES</h1>
       <div class="separator2"></div>
       <ul>
-        <li>ccMixter on GitHub</li>
-        <li>dig.ccMixter on GitHub</li>
-        <li>ccHost on GitHub</li>
-        <li>Query API</li>
-        <li>Sample Pool API</li>
-        <li>Site Credits</li>
-        <li>ccPlus Library</li>
+        <li><a href="https://github.com/ArtisTechMedia/ccMixterHost/tree/php5.5">ccMixter on GitHub</a></li>
+        <li><a href="https://github.com/ArtisTechMedia/dig.ccMixter">dig.ccMixter on GitHub</a></li>
+        <li><a href="/query-api">Query API</a></li>
+        <li><a href="/pool_api_doc">Sample Pool API</a></li>
+        <li><a href="/credits">Site Credits</a></li>
       </ul>
     </div>
     <div class="col-md-4 footer1">
       <h1>SOCIAL</h1>
       <div class="separator2"></div>
       <ul>
-        <li>Twitter</li>
-        <li>YouTube</li>
-        <li>Vimeo</li>
-        <li>Facebook</li>
-        <li>Pinterest</li>
-        <li>Instagram</li>
-        <li>Blogspot</li>
-        <li>TuneTrack</li>
+        <li><a href="https://twitter.com/ccmixtermusic">Twitter</a></li>
+        <li><a href="https://www.youtube.com/channel/UCU7QBXVX4gcePOcEyha7yng">YouTube</a></li>
+        <li><a href="https://vimeo.com/ccmixter">Vimeo</a></li>
+        <li><a href="https://www.facebook.com/CCMixter">Facebook</a></li>
+        <li><a href="https://www.pinterest.com/ccmixtermusic/">Pinterest</a></li>
+        <li><a href="http://instagram.com/ccmixter">Instagram</a></li>
+        <li><a href="http://ccmixterblog.blogspot.com/">Blogspot</a></li>
+        <li><a href="http://tunetrack.net">TuneTrack</a></li>
       </ul>
     </div>
   </div>
