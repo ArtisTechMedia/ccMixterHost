@@ -96,10 +96,18 @@ class CCPlaylistHV
             parse_str($row['cart_dynamic'],$cargs);
             $args = array_merge($args, $cargs);
             $args['title'] = $row['cart_name'];
-            if( !empty($args['limit']) && ($args['limit'] == 'default') )
+            if( !empty($args['limit']) )
             {
-                $page =& CCPage::GetPage();
-                $args['limit'] = $page->GetPageQueryLimit();
+                if( $args['limit'] == 'default' )
+                {
+                    $page =& CCPage::GetPage();
+                    $args['limit'] = $page->GetPageQueryLimit();
+                }
+                else
+                {
+                    // TODO: *cough*
+                    $queryObj->_limit_is_valid = true;
+                }
             }
         }
         else
