@@ -2181,7 +2181,7 @@ END;
         
         $sizestr = $maxwidth . 'x' . $maxheight;
         $oldrealpath = realpath( $imagedir) . '/' . $clean_name ;
-        $clean_name = preg_replace('/(\.[a-z]+)$/i', $sizestr . '\2', $clean_name );
+        $clean_name = preg_replace('/(\.[a-z]+)$/i', $sizestr . '\1', $clean_name );
         $realpath = realpath( $imagedir) . '/' . $clean_name ;
         if( file_exists($realpath) )
             unlink($realpath);

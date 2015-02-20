@@ -279,6 +279,7 @@ html a:hover {
 	-webkit-transform: translatey(-14%);
 	transform: translatey(-14%);
 }
+
 .heroText h1 {
 	font-family: 'Lato', sans-serif;
 	font-weight: 700;
@@ -292,6 +293,24 @@ html a:hover {
 	width: 400px;
 	line-height: 103%;
 }
+
+@media screen and (max-width: 640px){
+    .heroText h1 {
+        font-family: 'Lato', sans-serif;
+        font-weight: 700;
+        color: #fffefe;
+        -webkit-transform: translatey(170%);
+        transform: translatey(170%);
+        left: 10px;
+        font-size: 42px;
+        letter-spacing: 3px;
+        line-height: 1.3;
+        width: 400px;
+        line-height: 103%;
+        max-width:300px;
+    }
+}
+
 .heroText h4 {
 	font-size: 36px;
 	color: #fffefe;
@@ -299,6 +318,18 @@ html a:hover {
 	font-weight: 300;
 	margin-top: 270px;
 }
+
+@media screen and (max-width: 640px){
+    .heroText h4 {
+        font-size: 24px;
+        color: #fffefe;
+        width: 550px;
+        font-weight: 300;
+        margin-top: 270px;
+        max-width:300px;
+    }
+}
+
 .signB {
 	width: 270px;
 	height: 55px;
@@ -314,6 +345,7 @@ html a:hover {
 	background-image: -ms-linear-gradient(bottom, #309200, #6dca00 74%, #b4ce02);
 	background-image: linear-gradient(to top, #309200, #6dca00 74%, #b4ce02);
 	padding: 8px 60px 9px 60px;
+	border: none;
 }
 .signB:hover {
 	width: 270px;
@@ -330,6 +362,7 @@ html a:hover {
 	background-image: -ms-linear-gradient(bottom, #309200, #309200 74%, #309200);
 	background-image: linear-gradient(to top, #309200, #309200);
 	padding: 8px 60px 9px 60px;
+	border: none;
 }
 .signB a, .signB2 a {
 	font-family: "Open Sans";
@@ -337,6 +370,8 @@ html a:hover {
 	color: #fffefe;
 	text-shadow: 0 2px 2px rgba(0,0,0,.2);
 	font-weight: 300;
+	text-decoration: none;
+	border: none;
 }
 #sign {
 	width: 270px;
@@ -353,6 +388,13 @@ html a:hover {
 #heroImg img {
 	vertical-align: super;
 }
+
+@media screen and (max-width: 640px) {
+    #heroImg {
+        padding-left:20px;
+    }
+}
+
 .signF {
 	width: 270px;
 	height: 55px;
@@ -467,11 +509,30 @@ span#faceText {
 	font-weight: 300;
 	color: #555555;
 	text-align: center;
-	width: 450px;
 	margin-left: auto;
 	margin-right: auto;
 	margin-top: -30px;
+	width: 450px; /* uhhhh... */
+    max-width: 300px;	
 }
+
+.videowrapper {
+    float: none;
+    clear: both;
+    width: 100%;
+    position: relative;
+    padding-bottom: 56.25%;
+    padding-top: 25px;
+    height: 0;
+}
+.videowrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
 .signB2 {
 	width: 270px;
 	height: 55px;
@@ -491,6 +552,7 @@ span#faceText {
 	padding: 8px 60px 9px 60px;
 	margin-left: auto;
 	margin-right: auto;
+	border: none;
 }
 .signB2:hover {
 	width: 270px;
@@ -510,18 +572,37 @@ span#faceText {
 	padding: 8px 60px 9px 60px;
 	margin-left: auto;
 	margin-right: auto;
+	border: none;
 }
 /* MUSIC */
-
-.desc {
-	background-image: url(/mixter-files/splash/images/mixer-image.jpg);
-	width: 100%;
-	height: 490px;
-	background-size: contain;
-	background-repeat: no-repeat;
-	text-align: center;
-	color: #ffffff;
+@media screen and (min-width: 992px){
+    .desc {
+        background-image: url(/mixter-files/splash/images/mixer-image.jpg);
+        width: 100%;
+        height: 490px;
+        background-repeat: no-repeat;
+        text-align: center;
+        color: #ffffff;
+        /* background-size: contain; */
+        background-size: cover;
+        min-height: 490px;
+        color: #ffffff;
+        padding-bottom:150px;
+    }
 }
+@media screen and (max-width: 992px){
+    .desc {
+           background-image: none;
+           background-color:#3C3F44;
+           width: 100%;
+           min-height: 490px;
+           height:100%;
+           text-align: center;
+           color: #ffffff;
+           padding-bottom:150px;
+    }
+}
+    
 .desc img {
 	height: 40px;
 }
@@ -623,31 +704,9 @@ span#faceText {
 	padding: 20px;
 }
 
+button {
+    border: none;
+}
 /*
-@media screen and (min-width: 992px){
-.desc {
-       background-image: url(/ccMixter/img/mixer-image.jpg);
-       width: 100%;
-       min-height: 490px;
-       height:100%;
-       background-size: cover;
-       background-repeat: no-repeat;
-       text-align: center;
-       color: #ffffff;
-       padding-bottom:150px;
-}
-}
- 
-@media screen and (max-width: 992px){
-.desc {
-       background-image: none;
-       background-color:#3C3F44;
-       width: 100%;
-       min-height: 490px;
-       height:100%;
-       text-align: center;
-       color: #ffffff;
-       padding-bottom:150px;
-}
-}
+
 */
