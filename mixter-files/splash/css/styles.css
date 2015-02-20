@@ -502,12 +502,9 @@ span#faceText {
     margin-top: 100px;
 }
 
-@media screen and (min-width: 640px){
-}
-
 @media screen and (max-width: 640px){
-    .separator {
-        width: 630px;
+    .separator img{
+        display: none;
     }
 }
 
