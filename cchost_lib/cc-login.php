@@ -98,7 +98,7 @@ class CCNewUserForm extends CCUserForm
         }
 
         $this->AddFormFields( $fields );
-        $this->SetSubmitText('str_login_register');
+        $this->SetSubmitText('str_login_register');        
     }
 
 }
@@ -350,7 +350,18 @@ class CCLogin
         $this->_bread_crumbs_login($page,'str_login_create_acc');
         $page->SetTitle('str_login_create_acc');
         $form = new CCNewUserForm();
-        $form->SetHelpText('str_login_this_site_req');
+//        $form->SetHelpText('str_login_this_site_req');
+        
+        $help = _('Already have an account? Log in <a href="/login">here</a>.');
+        
+        if( !empty($CC_GLOBALS['facebook_allow_login']) )
+        {
+            $help .= '<br /><br />' . _('Either way you can login via Facebook: ') . '<br /><br />' .
+                '<fb:login-button scope="public_profile,email" onlogin="fb_check_login_state();"></fb:login-button>' .
+                '<br />';
+        }
+        
+        $form->SetHelpText($help);
         
         $show = empty($_POST['newuser']) || !$form->ValidateFields();
 

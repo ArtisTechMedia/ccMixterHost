@@ -110,6 +110,22 @@ class CCPathAdminForm extends CCEditConfigForm
                        'formatter'  => 'textedit',
                        'flags'      => CCFF_POPULATE );
 
+        $fields['imagemagick-path'] =
+               array(  'label'      => _('Location of ImageMagick'),
+                       'form_tip'   => _("Full path to 'convert' utility (e.g. /usr/bin/convert)"),
+                       'slash'      => false,
+                       'value'      => '',
+                       'formatter'  => 'sysdir',
+                       'flags'      => CCFF_POPULATE );
+
+        $fields['curl-path'] =
+               array(  'label'      => _('Location of curl'),
+                       'form_tip'   => _("Full path to 'curl' utility (e.g. /usr/bin/curl)"),
+                       'slash'      => false,
+                       'value'      => '',
+                       'formatter'  => 'sysdir',
+                       'flags'      => CCFF_POPULATE );
+
         $fields['error-txt'] =
                array( 'label'       => _('System Error Message'),
                        'form_tip'   => _('This file is displayed when the system encounters an error.'),

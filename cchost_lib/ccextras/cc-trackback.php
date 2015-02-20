@@ -99,11 +99,25 @@ class CCTrackBack
             return $name;
         require_once('cchost_lib/snoopy/Snoopy.class.php');
         $snoopy = new Snoopy();
+        global $CC_GLOBALS;
+        
+        if( !empty($CC_GLOBALS['curl-path']) )
+        {
+            $snoopy->curl_path = $CC_GLOBALS['curl-path'];
+        }
+        $snoopy->maxredirs = 8;
+        $snoopy->offsiteok = true;
+        
         @$snoopy->fetch($link);
-        // This closes #5 (ad hoc)
-        // TODO: make this a global var
 
-        $snoopy->curl_path = "/usr/bin/curl" ;
+        if( $snoopy->status == "301" )
+        {
+            if( $snoopy->_redirectaddr )
+            {
+               // return $this->_get_item_name($name,$snoopy->_redirectaddr);
+            }
+        }
+        
         if( !empty($snoopy->error) )
         {
             $text1 = _('There was an error trying to validate the web address. Test it in your %sbrowser%s to make sure.');
@@ -116,6 +130,7 @@ class CCTrackBack
 EOF;
             $this->_error_out($msg);
         }
+        
         if( preg_match( '/<meta name="title" content="([^"]+)">/U',$snoopy->results,$m ) )
             return $m[1];
         if( preg_match( '#<title>([^<]+)</title>#',$snoopy->results,$m) )
