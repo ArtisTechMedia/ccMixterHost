@@ -48,6 +48,7 @@ CCEvents::AddHandler(CC_EVENT_FILTER_CART_MENU,   array( 'CCPlaylistBrowse', 'On
 CCEvents::AddHandler(CC_EVENT_FILTER_CART_NSFW,   array( 'CCPlaylistBrowse', 'OnFilterCartNSFW'), 'cchost_lib/ccextras/cc-playlist-browse.inc' );
 
 CCEvents::AddHandler(CC_EVENT_ADMIN_MENU,         array( 'CCPlaylistManage',  'OnAdminMenu'),     'cchost_lib/ccextras/cc-playlist-forms.inc' );
+CCEvents::AddHandler(CC_EVENT_USER_DELETED,       array( 'CCPlaylistManage' , 'OnUserDelete'),     'cchost_lib/ccextras/cc-playlist-forms.inc' );
 
 
 class CCPlaylistHV 
@@ -335,7 +336,6 @@ EOF;
         }
         return $cart_id;
     }
-
 
 }
 

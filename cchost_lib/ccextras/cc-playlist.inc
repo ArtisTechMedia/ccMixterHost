@@ -176,7 +176,13 @@ class CCPlaylists
             'cchost_lib/ccextras/cc-playlist-forms.inc' ,
             '', _('Playlist api'), CC_AG_PLAYLIST ); 
 
+        CCEvents::MapUrl( ccp('admin','playlists','cleanup'),
+            array( 'CCPlaylistManage', 'CleanUp'), CC_ADMIN_ONLY,   
+            'cchost_lib/ccextras/cc-playlist-forms.inc' ,
+            '', _('Clean up playlists attached to dead accounts'), CC_AG_PLAYLIST ); 
+
     }
+
 
     function GetType($user_name,$type,$name='')
     {

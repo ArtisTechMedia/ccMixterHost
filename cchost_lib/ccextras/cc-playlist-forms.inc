@@ -394,6 +394,43 @@ EOF;
         else
            $page->Prompt($msg);
     }
+    
+    function _wipe_carts($dead_carts_arr)
+    {
+        if( empty($dead_carts_arr) )
+        {
+            $count = '0';
+        }
+        else
+        {
+            $count = count($dead_carts_arr);
+            $dead_carts = join(',',$dead_carts_arr);
+            $sql2 = "DELETE FROM cc_tbl_cart_items where cart_item_cart in ({$dead_carts})";
+            CCDatabase::Query($sql2);
+            $sql3 = "DELETE FROM cc_tbl_cart WHERE cart_id in ({$dead_carts})";
+            CCDatabase::Query($sql3);
+        }
+        return $count;
+    }
+    
+    function OnUserDelete($user_id)
+    {
+        $sql = "select cart_id from cc_tbl_cart where cart_user = {$user_id}";
+        $dead_carts_arr = CCDatabase::QueryItems($sql);
+        $this->_wipe_carts($dead_carts_arr);
+    }
+    
+    function CleanUp()
+    {
+        $sql = "select cart_id from cc_tbl_cart left outer join cc_tbl_user on cart_user = user_id where isnull(user_id)";
+        $dead_carts_arr = CCDatabase::QueryItems($sql);
+        $count = $this->_wipe_carts($dead_carts_arr);
+        require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
+        $page->SetTitle(_('Playlist Cleanup'));
+        $page->Prompt("Playlist: cleaned up {$count} records");
+    }
+
 }
 
 ?>
