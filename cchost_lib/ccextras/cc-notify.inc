@@ -529,8 +529,9 @@ EOF;
             $ok = @$mailer->Send();
             if( !$ok )
             {
-                CCDebug::Enable(true);
-                CCDebug::Log("Message '$subject' failed to send: \n{$u_body}");
+                $wasEnabled = CCDebug::Enable(true);
+                CCDebug::Log("*** NOTIFY FAILED *** Message '$subject' send to {$urow['user_name']}");
+                CCDebug::Enable($wasEnabled);
             }
         }
     }

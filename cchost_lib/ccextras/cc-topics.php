@@ -32,6 +32,9 @@ define( 'CC_TOPIC_FORMAT_PLAIN', 2 );
 
 CCEvents::AddHandler(CC_EVENT_MAP_URLS, array( 'CCTopic',  'OnMapUrls'), 'cchost_lib/ccextras/cc-topics.inc');
 
+CCEvents::AddHandler(CC_EVENT_USER_DELETED,  array( 'CCTopic' , 'OnUserDelete'), 'cchost_lib/ccextras/cc-topics.inc');
+
+
 CCEvents::AddHandler( CC_EVENT_API_QUERY_SETUP, 'xlat_ApiQuerySetup' );
 
 function xlat_ApiQuerySetup( &$args, &$queryObj, $requiresValidation )

@@ -157,7 +157,6 @@ class CCForumAPI
         $threads->SetOffsetAndLimit(0,1);
         $threads->SetSort('forum_thread_date', 'DESC');
 
-
         //
         // and finally Topics
         //
@@ -365,6 +364,10 @@ EOF;
         $page->AddBreadCrumbs($trail);
     }
 
+    // The topic database record is actually gone at this point
+    // the $topic argument is a shadow of that record
+    // Here we update the 'newest' topic in the thread. If there
+    // are no more topics in the thread, the thread is destroyed.
     function OnPostTopicDelete($deltype,$topic)
     {
         if( empty($topic['topic_thread']) )
@@ -380,7 +383,8 @@ EOF;
             ORDER BY topic_date DESC 
             LIMIT 1
 EOF;
-        list( $newest, $topic_date ) = CCDatabase::QueryRow($sql,false);
+        $row = CCDatabase::QueryRow($sql,false);
+        list( $newest, $topic_date ) = $row;
         if( empty($newest) )
         {
             $topic_threads->DeleteKey( $thread_id );
@@ -394,6 +398,9 @@ EOF;
         }
     }
 
+    // This topic_id is about to be deleted from the database
+    // all we are doing here is updating the users' forum
+    // post count
     function OnTopicDelete($deltype,$topic_id)
     {
         $deep = $deltype == CCTDF_DEEP;
@@ -401,7 +408,14 @@ EOF;
         if( $deep )
         {
             list( $left, $right ) = CCDatabase::QueryRow('SELECT topic_left, topic_right FROM cc_tbl_topics WHERE topic_id='.$topic_id,false);
-            $where = "topic_left >= $left AND topic_right <= $right";
+            if( empty($left) || empty($right) ) // orphaned
+            {
+                $where = "topic_id = $topic_id";
+            }
+            else
+            {            
+                $where = "topic_left >= $left AND topic_right <= $right";
+            }
         }
         else
         {
@@ -410,19 +424,27 @@ EOF;
 
         $sql = "SELECT topic_user FROM cc_tbl_topics WHERE {$where}";
         $user_ids = CCDatabase::QueryItems($sql);
-        $user_ids = join( ', ', $user_ids );
-        $sql =<<<EOF
-            SELECT COUNT(*)-1 as user_num_posts, topic_user as user_id 
-            FROM cc_tbl_topics 
-            WHERE topic_user IN ({$user_ids}) AND topic_thread > 0 
-            GROUP BY topic_user
-EOF;
-        $rows = CCDatabase::QueryRows($sql);
-        $users =& CCUsers::GetTable();
-        foreach( $rows as $row )
-            $users->Update($row);
+        $this->UpdateUserPostCounts($user_ids);
     }
 
+    function UpdateUserPostCounts($user_ids)
+    {
+        if( !empty($user_ids) ) // topics were orphaned if null
+        {
+            $user_ids = join( ', ', $user_ids );
+            $sql =<<<EOF
+                SELECT COUNT(*)-1 as user_num_posts, topic_user as user_id 
+                FROM cc_tbl_topics 
+                WHERE topic_user IN ({$user_ids}) AND topic_thread > 0 
+                GROUP BY topic_user
+EOF;
+            $rows = CCDatabase::QueryRows($sql);
+            $users =& CCUsers::GetTable();
+            foreach( $rows as $row )
+                $users->Update($row);
+        }
+    }
+    
     function OnTopicReply(&$reply, &$original)
     {
         $this->_on_new_topic($reply);
@@ -488,7 +510,6 @@ EOF;
 
     function _post_new_topic($values,$forum_id)
     {
-        
         $topics =& CCTopics::GetTable();
         $topic_id = $topics->NextID();
         $threads =& CCForumThreads::GetTable();
@@ -540,16 +561,17 @@ EOF;
         }
 
         $sql = <<<EOF
-        SELECT topic_name, forum_thread_forum, forum_read_access, topic_id, topic_locked,
-               forum_post_access, forum_thread_closed, forum_thread_sticky, forum_id, forum_name
+        SELECT topic_name, topic_id, topic_locked, topic_user,
+                forum_thread_forum, forum_read_access,                 
+                forum_post_access, forum_thread_closed, forum_thread_sticky, forum_id, forum_name
             FROM cc_tbl_topics 
             JOIN cc_tbl_forum_threads ON forum_thread_oldest = topic_id 
             JOIN cc_tbl_forums        ON forum_thread_forum = forum_id
             WHERE forum_thread_id = $thread_id
 EOF;
-
+        
         $row = CCDatabase::QueryRow($sql);
-
+        
         $mask = CCMenu::GetAccessMask();
         if( ($mask & $row['forum_read_access']) == 0 )
         {
@@ -576,8 +598,8 @@ EOF;
         $query = new CCQuery();
         $args = $query->ProcessAdminArgs('limit=0&sort=left&paging=off&f=page&t=topic_thread&&title=' . 
             urlencode($row['topic_name']) . '&match='. $thread_id );
-                        
-        $query->Query($args);
+
+        $query->Query($args);                        
         
         $name = $row['forum_name'] . '::' . $row['topic_name'];
         $this->_add_feed_links( $thread_id, '', '', $name );

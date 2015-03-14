@@ -596,8 +596,9 @@ class CCMailerAPI
             $page->Prompt( _('Mail sent') );
 
             // enabled debug to force log message
-            CCDebug::Enable(true);
+            $wasEnabled = CCDebug::Enable(true);
             CCDebug::Log("Mail sent from $from_name -- to $userto");
+            CCDebug::Enable($wasEnabled);
         }
     }
 

@@ -29,6 +29,12 @@ if( !defined('IN_CC_HOST') )
 require_once('cchost_lib/ccextras/cc-extras-events.php'); // for EVENT_TOPIC stuff
 require_once('cchost_lib/cc-page.php');
 
+/*
+    NOTE:
+    
+    Hierarchy is achieved via  http://en.wikipedia.org/wiki/Nested_set_model
+    
+*/
 /**
 */
 // Topic Delete Flags
@@ -154,10 +160,17 @@ class CCTopics extends CCTable
         // Locking broken when added if-modified-since
         $this->Lock();
         list( $left, $right ) = CCDatabase::QueryRow('SELECT topic_left,topic_right FROM cc_tbl_topics WHERE topic_id='.$topic_id,false);
-        $wid = ($right - $left) + 1;
-        $sql[] = "DELETE FROM cc_tbl_topics WHERE topic_left BETWEEN $left AND $right";
-        $sql[] = "UPDATE cc_tbl_topics SET topic_right = topic_right - $wid WHERE topic_right > $right";
-        $sql[] = "UPDATE cc_tbl_topics SET topic_left  = topic_left - $wid  WHERE topic_left  > $right";
+        if( empty($left) || empty($right) ) // orphaned
+        {
+            $sql[] = "DELETE FROM cc_tbl_topics WHERE topic_id = {$topic_id}";
+        }
+        else
+        {
+            $wid = ($right - $left) + 1;
+            $sql[] = "DELETE FROM cc_tbl_topics WHERE topic_left BETWEEN $left AND $right";
+            $sql[] = "UPDATE cc_tbl_topics SET topic_right = topic_right - $wid WHERE topic_right > $right";
+            $sql[] = "UPDATE cc_tbl_topics SET topic_left  = topic_left - $wid  WHERE topic_left  > $right";
+        }
         CCDatabase::Query($sql);
         $this->Unlock();
     }
@@ -229,7 +242,7 @@ class CCTopics extends CCTable
     function InsertNewTopic(&$values,$parent_id)
     {
         // we do a variation of the nested set model discussed here
-        // see: http://dev.mysql.com/tech-resources/articles/hierarchical-data.html
+        // see: http://en.wikipedia.org/wiki/Nested_set_model
         //
         if( $parent_id === 0 )
         {
@@ -311,6 +324,8 @@ class CCTopics extends CCTable
     {
         // I think this is how to get the immediate parent
         list( $left, $right ) = CCDatabase::QueryRow('SELECT topic_left,topic_right FROM cc_tbl_topics WHERE topic_id='.$topic_id,false);
+        if( empty($left) || empty($right) ) // orphaned topic
+            return array( 0, 0, 0 );
         $sql = "SELECT topic_id FROM cc_tbl_topics WHERE topic_left < $left AND topic_right > $right ORDER BY topic_left DESC LIMIT 1";
         return array( CCDatabase::QueryItem($sql), $left, $right );
     }
@@ -574,6 +589,16 @@ class CCTopic
         }
     }
 
+    function OnUserDelete($user_id)
+    {
+        $topic_ids = CCDatabase::QueryItems('SELECT topic_id FROM cc_tbl_topics WHERE topic_user='.$user_id,false);
+    
+        foreach( $topic_ids as $id )
+        {
+            $this->DeleteTopic( $id, true );
+        }
+    }
+
     function DeleteTopic($topic_id,$branch=false)
     {
         $translations =& CCTopicsi18n::GetTable();
@@ -683,7 +708,16 @@ class CCTopic
         }
         list( $left, $right, $topic_locked  ) = $row;
         $lock = $topic_locked ? '0' : '1';
-        $sql = "UPDATE cc_tbl_topics SET topic_locked = {$lock} WHERE topic_left >= {$left} AND topic_right <= {$right}";
+        $sql = "UPDATE cc_tbl_topics SET topic_locked = {$lock} ";
+        if( empty($left) || empty($right) ) // orphaned
+        {
+            $where = "WHERE topic_id = " . $topic_id;
+        }
+        else
+        {
+            $where = "WHERE topic_left >= {$left} AND topic_right <= {$right}";
+        }
+        $sql .= $where;
         CCDatabase::Query($sql);
 
         $prompt = $lock ? _('Topic is now locked') 

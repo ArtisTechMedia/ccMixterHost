@@ -570,7 +570,8 @@ EOF;
 
         if( $show )
         {
-            if( CCPool::IsPoolWrapper($row['pool_api_url']) )
+            $poolApi = new CCPool();
+            if( $poolApi->IsPoolWrapper($row['pool_api_url']) )
             {
                 $local_fields = array(
                         'manage' => 

@@ -95,6 +95,8 @@ class CCDatabase
         static $_sql_t;
 
         //CCDebug::Chronometer($_sql_t);
+        $last_statement =& CCDatabase::_last_sql_statement();
+        $last_statement = $sql;
         $qr = mysql_query($sql,$link);
         if( !$qr ) {
             $mysqlerr = mysql_error();
@@ -137,7 +139,8 @@ class CCDatabase
             }
             else
             {
-                //print mysql_error();
+                print( "<pre>$sql<br /><hr /></pre>");
+                print mysql_error();
                 //st();
                 trigger_error(_("Internal error, contact the admin"));
             }
@@ -298,6 +301,12 @@ class CCDatabase
     {
         static $_id;
         return $_id;
+    }
+    
+    static function & _last_sql_statement()
+    {
+        static $_statement;
+        return $_statement;
     }
     
 }
