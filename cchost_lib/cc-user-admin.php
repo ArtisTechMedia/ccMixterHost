@@ -553,7 +553,8 @@ $ephp
 
 END;
         $filename = '.cc-ban.txt';
-        unlink($filename);
+        if( file_exists($filename) )
+            unlink($filename);
         $f = fopen($filename,'w');
         fwrite($f,$text);
         fclose($f);
