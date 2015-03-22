@@ -515,10 +515,12 @@ EOF;
             array_unshift( $cc_banned_ips, $new_ip );
         }
 
+
         $form = new CCIPManageForm($cc_banned_ips);
 
         if( empty($_POST['ipmanage']) || !$form->ValidateFields() )
         {
+            $page =& CCPage::GetPage();
             $page->AddForm( $form->GenerateForm() );
         }
         else
@@ -546,13 +548,17 @@ if( !defined('IN_CC_HOST') ) exit;
 \$cc_banned_ips = array (
 $new_masks
 );
-if( @preg_match('/' . implode('|',\$cc_banned_ips) . '/',\$_SERVER['REMOTE_ADDR']) ) exit;
+if( !empty(\$cc_banned_ips) && @preg_match('/' . implode('|',\$cc_banned_ips) . '/',\$_SERVER['REMOTE_ADDR']) ) exit;
 $ephp
+
 END;
-        $f = fopen('.cc-ban.txt','w');
+        $filename = '.cc-ban.txt';
+        unlink($filename);
+        $f = fopen($filename,'w');
         fwrite($f,$text);
         fclose($f);
-        chmod('.cc-ban.txt',cc_default_file_perms());
+        $perms = cc_default_file_perms();
+        chmod('.cc-ban.txt', $perms);
 
     }
 
