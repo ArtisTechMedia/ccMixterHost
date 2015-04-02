@@ -183,7 +183,7 @@ class CCDataView
 
             case CCDV_RET_ITEMS:
             {
-                $items =& CCDatabase::QueryItems($this->sql);
+                $items = CCDatabase::QueryItems($this->sql);
                 return $items;
             }
 

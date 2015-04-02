@@ -327,7 +327,6 @@ EOF;
         if( empty($rows) )
             return false;
         require_once('cchost_lib/cc-tags.php');
-        $result = array( 'remixAllowed' => !empty($rows) );
         foreach( $rows as $tags )
         {
             if( !CCTag::InTag( $tag, $tags ) )
