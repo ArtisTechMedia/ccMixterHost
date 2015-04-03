@@ -307,31 +307,66 @@ EOF;
 
     function RemixRequiredTag()
     {
-        $tag = $_GET['tag'];
+        $ok = true;
         $remix_sources = $_GET['remix_sources'];
-        $result = array( 'remixAllowed' => $this->AreAllSourcesTaggedWith( $tag, $remix_sources ) );
-        CCUtil::ReturnAjaxData($result);        
+        $tag = $_GET['tag'];
+        $strictest_license = empty($_GET['strictest_license']) ? null : $_GET['strictest_license'];
+        $ok = $this->AreAllSourcesTaggedWith( $tag, $remix_sources, $strictest_license );
+        CCUtil::ReturnAjaxData( array( 'remixAllowed' => $ok ) );        
     }
-    
-    public static function AreAllSourcesTaggedWith( $tag, $remix_sources )
+
+    /*
+        remix_sources can be array of records or string of comma
+        separated upload_ids
+        
+        strictest_license is a license_id. Including this parameter
+        says: if the remix source does NOT have the required tag, 
+        allow it if it no stricter than strictest_license.
+        
+        This is used to allow licenses with attribution, cczero or
+        pd to be used as a ccplus remix source.
+        
+        Example: to test whether a remix can be a ccplus remix:
+        
+        $okToCCPlus = AreAllSourcesTaggedWith( 'ccplus', '1234,4444,304', 'attribution_3'); 
+        
+    */
+    public static function AreAllSourcesTaggedWith( $tag, $remix_sources, $strictest_license='' )
     {
         if( is_array($remix_sources) )
         {
             $rows = $remix_sources;
+            if( !empty($rows) && empty($rows[0]['upload_license']) )
+            {
+                // this looks expensive but there is rarely more 
+                // than 1 or 2 sources
+                for( $i = 0; $i < count($rows); $i++ )
+                {
+                    $sql = "SELECT upload_license FROM cc_tbl_uploads WHERE upload_id = {$rows[$i]['upload_id']}";
+                    $rows[$i]['upload_license'] = CCDatabase::QueryItem($sql);
+                }
+            }
         }
         else
         {
-            $sql = 'SELECT upload_tags FROM cc_tbl_uploads WHERE upload_id IN (' . $remix_sources . ')';
-            $rows = CCDatabase::QueryItems($sql);
+            $sql = 'SELECT upload_license, upload_tags FROM cc_tbl_uploads WHERE upload_id IN (' . $remix_sources . ')';
+            $rows = CCDatabase::QueryRows($sql);
         }
         if( empty($rows) )
             return false;
         require_once('cchost_lib/cc-tags.php');
-        foreach( $rows as $tags )
+        require_once('cchost_lib/cc-lics-chart.inc');
+        foreach( $rows as $row )
         {
-            if( !CCTag::InTag( $tag, $tags ) )
+            if( !CCTag::InTag( $tag, $row['upload_tags'] ) )
             {
-                return false;
+                if( !empty($strictest_license) )
+                {
+                    $license = cc_stricter_license( $row['upload_license'], $strictest_license );
+                    $ok = empty($license) || ($license == $strictest_license);
+                    if( !$ok )
+                        return false;
+                }
             }
         }
         return true;

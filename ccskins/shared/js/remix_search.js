@@ -81,7 +81,11 @@ ccRemixSearch.prototype = {
 
                 if( $('upload_ccplus') )
                 {                
-                    url = home_url + '/remixrequiredtag' + q + 'tag=ccplus&remix_sources=' + remix_sources;
+                    url = home_url + '/remixrequiredtag' + q 
+                                 +  'tag=ccplus'
+                                 + '&remix_sources=' + remix_sources 
+                                 + '&strictest_license=attribution_3';
+                                 
                     new Ajax.Request(url, { method: 'get', onComplete: this.onCCPlusResults.bind(this) } );
                 }
             }

@@ -144,7 +144,7 @@ class CCCCPlus
     {
         if( CCUpload::HasTag($remixid,'ccplus') )
         {
-            if( !CCRemix::AreAllSourcesTaggedWith('ccplus',$remix_sources) )
+            if( !CCRemix::AreAllSourcesTaggedWith('ccplus',$remix_sources,'attribution_3') )
             {
                 CCUploadAPI::UpdateCCUD($remixid,'','ccplus');
             }            
