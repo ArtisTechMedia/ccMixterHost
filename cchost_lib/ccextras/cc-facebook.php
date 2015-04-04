@@ -166,6 +166,7 @@ class CCFacebook
             $userObject = $this->_get_fb_user_object();  
             if( $userObject == null )
             {
+                $page->SetTitle(_('Incompatible Browser'));
                 $page->Prompt("It looks like your browser may not allow Facebook login to this site. Sorry about that!");
                 return;
             }  
