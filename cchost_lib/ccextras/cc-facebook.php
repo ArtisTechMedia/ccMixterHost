@@ -105,6 +105,8 @@ class CCFacebook
     
     function _get_fb_user_object()
     {
+        if( empty($_REQUEST['fbaccessid']) )
+            return null;
         $accesstoken = $_REQUEST['fbaccessid'];
         $userid = $_REQUEST['fbuserid'];
         global $CC_GLOBALS;
@@ -161,7 +163,12 @@ class CCFacebook
         
         if( empty($_POST['fbcreateaccount']) || !$form->ValidateFields() )
         {
-            $userObject = $this->_get_fb_user_object();    
+            $userObject = $this->_get_fb_user_object();  
+            if( $userObject == null )
+            {
+                $page->Prompt("It looks like your browser may not allow Facebook login to this site. Sorry about that!");
+                return;
+            }  
             $firstname = $userObject->getFirstName();
             $lastname = $userObject->getLastName();
         
@@ -204,64 +211,73 @@ class CCFacebook
     function Login()
     {
         $ret = array();
-        $userObject = $this->_get_fb_user_object();    
-        $email = $userObject->getEmail();
-        
-        $users =& CCUsers::GetTable();
-        $rows = $users->QueryRows( array( 'user_email' => $email ) );
-        if( count($rows) > 1 )
+        $userObject = $this->_get_fb_user_object();  
+        if( $userObject == null )
         {
-            foreach( $rows as $R )
+            $ret['status']  = 'error';
+            $ret['problem'] = 'bad browser';
+            $ret['num_users'] = 0;
+        }  
+        else 
+        {
+            $email = $userObject->getEmail();
+        
+            $users =& CCUsers::GetTable();
+            $rows = $users->QueryRows( array( 'user_email' => $email ) );
+            if( count($rows) > 1 )
             {
-                if( $users->GetExtraField($R['user_id'], 'facebook-account') )
+                foreach( $rows as $R )
                 {
-                    $rows = array( $R );
-                    break;
+                    if( $users->GetExtraField($R['user_id'], 'facebook-account') )
+                    {
+                        $rows = array( $R );
+                        break;
+                    }
                 }
             }
-        }
-        $ret = array();
-        if( empty($rows) )
-        {
-            $ret['num_users'] = 0;
-            if( empty($_REQUEST['fbaccessid']) )
+            $ret = array();
+            if( empty($rows) )
             {
-                $ret['status']  = 'browser incompatible';
-                $ret['problem'] = 'bad browser';
+                $ret['num_users'] = 0;
+                if( empty($_REQUEST['fbaccessid']) )
+                {
+                    $ret['status']  = 'error';
+                    $ret['problem'] = 'bad browser';
+                }
+                else
+                {
+                    $ret['status']     = 'error';
+                    $ret['problem']    = 'no such user';
+                    $ret['email']      = $email;
+                    $ret['fbaccessid'] = $_REQUEST['fbaccessid'];
+                    $ret['fbuserid']   = $_REQUEST['fbuserid'];
+                }
+            }
+            else if( count($rows) > 1 )
+            {
+                $ret['num_users'] = count($rows);                
+                $ret['users'] = array();
+                foreach( $rows as $R)
+                {
+                    $ret['users'][] = array( 'user_id' => $R['user_id'],
+                                             'user_name' => $R['user_name'] );
+                }
+                $ret['status'] = 'action required';
+                $ret['problem'] = 'multiple matches';
             }
             else
             {
-                $ret['status']     = 'error';
-                $ret['problem']    = 'no such user';
-                $ret['email']      = $email;
-                $ret['fbaccessid'] = $_REQUEST['fbaccessid'];
-                $ret['fbuserid']   = $_REQUEST['fbuserid'];
+                $row = $rows[0];
+                require_once('cchost_lib/cc-login.php');
+                $login = new CCLogin();
+                $login->_create_login_cookie(true,$row['user_name'],$row['user_password']);
+                $ret['num_users'] = 1;
+                $ret['user_id'] = $row['user_id'];
+                $ret['user_name'] = $row['user_name'];            
+                $ret['status'] = 'OK';
             }
         }
-        else if( count($rows) > 1 )
-        {
-            $ret['num_users'] = count($rows);                
-            $ret['users'] = array();
-            foreach( $rows as $R)
-            {
-                $ret['users'][] = array( 'user_id' => $R['user_id'],
-                                         'user_name' => $R['user_name'] );
-            }
-            $ret['status'] = 'action required';
-            $ret['problem'] = 'multiple matches';
-        }
-        else
-        {
-            $row = $rows[0];
-            require_once('cchost_lib/cc-login.php');
-            $login = new CCLogin();
-            $login->_create_login_cookie(true,$row['user_name'],$row['user_password']);
-            $ret['num_users'] = 1;
-            $ret['user_id'] = $row['user_id'];
-            $ret['user_name'] = $row['user_name'];            
-            $ret['status'] = 'OK';
-        }
-        
+                
         return CCUtil::ReturnAjaxData($ret);
     }
     
