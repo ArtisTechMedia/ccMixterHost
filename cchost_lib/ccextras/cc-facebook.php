@@ -223,12 +223,20 @@ class CCFacebook
         $ret = array();
         if( empty($rows) )
         {
-            $ret['status'] = 'error';
-            $ret['problem'] = 'no such user';
-            $ret['email'] = $email;
-            $ret['fbaccessid'] = $_REQUEST['fbaccessid'];
-            $ret['fbuserid'] = $_REQUEST['fbuserid'];
             $ret['num_users'] = 0;
+            if( empty($_REQUEST['fbaccessid']) )
+            {
+                $ret['status']  = 'browser incompatible';
+                $ret['problem'] = 'bad browser';
+            }
+            else
+            {
+                $ret['status']     = 'error';
+                $ret['problem']    = 'no such user';
+                $ret['email']      = $email;
+                $ret['fbaccessid'] = $_REQUEST['fbaccessid'];
+                $ret['fbuserid']   = $_REQUEST['fbuserid'];
+            }
         }
         else if( count($rows) > 1 )
         {

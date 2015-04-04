@@ -37,7 +37,16 @@ function fb_on_login_response(response)
     response = eval(response.response);
     if( response.num_users == 0 )
     {
-        FB.getLoginStatus(fb_on_status_check_for_create);
+        /*
+        if( response.error && response.error == 'bad browser' )
+        {
+            alert('It looks like your browser does not support Facebook login with this site. Sorry about that!');
+        }
+        else
+        */
+        {
+            FB.getLoginStatus(fb_on_status_check_for_create);
+        }
     }
     else if( response.num_users == 1 )
     {
