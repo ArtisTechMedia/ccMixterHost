@@ -229,7 +229,18 @@ class CCQuery
 
         return $this->args;
     }
-
+    
+    function _clean_uri_arg($arg)
+    {
+        // Unfortunately some templates pass parameters directly
+        // into embed and html formats so we can't assume that
+        // _form_url is accurate
+        
+        //if( !empty($this->_from_url) )
+        if( !empty($this->args[$arg]) )
+            return CCUtil::CleanUrl($this->args[$arg]);
+    }
+    
     /**
     * Helper function for formats during CC_EVENT_QUERY_SETUP
     *
@@ -555,11 +566,15 @@ class CCQuery
             $this->$method();
         }
 
-        foreach( array( 'search', 'tags', 'type', 'ids', 'user', 'remixes', 'sources', 
+        foreach( array( '*search', 'tags', 'type', 'ids', 'user', 'remixes', 'sources', 
                          'remixesof', 'score', 'lic', 'remixmax', 'remixmin', 'reccby',  'upload', 'thread',
-                         'reviewee', 'match', 'reqtags','rand', 'recc', 'collab', 'topic', 'minitems', 'pool',
+                         'reviewee', '*match', 'reqtags','rand', 'recc', 'collab', 'topic', 'minitems', 'pool',
                         ) as $arg )
         {
+            if( strpos($arg,'*',0) === 0 )
+                $arg = substr($arg,1);
+            else
+                $this->_clean_uri_arg($arg);
             if( isset($this->args[$arg]) )
             {
                 $method = '_gen_' . $arg;

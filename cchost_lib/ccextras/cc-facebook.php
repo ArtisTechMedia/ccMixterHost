@@ -115,6 +115,9 @@ class CCFacebook
         $request = new FacebookRequest($session, 'GET', '/' . $userid);
         $response = $request->execute();
         $userObject = $response->getGraphObject(GraphUser::className());         
+        $email = $userObject->getEmail();
+        if( empty($email) )
+            return null;
         return $userObject;
     }
     

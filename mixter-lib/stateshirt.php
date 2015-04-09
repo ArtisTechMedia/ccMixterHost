@@ -26,6 +26,7 @@
 if( !defined('IN_CC_HOST') )
    die('Welcome to CC Host');
 
+/*
 CCEvents::AddHandler(CC_EVENT_GET_CONFIG_FIELDS,  array( 'StateShirt' , 'OnGetConfigFields' ), dirname(__FILE__) . '/stateshirt.inc' );
 
 CCEvents::AddHandler(CC_EVENT_FORM_FIELDS,    array( 'StateShirt', 'OnFormFields'), dirname(__FILE__) . '/stateshirt.inc' );
@@ -33,6 +34,6 @@ CCEvents::AddHandler(CC_EVENT_FORM_POPULATE,  array( 'StateShirt', 'OnFormPopula
 CCEvents::AddHandler(CC_EVENT_FORM_VERIFY,    array( 'StateShirt', 'OnFormVerify'), dirname(__FILE__) . '/stateshirt.inc'  );
 
 CCEvents::AddHandler(CC_EVENT_UPLOAD_DONE,    array( 'StateShirt', 'OnUploadDone'), dirname(__FILE__) . '/stateshirt.inc'  );
-
+*/
 
 ?>

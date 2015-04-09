@@ -966,9 +966,9 @@ class CCSkin
             {
                 require_once('cchost_lib/cc-tpl-parser.php');
                 $parsed = cc_tpl_parse_file($file,$bfunc);
-//             CCDebug::Log( "\n\n-------- $file ------------\n\n  $parsed \n\n---------------\n\n" );
+//                CCDebug::Enable(true);
+//                 CCDebug::Log( "\n\n-------- $file ------------\n\n  $parsed \n\n---------------\n\n" );
                 $ret = eval( '?>' . $parsed);
-
                 if( $ret != 'ok' && CCUser::IsAdmin() )
                 {
                     $lines = cc_split("\n",$parsed);

@@ -404,8 +404,6 @@ class CCPage extends CCSkin
     {
         global $CC_GLOBALS;
 
-        CCDebug::Enable(true);
-        
         if( !CCUtil::IsHTTP() )
             return;
 

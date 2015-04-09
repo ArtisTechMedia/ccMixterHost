@@ -500,10 +500,13 @@ class CCTopic
        else
         {
             $form->GetFormValues($values);
-            $record = array();
-            $this->_do_reply($topic_id,$values,$record);
-            CCEvents::Invoke( CC_EVENT_TOPIC_REPLY, array( &$values, &$record ) );
-            CCUtil::SendBrowserTo();
+            if( CCTopic::OKForUserToPost($values) )
+            {
+                $record = array();
+                $this->_do_reply($topic_id,$values,$record);
+                CCEvents::Invoke( CC_EVENT_TOPIC_REPLY, array( &$values, &$record ) );
+                CCUtil::SendBrowserTo();
+            }
         }
     }
 
@@ -562,6 +565,62 @@ class CCTopic
         cc_exit();
     }
 
+    public static function OKForUserToPost($values)
+    {
+        global $CC_GLOBALS;
+        
+        if( empty($CC_GLOBALS['topic-throttled-flag']) )
+            return true;
+            
+        $ip     = CCUtil::EncodeIP($_SERVER['REMOTE_ADDR']);
+        $sql    = "SELECT user_id, user_num_uploads, user_registered FROM cc_tbl_user WHERE ";
+        $where  = "user_last_known_ip LIKE '{$ip}%'";
+        $rows   = CCDatabase::QueryRows($sql . $where);
+        if( empty($rows) )
+        {
+            // in case the IP addr hasn't been recorded yet
+            // we use the current user record which is 
+            // embedded in CC_GLOBALS
+            // 
+            $rows = array( $CC_GLOBALS ); // talks like a user record, walks like a user record
+        }            
+        
+        $ok = false;
+        
+        foreach( $rows as $row )
+        {
+            $ok = $row['user_num_uploads'] > 0;
+
+            if( $ok )
+                break;
+        }
+        
+        if( !$ok )
+        {
+            $hasLinks = preg_match('%(https?://|\.com|dot com)%i', $values['topic_text']) === 1;
+            $now = new DateTime("now");
+
+            // no uploads, look for when they registered
+            foreach( $rows as $row )
+            {                
+                $reg = new DateTime(substr($row['user_registered'],0,10));
+                $diff = $now->diff($reg);
+                $ageOK = $diff->d > 1; // older than 1 day 
+                $ok = $ageOK || !$hasLinks;
+                if( !$ok ) // at least one of the accounts is too young to post links
+                    break;
+            }
+        }
+
+        if( !$ok )
+        {
+            $page =& CCPage::GetPage();        
+            $page->SetTitle(_('Restricted'));
+            $page->SetArg('topic_throttled',1);
+        }
+        return $ok;
+    }
+    
     function Delete($topic_id,$branch=false)
     {
         if( $branch && !CCUser::IsAdmin() )
@@ -732,6 +791,25 @@ class CCTopic
        $page->Prompt($prompt);
     }
 
+    function OnGetConfigFields($scope,&$fields)
+    {
+        if( $scope == CC_GLOBAL_SCOPE )
+        {
+            $fields['topic-throttled-flag'] =
+               array(  'label'      => _('Apply Topic Throttles'),
+                       'value'      => '',
+                       'form_tip'   => 'Apply checkes for topic spamming',
+                       'formatter'  => 'checkbox',
+                       'flags'      => CCFF_POPULATE);
+            $fields['topic-throttled-msg'] =
+               array(  'label'      => _('Topic Throttle Message'),
+                       'form_tip'      => 'Seen by users who have posted a invalid topic.',
+                       'value'      => '',
+                       'formatter'  => 'textedit',
+                       'flags'      => CCFF_POPULATE);
+        }
+    }
+    
     /**
     * Event handler for {@link CC_EVENT_MAP_URLS}
     *

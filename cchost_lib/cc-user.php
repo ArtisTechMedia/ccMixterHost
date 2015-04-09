@@ -112,7 +112,6 @@ class CCUser
         return( $users->QueryItemFromKey('user_name',$userid) );
     }
 
-
     public static function CheckCredentials($usernameorid)
     {
         $id     = CCUser::CurrentUser();

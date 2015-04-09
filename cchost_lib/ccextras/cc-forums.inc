@@ -502,9 +502,16 @@ EOF;
         else
         {
             $form->GetFormValues($values);
-            list( $thread_id, $topic_id ) = $this->_post_new_topic($values,$forum_id);
-            $url = ccl('thread',$thread_id);
-            CCUtil::SendBrowserTo($url);
+            if( CCTopic::OKForUserToPost($values) )
+            {
+                list( $thread_id, $topic_id ) = $this->_post_new_topic($values,$forum_id);
+                $url = ccl('thread',$thread_id);
+                CCUtil::SendBrowserTo($url);
+            }
+            else
+            {
+                $page->AddMacro('topic_throttled.tpl');
+            }
         }
     }
 

@@ -116,39 +116,46 @@ class CCReviewFormAPI
                 require_once('cchost_lib/cc-page.php');
                 $page->Prompt(_("You have already reviewed this upload."));
             }
-            else
+            else 
             {
                 $form->GetFormValues($values);
-                $reviews =& CCReviews::GetTable();
-                $values['topic_id'] = $reviews->NextID();
-                $values['topic_upload'] = $upload_id;
-                $values['topic_date'] = date('Y-m-d H:i:s',time());
-                $values['topic_user'] = CCUser::CurrentUser();
-                $values['topic_type'] = 'review';
-                $user_real = CCUser::CurrentUserField('user_real_name');
-                $values['topic_name'] = sprintf(_("Review of '%s' by '%s'"), 
-                                                $upload_name, $user_real);
-                $reviews->InsertNewTopic($values,0);
-                CCReview::Sync($upload_id,$values['topic_user']);
-
-                $row = $reviews->QueryKeyRow($values['topic_id']);
-                $row['user_real_name'] = $user_real;
-                $row['topic_permalink'] = ccl('reviews',$user_name, $upload_id ) . '#' . $values['topic_id'];
-
-                CCEvents::Invoke( CC_EVENT_REVIEW, array( &$row ) );
-
-                if( empty($_GET['ajax']) )
+                if( CCTopic::OKForUserToPost($values) )
                 {
-                    $url = ccl( 'reviews', $user_name, $upload_id );
-                    CCUtil::SendBrowserTo($url);
+                    $reviews =& CCReviews::GetTable();
+                    $values['topic_id'] = $reviews->NextID();
+                    $values['topic_upload'] = $upload_id;
+                    $values['topic_date'] = date('Y-m-d H:i:s',time());
+                    $values['topic_user'] = CCUser::CurrentUser();
+                    $values['topic_type'] = 'review';
+                    $user_real = CCUser::CurrentUserField('user_real_name');
+                    $values['topic_name'] = sprintf(_("Review of '%s' by '%s'"), 
+                                                    $upload_name, $user_real);
+                    $reviews->InsertNewTopic($values,0);
+                    CCReview::Sync($upload_id,$values['topic_user']);
+
+                    $row = $reviews->QueryKeyRow($values['topic_id']);
+                    $row['user_real_name'] = $user_real;
+                    $row['topic_permalink'] = ccl('reviews',$user_name, $upload_id ) . '#' . $values['topic_id'];
+
+                    CCEvents::Invoke( CC_EVENT_REVIEW, array( &$row ) );
+                
+                    if( empty($_GET['ajax']) )
+                    {
+                        $url = ccl( 'reviews', $user_name, $upload_id );
+                        CCUtil::SendBrowserTo($url);
+                    }
+                    else
+                    {
+                        $ret['upload_id']   = $upload_id;
+                        $ret['reviews_url'] = ccl('reviews',$user_name, $upload_id );
+                        $ret['num_reviews'] = CCDatabase::QueryItem(
+                                                'SELECT COUNT(*) FROM cc_tbl_topics WHERE topic_type = \'review\' AND topic_upload = '.$upload_id);
+                        CCUtil::ReturnAjaxData($ret);
+                    }
                 }
                 else
                 {
-                    $ret['upload_id']   = $upload_id;
-                    $ret['reviews_url'] = ccl('reviews',$user_name, $upload_id );
-                    $ret['num_reviews'] = CCDatabase::QueryItem(
-                                            'SELECT COUNT(*) FROM cc_tbl_topics WHERE topic_type = \'review\' AND topic_upload = '.$upload_id);
-                    CCUtil::ReturnAjaxData($ret);
+                    $page->AddMacro('topic_throttled.tpl');
                 }
             }
 

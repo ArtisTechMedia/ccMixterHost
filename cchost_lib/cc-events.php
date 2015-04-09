@@ -572,7 +572,9 @@ class CCEvents
         }
         elseif( empty($url) )
         {
-            preg_match_all($regex,CCUtil::StripText($_REQUEST['ccm']),$a);
+            $url = CCUtil::StripText($_REQUEST['ccm']);
+            $url = CCUtil::CleanUrl($url);
+            preg_match_all($regex,$url,$a);
             // peel off the cfgroot
             array_shift($a[1]);
             $url_pieces =& $a[1];

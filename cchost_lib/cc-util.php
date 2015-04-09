@@ -155,6 +155,23 @@ class CCUtil
         return($text);
     }
 
+    public static function CleanUrl($url)
+    {
+        // likely malevelant expressions:
+        // ' (single quote)
+        // [
+        // ]
+        // <
+        // <
+        // +
+        $regex = '%(\'|\[|\]|\+|\<|\>)%';
+        if( preg_match($regex, $url) == 1 )
+        {
+            die('Invalid url');
+        }
+        return $url;
+    }
+    
     public static function StripSlash(&$mixed)
     {
         if( get_magic_quotes_gpc() == 1 )
