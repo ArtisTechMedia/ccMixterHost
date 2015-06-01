@@ -693,21 +693,21 @@ function mixup_helper_get_rules()
 }
 
 
-function mixup_helper_mail_merge($org_text,$query_str,$merge_with = array())
+function mixup_helper_mail_merge($org_text,$query_str)
 {
-    if( empty($merge_with) )
-    {
-        require_once('cchost_lib/cc-query.php');
-        $query = new CCQuery();
-        $args = $query->ProcessAdminArgs($query_str);
-        $results = $query->Query($args);
-        if( empty($results[0][0]) ) {
-            return false;
-        }
-        $merge_with = $results[0][0];
+    require_once('cchost_lib/cc-query.php');
+    $query = new CCQuery();
+    global $CC_GLOBALS;
+    $CC_GLOBALS['querylimit'] = 20000; // FIXME
+    $args = $query->ProcessAdminArgs($query_str);
+    $results = $query->Query($args);
+    if( empty($results[0][0]) ) {
+        return false;
     }
-     
+    $merge_with = $results[0][0];
+    
     $replace_pats = array_map('mixup_helper_addpatt',array_keys($merge_with));
+    
     foreach( $results[0] as $R ) {
         $text = str_replace( $replace_pats, $R, $org_text );
         mixup_helper_send_mail($text,$R['mixer_user_id'],$R['mixup_display']);
