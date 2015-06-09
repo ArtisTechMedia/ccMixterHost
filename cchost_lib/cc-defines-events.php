@@ -581,6 +581,16 @@ define('CC_EVENT_USER_REGISTERED',      'userreg' );
 */
 define('CC_EVENT_USER_PROFILE_CHANGED', 'userprof' );
 
+/**
+* Request for Data Event: Data request for user admin menu
+*
+* Event handler prototype:
+*<code>
+*function OnUserUserAdminMenu($user_id,&$menuarray)
+*</code>
+* @see CCEvents::AddHandler()
+*/
+define('CC_EVENT_USER_ADMIN_MENU', 'useradminmenu' );
 
 /**
 * Notification Event: User logged in
