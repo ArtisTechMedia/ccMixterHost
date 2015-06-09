@@ -286,7 +286,8 @@ class CCUserPage
         }
         else
         {
-            $alpha = CCUtil::StripText($_GET['p']);
+            $p = CCUtil::CleanUrl($_GET['p']);
+            $alpha = CCUtil::StripText($p);
             $sqlargs['where'] .= " AND (user_name LIKE '{$alpha}%')";
             $qargs .= '&sort=user_name&ord=ASC';
         }

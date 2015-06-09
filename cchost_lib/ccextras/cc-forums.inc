@@ -559,6 +559,7 @@ EOF;
         $api = new CCForums();
 
         $threads =& CCForumThreads::GetTable();
+        $thread_id = CCUtil::CleanNumber($thread_id);
         if( empty($thread_id) || !$threads->KeyExists($thread_id) )
         {
             $this->_build_bread_crumb_trail(1);

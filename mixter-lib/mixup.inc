@@ -705,7 +705,6 @@ function mixup_helper_mail_merge($org_text,$query_str)
         return false;
     }
     $merge_with = $results[0][0];
-    
     $replace_pats = array_map('mixup_helper_addpatt',array_keys($merge_with));
     
     foreach( $results[0] as $R ) {

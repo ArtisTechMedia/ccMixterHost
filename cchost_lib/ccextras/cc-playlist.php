@@ -72,7 +72,11 @@ class CCPlaylistHV
         }
 
         if( $args['format'] == 'playlist' )
-            $queryObj->GetSourcesFromTemplate($args['template']);
+        { 
+            if( empty($args['template']) )
+                return;
+             $queryObj->GetSourcesFromTemplate($args['template']);
+        }
 
         if( empty($args['playlist']) ) 
             return;

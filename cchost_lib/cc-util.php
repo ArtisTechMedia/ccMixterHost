@@ -190,6 +190,11 @@ class CCUtil
         return($mixed);
     }
 
+    public static function CleanNumber($key)
+    {
+        return sprintf("%0d",$key);
+    }
+
     public static function CleanNumbers($keys)
     {
         if( is_array($keys) )
