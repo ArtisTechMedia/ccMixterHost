@@ -138,6 +138,7 @@ class CCDeleteUserFilesForm extends CCUserForm
     }
 
 }
+
 class CCIPManageForm extends CCGridForm
 {
     /**
@@ -175,7 +176,7 @@ class CCIPManageForm extends CCGridForm
 }
 
 class CCUserAdmin
-{
+{    
     function DefaultAvatar()
     {
         global $CC_GLOBALS;
@@ -328,7 +329,6 @@ EOF;
         if( $ip )        
             $activity_ip = url_args( ccl('activity'), 'ip=' . $ip );
 
-
         require_once('cchost_lib/cc-page.php');
         $page =& CCPage::GetPage();
         $page->SetTitle(sprintf(_("Manage User Account for %s"), $username ));
@@ -432,6 +432,8 @@ EOF;
                          'menu_text' => sprintf(_("Activity for %s"), $uq ),
                          'help'      => _('See Activity Log for this user.') );
 
+        CCEvents::Invoke( CC_EVENT_USER_ADMIN_MENU, array( $user_id, &$args) );
+        
         $page->PageArg('client_menu',$args,'print_client_menu');
 
     }
