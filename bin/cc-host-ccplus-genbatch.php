@@ -70,7 +70,7 @@ EOF;
             $sh .= 'mkdir $FILE_DEST' . "\n";
             $clean .= "rm {$dest}/*\n";
             $clean .= "rmdir {$dest}\n";
-            $zip .= "zip {$ccmixter_home}/dashgo/{$batch_no_str}/ccmixter-{$batch_no_str}-{$chuck_no}.zip {$dest}/*\n";
+            $zip .= "zip -j {$home}/dashgo/{$batch_no_str}/ccmixter-{$batch_no_str}-{$chuck_no}.zip {$dest}/*\n";
         }
         $str = "cp \"{$ccmixter_home}/content/{$R['user_name']}/{$R['file_name']}\" " . '$FILE_DEST' . "\n";
         $sh .= $str;
