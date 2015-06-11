@@ -1,13 +1,16 @@
 <?
 define('CC_HOST_CMD_LINE', 1 );
-chdir( dirname(__FILE__) . '/..');
+chdir( dirname(__FILE__) . '/..' );
+$ccmixter_home = getcwd();
 $NO_EXTRANEOUS_OUTPUT = true;
 require_once('cc-cmd-line.inc');
 require_once('cchost_lib/ccextras/cc-ccplus-api.inc');
+$home = getenv("HOME");
               
-print "hello\n";
 function ccPlusGenerateBatch($batch_no_str)
 {
+    global $ccmixter_home, $home;
+    
     $plusArtists = ccPlusUserIDs();
     $arrstr = implode(',',$plusArtists);
 
@@ -41,11 +44,14 @@ EOF;
                 
     $rows = CCDatabase::QueryRows($sql);
     
-    print ("genre,artist,title,id,filename,featured_artists\n");
-    $csv = '';
-    $sh = '';
+    $csv = "genre,artist,title,id,filename,featured_artists\n";
+    $sh = "mkdir {$home}/dashgo\n";
+    $sh .= "mkdir {$home}/dashgo/{$batch_no_str}\n";
+    $zip = '';
+    $clean = '';
     $chuck_no = 1;
     $chuck_count = 0;
+    $CHUNK_SIZE = 250;
     foreach($rows as $R)
     {
         $ex = unserialize($R['upload_extra']);
@@ -59,28 +65,41 @@ EOF;
 
         if( !$chuck_count )
         {
-            $sh .= "FILE_DEST=/var/www/ccmixter/dashgo/001/{$chuck_no}\n";
+            $dest = "{$home}/dashgo/{$batch_no_str}/{$chuck_no}";
+            $sh .= "\n#\n#\n#\nFILE_DEST={$dest}\n";
+            $sh .= 'mkdir $FILE_DEST' . "\n";
+            $clean .= "rm {$dest}/*\n";
+            $clean .= "rmdir {$dest}\n";
+            $zip .= "zip {$ccmixter_home}/dashgo/{$batch_no_str}/ccmixter-{$batch_no_str}-{$chuck_no}.zip {$dest}/*\n";
         }
-        $str = "mv /var/www/ccmixter/content/{$R['user_name']}/{$R['file_name']} " . '$FILE_DEST' . "\n";
+        $str = "cp {$ccmixter_home}/content/{$R['user_name']}/{$R['file_name']} " . '$FILE_DEST' . "\n";
         $sh .= $str;
-        if( ++$chuck_count > 100  )
+
+        if( ++$chuck_count > $CHUNK_SIZE  )
         {
             $chuck_count = 0;
+            ++$chuck_no;
         }
     }
 
-    print $csv;
-    print $sh;
-    /*  
-    $file = fopen("ccmixter-001.csv", "w");
+    chdir($home);
+    $file = fopen("ccmixter-{$batch_no_str}.csv", "w");
     fwrite($file,$csv);
     fclose( $file );
     
-    $file = fopen("ccmixter-001-package.sh", "w");
-    fwrite($file,$csv);
+    $file = fopen("ccmixter-{$batch_no_str}-package.sh", "w");
+    fwrite($file,$sh);
     fclose( $file );
-    */
+
+    $file = fopen("ccmixter-{$batch_no_str}-zip.sh", "w");
+    fwrite($file,$zip);
+    fclose( $file );
     
+    $file = fopen("ccmixter-{$batch_no_str}-clean.sh", "w");
+    fwrite($file,$clean);
+    fclose( $file );
+    
+    print("Files written to {$home}\n");
     
 }
 
