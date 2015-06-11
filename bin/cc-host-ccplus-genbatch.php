@@ -72,7 +72,7 @@ EOF;
             $clean .= "rmdir {$dest}\n";
             $zip .= "zip {$ccmixter_home}/dashgo/{$batch_no_str}/ccmixter-{$batch_no_str}-{$chuck_no}.zip {$dest}/*\n";
         }
-        $str = "cp {$ccmixter_home}/content/{$R['user_name']}/{$R['file_name']} " . '$FILE_DEST' . "\n";
+        $str = "cp \"{$ccmixter_home}/content/{$R['user_name']}/{$R['file_name']}\" " . '$FILE_DEST' . "\n";
         $sh .= $str;
 
         if( ++$chuck_count > $CHUNK_SIZE  )
