@@ -435,8 +435,6 @@ function htmlForFiles($ids,$name,$sources = true,$depth=0)
 function report($name,$ids,$linkname)
 {
     print "<h2><a name=\"{$linkname}\">$name</h2>\n";
-    global $CC_GLOBALS;
-    $CC_GLOBALS['querylimit'] = 20000; // FIXME
 
     if( empty($ids) )
     {

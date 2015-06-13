@@ -204,7 +204,7 @@ class CCQuery
         $this->_arg_alias_ref($req); // convert short to long
         $this->_uri_args = $req;     // store for later
 
-        $defargs = $this->GetDefaultArgs($req);
+        $defargs = $this->GetDefaultArgs();
         $this->args = array_merge($defargs,$req,$extra_args);
         
         // get the '+' out of the tag str
@@ -325,32 +325,6 @@ class CCQuery
             //
             $this->args['datasource'] = $this->templateProps['datasource'];
         }
-    }
-
-    /** 
-    * Helper function for formats during CC_EVENT_QUERY_SETUP
-    *
-    */
-    function ValidateLimit($admin_limit_key,$max=12)
-    {
-        if( !empty($this->_limit_is_valid) )
-            return;
-        if( empty($max) )
-            $max = 12;
-        global $CC_GLOBALS;
-        if( empty($this->_from_url) && empty($this->args['limit']) )
-            $admin_limit_key = 'querylimit';
-        if( empty($CC_GLOBALS[$admin_limit_key]) )
-             $CC_GLOBALS[$admin_limit_key] = $max;
-        $admin_limit = empty($admin_limit_key) ? $max : $CC_GLOBALS[$admin_limit_key];
-        if( empty($this->args['limit']) || ( $this->args['limit'] == 'default' ) )
-            $caller_limit = 'default';
-        else 
-            $caller_limit = sprintf('%0d',$this->args['limit']);
-        if( empty($caller_limit) || ($caller_limit == 'default') || ($caller_limit > $admin_limit) )
-            $caller_limit = $admin_limit;
-        $this->args['limit'] = $caller_limit;
-        $this->_limit_is_valid = true;
     }
 
     function _trigger_setup_event()
@@ -521,7 +495,7 @@ class CCQuery
         if( empty($args) )
             $args =& $this->args;
         $keys = array_keys($args);
-        $default_args = $this->GetDefaultArgs($args);
+        $default_args = $this->GetDefaultArgs();
         $str = '';
 
         // alias short to long
@@ -545,14 +519,15 @@ class CCQuery
         return $str;
     }
 
-    function GetDefaultArgs($passed_in=array())
+    function GetDefaultArgs()
     {
         global $CC_GLOBALS;
 
         $args = array(
                     'sort' => 'date', 
                     'ord'  => 'DESC', 
-                    'limit' => 'default', 'offset' => 0,
+                    'limit' => $CC_GLOBALS['querylimit'],
+                    'offset' => 0,
                     'format' => 'page',
                     );
         return $args;
@@ -741,7 +716,7 @@ class CCQuery
 
     function _gen_lic()
     {
-       if( empty($this->args['lic']) )
+        if( empty($this->args['lic']) )
         {
             return;
         }
@@ -787,20 +762,35 @@ class CCQuery
 
     function _gen_limit()
     {
-        if( !empty($this->sql_p['limit']) )
-            return;
-
-        $this->ValidateLimit('querylimit');
-        
         $A =& $this->args;
 
-        if( !empty($A['offset']) )
-            $A['offset'] = sprintf('%0d',$A['offset'] );
+        if( !empty($this->sql_p['limit']) )
+        {
+            $A['limit'] = $this->sql_p['limit'];
+        }
 
-        if( empty($A['offset']) || ($A['offset'] <= 0) )
-            $A['offset'] = '0';
+        if( !empty($A['limit']) )
+        {
+            if( preg_match("/[a-zA-Z]/", $A['limit']) )
+            {
+                global $CC_GLOBALS;
+                
+                // alias:
+                if( $A['limit'] == 'query' || !array_key_exists($A['limit'], $CC_GLOBALS) )
+                    $A['limit'] = 'querylimit';                 
+                    
+                $A['limit'] = $CC_GLOBALS[$A['limit']];
+            }
+            
+            if( !empty($A['offset']) )
+                $A['offset'] = sprintf('%0d',$A['offset'] );
 
-        $this->sql_p['limit'] = $A['limit'] . ' OFFSET ' . $A['offset'];
+            if( empty($A['offset']) || ($A['offset'] <= 0) )
+                $A['offset'] = '0';
+
+            $this->sql_p['limit'] = $A['limit'] . ' OFFSET ' . $A['offset'];
+        }
+        
     }
 
     function _gen_match()

@@ -60,14 +60,16 @@ class CCPageAdmin
     {
         extract($args);
 
-        $original_limit = $limit;
-        if( ($limit == 'page') || ($format == 'page')  )
+        // regardless of the format, anyone can use the 'page' 
+        // value of the 'limit' arg
+        // otherwise, all f=page requests use max-listing from
+        // the current skin's config
+        if( $limit === 'page' || $format == 'page' )
         {
             $page =& CCPage::GetPage();
-            $max_listing = $page->GetPageQueryLimit();
-            $queryObj->ValidateLimit(null,$max_listing);
+            $args['limit'] = $page->GetPageQueryLimit();
         }
-
+        
         if( $format != 'page' )
             return;
 
@@ -83,15 +85,12 @@ class CCPageAdmin
 
         if( $queryObj->args['datasource'] == 'topics' )
         {
-            $args['limit'] = !empty($original_limit) && is_numeric($original_limit) ? $original_limit : 1000;
+            if( empty($limit) )
+                $args['limit'] = 1000;
         }
         
-        // why is this needed again?
         if( !empty($_GET['offset']) )
             $args['offset'] = sprintf('%0d',$_GET['offset']);
-
-        if( !empty($args['dataview']) && ($args['dataview'] == 'passthru') )
-            return;
 
     }
 

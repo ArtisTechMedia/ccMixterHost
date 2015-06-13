@@ -222,6 +222,12 @@ class CCDebug
         exit;
     }
 
+    public static function PrintV(&$var, $template_safe = false)
+    {
+        CCDebug::Enable(true);
+        CCDebug::PrintVar($var,$template_safe);
+    }
+
     /**
     * Log errors according the severity
     * 

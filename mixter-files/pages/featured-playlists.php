@@ -3,8 +3,11 @@
 
 [meta]
      type = dynamic_content_page
+
      desc = _('Featured Playlists')
+
      page_title = _('Featured Playlists')
+
       content_feed = 1
       content_page_box = 1
       content_page_columns = 2
@@ -19,17 +22,24 @@
       t = ccskins/shared/pages/content_page.tpl
       topic_type = feat_playlist
 
+
 [/meta]
+
 */
+
 $A['content_page_box'] = '1';
 $A['content_page_width'] = '730px';
 $A['content_page_textformat'] = 'format';
 $A['content_page_columns'] = '2';
 
+
 $topic = empty($_GET['topic']) ? '' : $_GET['topic'];
-cc_query_fmt('f=html&limit=query&&noexit=1&nomime=1&t=ccskins/shared/formats/topic_toc_select.tpl&page=featured-playlists&sort=date&ord=desc');
+
+cc_query_fmt('f=html&limit=query&noexit=1&nomime=1&t=ccskins/shared/formats/topic_toc_select.tpl&page=featured-playlists&sort=date&ord=desc');
 cc_query_fmt('f=embed&t=ccskins/shared/pages/content_page.tpl&sort=date&ord=desc&type=feat_playlist&limit=10&paging=off&topic=' . $topic );
+
 // no paging 
 cc_content_feed('datasource=topics&type=feat_playlist&page=featured-playlists','Featured Playlists','topics'); 
+
 ?>
 

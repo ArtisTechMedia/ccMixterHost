@@ -28,7 +28,7 @@ $A['content_page_textformat'] = 'format';
 $A['content_page_columns'] = '1';
 
 $topic = empty($_GET['topic']) ? '' : $_GET['topic'];
-cc_query_fmt('f=html&limit=query&&noexit=1&nomime=1&t=ccskins/shared/formats/topic_toc_ul.tpl&page=artist-spotlight-q-a&sort=date&ord=desc');
+cc_query_fmt('f=html&limit=query&noexit=1&nomime=1&t=ccskins/shared/formats/topic_toc_ul.tpl&page=artist-spotlight-q-a&sort=date&ord=desc');
 cc_query_fmt('f=embed&t=ccskins/shared/pages/content_page.tpl&sort=date&ord=desc&type=artist_qa&limit=1&paging=on&topic=' . $topic );
 cc_add_content_paging_links($A,'artist_qa',$topic,'desc','artist-spotlight-q-a', '1');
 $A['macro_names'][] = 'prev_next_links';

@@ -98,7 +98,7 @@ function mixup_helper_admin_massmail($mixup_id,$mode='')
     }
     else {
         $form->GetFormValues($values);
-        $query_str = 'f=php&dataview=mixup_mail&mixup='.$mixup_id;
+        $query_str = 'f=php&dataview=mixup_mail&mixup='.$mixup_id .'&limit=' . mixup_helper_get_number_users($mixup_id);
         $org_text = $values['body_template'];
         if( mixup_helper_mail_merge($org_text,$query_str) )
         {
@@ -447,6 +447,12 @@ function mixup_helper_get_user_status($mixup_id,$mode_type)
     return $text;
 }
 
+function mixup_helper_get_number_users($mixup_id)
+{
+    $sql = "SELECT COUNT(mixup_user_user) FROM cc_tbl_mixup_user WHERE mixup_user_mixup = {$mixup_id}"; 
+    return CCDatabase::QueryItem($sql);
+}
+
 function mixup_helper_get_remix_confirm_text($mixup_id,$mixup_name,$logged_in)
 {
     $confirm_url = ccl('api','mixup','confirm_remix',$mixup_id);
@@ -697,10 +703,9 @@ function mixup_helper_mail_merge($org_text,$query_str)
 {
     require_once('cchost_lib/cc-query.php');
     $query = new CCQuery();
-    global $CC_GLOBALS;
-    $CC_GLOBALS['querylimit'] = 20000; // FIXME
     $args = $query->ProcessAdminArgs($query_str);
     $results = $query->Query($args);
+    
     if( empty($results[0][0]) ) {
         return false;
     }

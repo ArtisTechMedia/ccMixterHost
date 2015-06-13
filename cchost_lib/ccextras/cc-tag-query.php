@@ -156,7 +156,6 @@ function cc_tag_query_OnApiQuerySetup( &$args, &$queryObj, $requiresValidation )
         if( (integer)($limit) === 0 ) // e.g. 'default'
             $limit = 1200;
         $queryObj->sql_p['limit'] = $limit;
-        $queryObj->_limit_is_valid = true;
         
         if( !empty($category) )
             $cat = $category;
@@ -214,7 +213,6 @@ function cc_tag_query_OnApiQuerySetup( &$args, &$queryObj, $requiresValidation )
         
         $cattotal = CCDatabase::QueryItem('SELECT COUNT(*) FROM cc_tbl_tag_category');
         $queryObj->sql_p['limit'] = $cattotal;
-        $queryObj->_limit_is_valid = true;
         
         if( !empty($category) )
             $cat = $category;

@@ -108,11 +108,6 @@ class CCPlaylistHV
                     $page =& CCPage::GetPage();
                     $args['limit'] = $page->GetPageQueryLimit();
                 }
-                else
-                {
-                    // TODO: *cough*
-                    $queryObj->_limit_is_valid = true;
-                }
             }
         }
         else
