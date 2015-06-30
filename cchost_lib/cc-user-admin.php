@@ -463,6 +463,7 @@ EOF;
         $username = $record['user_name'];
         $prompt = "Delete all files for '$username'";
         $form = new CCDeleteUserFilesForm($username,$prompt);
+        $page =& CCPage::GetPage();
         if( empty($_POST['deleteuserfiles']) || !$form->ValidateFields() )
         {
             $page->AddForm( $form->GenerateForm() );
