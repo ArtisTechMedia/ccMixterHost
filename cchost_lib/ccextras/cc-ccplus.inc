@@ -1,26 +1,8 @@
 <?
-/*
-* Creative Commons has made the contents of this file
-* available under a CC-GNU-GPL license:
-*
-* http://creativecommons.org/licenses/GPL/2.0/
-*
-* A copy of the full license can be found as part of this
-* distribution in the file LICENSE.TXT.
-* 
-* You may use the ccHost software in accordance with the
-* terms of that license. You agree that you are solely 
-* responsible for your use of the ccHost software and you
-* represent and warrant to Creative Commons that your use
-* of the ccHost software will comply with the CC-GNU-GPL.
-*
-* $Id: cc-bpm.inc 8961 2008-02-11 22:17:33Z fourstones $
-*
-*/
 
 /**
 * @package cchost
-* @subpackage audio
+* @subpackage license
 */
 
 if( !defined('IN_CC_HOST') )
@@ -181,23 +163,16 @@ class CCCCPlus
 
         if( empty($CC_GLOBALS['do-ccplus']) )
             return;
-
         if( ($op == CC_UF_NEW_UPLOAD || $op == CC_UF_PROPERTIES_EDIT) )
         {
-            $newtag = '';
-            $oldtag = '';
-            if(  array_key_exists('upload_ccplus',$_POST) )
+            if(  array_key_exists('upload_ccplus',$_POST) && !empty($_POST['upload_ccplus']) )
             {
-                $newtag = 'ccplus';
-                $oldtag = '';
+                ccPlusMarkUpload($upload_id);
             }
             else
             {
-                $newtag = '';
-                $oldtag = 'ccplus';
+                ccPlusUnmarkUpload($upload_id);
             }
-            
-            ccPlusMarkUpload($upload_id);
         }
     }
 
