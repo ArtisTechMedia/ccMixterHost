@@ -716,7 +716,7 @@ class CCQuery
 
     function _gen_lic()
     {
-        if( empty($this->args['lic']) )
+        if( empty($this->args['lic']) || ($this->args['lic'] == 'all') )
         {
             return;
         }
@@ -736,7 +736,7 @@ class CCQuery
             );
 
         // available for commercial use, even ads
-        $T['open']  = array_merge( $T['by'], $T['pd'], $T['nd'], $T['sa'] );
+        $T['open']  = array_merge( $T['by'], $T['pd'], $T['nd'], $T['sa'], $T['zero'] );
 
         // available for commercial use, except ads
         $T['safe']  = array_merge( $T['open'], $T['s'], $T['splus'] );
