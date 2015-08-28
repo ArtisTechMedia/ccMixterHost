@@ -37,6 +37,6 @@ CCEvents::AddHandler(CC_EVENT_SOURCES_CHANGED,    array( 'CCCCPlus', 'OnSourcesC
 CCEvents::AddHandler(CC_EVENT_UPLOAD_DONE,        array( 'CCCCPlus', 'OnUploadDone'), 'cchost_lib/ccextras/cc-ccplus.inc'  );
 CCEvents::AddHandler(CC_EVENT_MAP_URLS,           array( 'CCCCPlus', 'OnMapUrls'), 'cchost_lib/ccextras/cc-ccplus.inc'  );
 CCEvents::AddHandler(CC_EVENT_USER_ADMIN_MENU,    array( 'CCCCPlus', 'OnUserAdminMenu'), 'cchost_lib/ccextras/cc-ccplus.inc'  );
-
+CCEvents::AddHandler(CC_EVENT_API_QUERY_SETUP,    array( 'CCCCPlus', 'OnApiQuerySetup'), 'cchost_lib/ccextras/cc-ccplus.inc'  );
 
 ?>

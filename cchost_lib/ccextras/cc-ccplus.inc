@@ -325,7 +325,19 @@ class CCCCPlus
             }            
         }
     }
-    
+
+    function OnApiQuerySetup( &$args, &$queryObj, $validate)
+    {
+        if( !empty($args['lic']) && $args['lic'] == 'ccplus' ) 
+        {
+            unset($args['lic']);
+            if( empty($args['tags']) ) {
+                $args['tags'] = '';
+            }
+            $args['tags'] .= ',ccplus';
+        }
+    }
+        
     function OnMapUrls()
     {
         CCEvents::MapUrl( 'admin/user/ccplus',     array('CCCCPlus', 'ccPlusUserAdmin'), 
