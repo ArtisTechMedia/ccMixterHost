@@ -541,7 +541,7 @@ class CCQuery
             $this->$method();
         }
 
-        foreach( array( '*search', 'tags', 'type', 'ids', 'user', 'remixes', 'sources', 
+        foreach( array( '*search', 'tags', 'type', 'ids', 'user', 'remixes', 'sources', 'trackbacksof',
                          'remixesof', 'score', 'lic', 'remixmax', 'remixmin', 'reccby',  'upload', 'thread',
                          'reviewee', '*match', 'reqtags','rand', 'recc', 'collab', 'topic', 'minitems', 'pool',
                         ) as $arg )
@@ -871,6 +871,28 @@ class CCQuery
         $this->_heritage_helper('remixes','tree_child','cc_tbl_tree','tree_parent','upload_id');
     }
 
+    function _gen_trackbacksof()
+    {        
+        $id = sprintf('%0d',$this->args['trackbacksof']);
+
+        $sql = "SELECT pool_tree_pool_child as pool_item_id FROM cc_tbl_pool_tree " .
+                 "JOIN cc_tbl_pool_item ON pool_tree_pool_child = pool_item_id " .
+                 "WHERE pool_item_approved > 0 AND pool_tree_parent = " . $id . ' ' .
+                 "ORDER BY pool_item_id DESC " ;
+
+        $rows = CCDatabase::QueryItems($sql);
+        if( empty($rows) )
+        {
+            //$this->where[] = $kf . 'pool_item_id IN (' . $sql . ')';
+            $this->dead = true;
+        }
+        else
+        {
+            $this->where[] = 'pool_item_id IN (' . join(',',$rows) . ')';
+        }
+
+    }
+    
     function _gen_reqtags()
     {
         $this->reqtags = preg_split('/[\s,+]+/',$this->args['reqtags'],-1,PREG_SPLIT_NO_EMPTY);
