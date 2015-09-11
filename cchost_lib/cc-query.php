@@ -543,7 +543,8 @@ class CCQuery
 
         foreach( array( '*search', 'tags', 'type', 'ids', 'user', 'remixes', 'sources', 'trackbacksof',
                          'remixesof', 'score', 'lic', 'remixmax', 'remixmin', 'reccby',  'upload', 'thread',
-                         'reviewee', '*match', 'reqtags','rand', 'recc', 'collab', 'topic', 'minitems', 'pool',
+                         'reviewee', '*match', 'reqtags','rand', 'recc', 'collab', 'topic', 
+                         'minitems', 'pool', 'upmin',
                         ) as $arg )
         {
             if( strpos($arg,'*',0) === 0 )
@@ -919,6 +920,15 @@ class CCQuery
         $this->where[] = 'upload_id IN (' . join(',',$ids) . ')';
     }
 
+    function _gen_upmin() 
+    {
+        $num =  CCUtil::CleanNumber( $this->args['upmin'] );
+        if( $num > 0 )
+        {
+            $this->where[] = 'user_num_uploads > ' . $num;
+        }
+    }
+    
     /*
     * Reviews left FOR a person
     */
