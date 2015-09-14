@@ -1003,7 +1003,7 @@ class CCQuery
         $grp = empty($this->args['type']) ? 0 : $this->args['type'];
         $ds = $this->args['datasource'];
 
-        // added this group just for query searches (probably belongs somewhere else)
+        // added uploads_alt group just for query searches (probably belongs somewhere else)
         //
         // usage: api/query?type=uploads_alt&s=QUERY_TEXT
         //
@@ -1011,14 +1011,22 @@ class CCQuery
         // is searched where type=uploads (which is the default)
         //
         $search_meta[] = array
-                        (
-                            'template' => 'search_uploads',
-                            'datasource' => 'uploads',
-                            'group' => 'uploads_alt',
-                            'match' => 'user_name,user_real_name,upload_name,upload_description,upload_tags'
-                        );
+                    (
+                        'group' => 'uploads_alt',
+                        'template' => 'search_uploads',
+                        'datasource' => 'uploads',
+                        'match' => 'user_name,user_real_name,upload_name,upload_description,upload_tags'
+                    );
 
-
+        // added uploads_precise group for more precise dig-style searches (without descriptions)
+        $search_meta[] = array
+                    (
+                        'group' => 'uploads_precise',
+                        'template' => 'search_uploads',
+                        'datasource' => 'uploads',
+                        'match' => 'user_name,user_real_name,upload_name,upload_tags'
+                    );
+        
         foreach( $search_meta as $meta )
         {
             if( (($grp === 0) || ($grp == $meta['group'])) && ($ds == $meta['datasource']) )
