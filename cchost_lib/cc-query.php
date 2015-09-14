@@ -590,7 +590,7 @@ class CCQuery
         {
             $this->dataviewProps['dataview'] = $this->args['dataview'];
             $this->records =&  $this->dataview->Perform( $this->dataviewProps, $this->sql_p, $this->args['rettype'], $this );
-            $this->sql =  $this->dataview->sql;
+            $this->sql = $this->dataview->sql;
         }
 
 
@@ -1000,7 +1000,10 @@ class CCQuery
     {
         $search_meta = array();
         CCEvents::Invoke( CC_EVENT_SEARCH_META, array(&$search_meta) );
-        $grp = empty($this->args['type']) ? 0 : $this->args['type'];
+        $grp = empty($this->args['group']) ? 0 : $this->args['group'];
+        if( empty($grp) ) {
+            $grp = empty($this->args['type']) ? 0 : $this->args['type'];
+        }
         $ds = $this->args['datasource'];
 
         // added uploads_alt group just for query searches (probably belongs somewhere else)
@@ -1015,7 +1018,8 @@ class CCQuery
                         'group' => 'uploads_alt',
                         'template' => 'search_uploads',
                         'datasource' => 'uploads',
-                        'match' => 'user_name,user_real_name,upload_name,upload_description,upload_tags'
+                        'match' => 'user_name,user_real_name,upload_name,upload_description,upload_tags',
+                        'joinuser' => 1
                     );
 
         // added uploads_precise group for more precise dig-style searches (without descriptions)
@@ -1024,7 +1028,8 @@ class CCQuery
                         'group' => 'uploads_precise',
                         'template' => 'search_uploads',
                         'datasource' => 'uploads',
-                        'match' => 'user_name,user_real_name,upload_name,upload_tags'
+                        'match' => 'user_name,user_real_name,upload_name,upload_tags',
+                        'joinuser' => 1
                     );
         
         foreach( $search_meta as $meta )
@@ -1073,6 +1078,11 @@ class CCQuery
                 else
                 {
                     $this->where[] = "MATCH({$meta['match']}) AGAINST( '$search' IN BOOLEAN MODE )";
+                }
+                
+                if( !empty($meta['joinuser']) && ($this->args['format'] == 'count') ) 
+                {
+                    $this->AddJoin( 'cc_tbl_user ON upload_user=user_id' );
                 }
                 break;
             }
