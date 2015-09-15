@@ -44,7 +44,7 @@ function cc_tag_query_OnApiQuerySetup( &$args, &$queryObj, $requiresValidation )
             return;
         
         $queryObj->GetSourcesFromDataview($dataview); // <-- this writes to $args...
-        $datasource = $args['datasource'];            //     ...but not result of expand()
+        $datasource = $args['datasource'];            //     ...but not result of extract()
     }
         
     if( !empty($tagexp) )
@@ -202,6 +202,11 @@ function cc_tag_query_OnApiQuerySetup( &$args, &$queryObj, $requiresValidation )
                 $queryObj->columns[] = 'SUM(tag_pair_count) as tags_count';
                 $queryObj->sql_p['group_by'] = 'tag_pair_tag';
             }
+        }
+        
+        if( !empty($ids) ) 
+        {
+            $queryObj->where[] = "tags_tag LIKE '{$ids}%'";
         }
     }
     elseif( $datasource == 'tag_cat')

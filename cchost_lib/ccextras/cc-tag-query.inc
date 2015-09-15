@@ -26,6 +26,8 @@
 if( !defined('IN_CC_HOST') )
    die('Welcome to CC Host');
 
+// holy shit ths file is never actually included at runtime
+
 CCEvents::AddHandler(CC_EVENT_API_QUERY_SETUP, 'cc_tag_query_OnApiQuerySetup' );
 
 function cc_tag_query_OnApiQuerySetup( &$args, &$queryObj, $requiresValidation )
