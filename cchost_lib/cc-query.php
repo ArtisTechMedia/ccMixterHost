@@ -212,8 +212,13 @@ class CCQuery
             $this->args['tags'] = str_replace( ' ', ',', urldecode($this->args['tags']));
 
         // queries might need decoding
+        $search_key = '';
         if( !empty($this->args['search']) )
-            $this->args['search'] = urldecode($this->args['search']);
+            $search_key = 'search';
+        else if( !empty($this->args['searchp']) )
+            $search_key = 'searchp';
+        if( !empty($search_key) )
+            $this->args[$search_key] = urldecode($this->args[$search_key]);
 
         $k = array_keys($this->args);
         $n = count($k);
@@ -374,10 +379,13 @@ class CCQuery
         {
             case 'count':
                 $A['rettype'] = CCDV_RET_ITEM;
-                if( !empty($A['datasource']) && ($A['datasource'] == 'pool_items') )
-                   $dv_name = 'count_pool_items';
-                else
-                    $dv_name = 'count';
+                $dv_name = 'count';
+                if( !empty($A['datasource']) ) {
+                    if( $A['datasource'] == 'pool_items') 
+                       $dv_name = 'count_pool_items';
+                    else if( $A['datasource'] == 'user' )
+                        $dv_name = 'count_users';
+                }   
                 $this->GetSourcesFromDataview($dv_name);
                 $this->_trigger_setup_event();
                 $this->sql_p['limit'] = '';
@@ -541,8 +549,10 @@ class CCQuery
             $this->$method();
         }
 
-        foreach( array( '*search', 'tags', 'type', 'ids', 'user', 'remixes', 'sources', 'trackbacksof',
-                         'remixesof', 'score', 'lic', 'remixmax', 'remixmin', 'reccby',  'upload', 'thread',
+        foreach( array( '*search', '*searchp', 'tags', 'type', 'ids', 'user', 'remixes', 
+                        'sources', 'trackbacksof',
+                         'remixesof', 'score', 'lic', 'remixmax', 'remixmin', 'reccby',  
+                         'upload', 'thread',
                          'reviewee', '*match', 'reqtags','rand', 'recc', 'collab', 'topic', 
                          'minitems', 'oneof', 'pool', 'minup', 'minrx',
                         ) as $arg )
@@ -998,13 +1008,29 @@ class CCQuery
 
     function _gen_search()
     {
+        $this->_gen_search_helper('search');
+    }
+
+    function _gen_searchp()
+    {
+        $this->_gen_search_helper('searchp');
+    }
+    
+    function _gen_search_helper($argtype)
+    {
         $search_meta = array();
         CCEvents::Invoke( CC_EVENT_SEARCH_META, array(&$search_meta) );
-        $grp = empty($this->args['group']) ? 0 : $this->args['group'];
-        if( empty($grp) ) {
-            $grp = empty($this->args['type']) ? 0 : $this->args['type'];
-        }
+        $is_searchp = $argtype == 'searchp';
         $ds = $this->args['datasource'];
+        
+        if( $is_searchp ) {
+            $grp = 'searchp';   
+        } else {        
+            $grp = empty($this->args['group']) ? 0 : $this->args['group'];
+            if( empty($grp) ) {
+                $grp = empty($this->args['type']) ? 0 : $this->args['type'];
+            }
+        }
 
         // added uploads_alt group just for query searches (probably belongs somewhere else)
         //
@@ -1019,24 +1045,31 @@ class CCQuery
                         'template' => 'search_uploads',
                         'datasource' => 'uploads',
                         'match' => 'user_name,user_real_name,upload_name,upload_description,upload_tags',
-                        'joinuser' => 1
+                        'join_user_on_count' => 1
                     );
 
-        // added uploads_precise group for more precise dig-style searches (without descriptions)
+        // added these for more precise dig-style searches (without descriptions)
         $search_meta[] = array
                     (
-                        'group' => 'uploads_precise',
+                        'group' => 'searchp',
                         'template' => 'search_uploads',
                         'datasource' => 'uploads',
-                        'match' => 'user_name,user_real_name,upload_name,upload_tags',
-                        'joinuser' => 1
+                        'match' => 'upload_name,upload_tags',
+                        'join_user_on_count' => 1
+                    );
+        $search_meta[] = array
+                    (
+                        'group' => 'searchp',
+                        'datasource' => 'user',
+                        'match' => 'user_name,user_real_name',
+                        'dataview' => 'user_basic'
                     );
         
         foreach( $search_meta as $meta )
         {
             if( (($grp === 0) || ($grp == $meta['group'])) && ($ds == $meta['datasource']) )
             {
-                $search = str_replace("'","\\'",(trim($this->args['search'])));
+                $search = str_replace("'","\\'",(trim($this->args[$argtype])));
                 $strlow = strtolower($search);
                 global $CC_GLOBALS;
                 if( empty($CC_GLOBALS['use_text_index']) )
@@ -1080,9 +1113,12 @@ class CCQuery
                     $this->where[] = "MATCH({$meta['match']}) AGAINST( '$search' IN BOOLEAN MODE )";
                 }
                 
-                if( !empty($meta['joinuser']) && ($this->args['format'] == 'count') ) 
-                {
-                    $this->AddJoin( 'cc_tbl_user ON upload_user=user_id' );
+                if( $this->args['format'] == 'count' ) {
+                    if( !empty($meta['join_user_on_count'])   ) {
+                        $this->AddJoin( 'cc_tbl_user ON upload_user = user_id' );
+                    }
+                } else if( !empty($meta['dataview']) ) {
+                    $this->GetSourcesFromDataview($meta['dataview']);
                 }
                 break;
             }

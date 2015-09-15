@@ -149,10 +149,10 @@ class CCDataView
         if( CCUser::IsAdmin() && !empty($_GET['dpreview']) )
         {
             $x['sqlargs'] = $sqlargs;
-            $x[] = $this->sql;
-            $x[] = !isset($dataview) ? '*no dv*' : $dataview;
+            $x['sql'] = $this->sql;
+            $x['dataview'] = !isset($dataview) ? '*no dv*' : $dataview;
             $x[] = $queryObj;
-            CCDebug::PrintVar($x);
+            CCDebug::PrintV($x);
         } 
 
         if( !empty($queryObj->records) )
