@@ -554,7 +554,7 @@ class CCQuery
                          'remixesof', 'score', 'lic', 'remixmax', 'remixmin', 'reccby',  
                          'upload', 'thread',
                          'reviewee', '*match', 'reqtags','rand', 'recc', 'collab', 'topic', 
-                         'minitems', 'oneof', 'pool', 'minup', 'minrx',
+                         'minitems', 'oneof', 'pool', 'uploadmin'
                         ) as $arg )
         {
             if( strpos($arg,'*',0) === 0 )
@@ -678,6 +678,57 @@ class CCQuery
         // Check for date limits
         $this->_date_helper('since');
         $this->_date_helper('before');
+    }
+    
+    function _gen_digrank() 
+    {
+        // this is difference in months from now to when it was uploaded
+        // period_diff(date_format(now(),'%y%m'), date_format(upload_date,'%y%m'))
+        
+        /*
+            STD_DEV             = select FORMAT(STD(upload_num_scores),2)
+            FLAT_SCORE          = (upload_num_scores / exp(log(STD_DEV)))
+            MONTHS_SINCE_UPLOAD = PERIOD_DIFF(DATE_FORMAT(NOW(),'%y%m'), DATE_FORMAT(upload_date,'%y%m'))
+
+            RANK -             
+            
+            DON'T TOUCH ----------------
+SELECT ( (upload_num_scores / exp(log(8.6))) / EXP(PERIOD_DIFF(DATE_FORMAT(NOW(),'%y%m'), DATE_FORMAT(upload_date,'%y%m'))) ) as rank, upload_num_scores as sc, upload_date, upload_name from cc_tbl_uploads where upload_tags like '%,hip_hop,%' order by rank desc limit 110;
+            DON'T TOUCH ----------------
+
+            DON'T TOUCH ----------------
+SELECT ((upload_num_scores / exp(log(8.6))) * (140 - PERIOD_DIFF(DATE_FORMAT(NOW(),'%y%m'), DATE_FORMAT(upload_date,'%y%m')) + (day(upload_date) / 31.0))) as dd, upload_num_scores as sc, upload_date, upload_name from cc_tbl_uploads order by dd desc limit 20;
+            DON'T TOUCH ----------------
+
+SELECT (140 - PERIOD_DIFF(DATE_FORMAT(NOW(),'%y%m'), DATE_FORMAT(upload_date,'%y%m')) + (day(upload_date) / 31.0)) as dd, upload_num_scores as sc, upload_date, upload_name from cc_tbl_uploads order by upload_date desc limit 20;
+
+
+SELECT ( (upload_num_scores / exp(log(8.6))) / EXP( (PERIOD_DIFF(DATE_FORMAT(NOW(),'%y%m'), DATE_FORMAT(upload_date,'%y%m'))+day(upload_date) / 31.0) ) ) as rank, upload_num_scores as sc, upload_date, upload_name from cc_tbl_uploads where upload_tags like '%,hip_hop,%' order by rank desc limit 110;
+
+std = 8.5
+avg = 9.7
+hi  = 19
+lo  = 2
+
+FLOOR((IF sc >  hi, hi + (sc / 8.5), (IF sc < lo, lo - (sc / 8.5), sc)))
+
+
+
+SELECT STD(upload_num_scores) AS std, AVG(upload_num_scores) + STD(upload_num_scores) AS hi, AVG(upload_num_scores) - STD(upload_num_scores) AS lo FROM cc_tbl_uploads WHERE upload_num_scores > 0;
+CREATE TABLE scores SELECT upload_num_scores AS sc, 100 AS ms FROM cc_tbl_uploads GROUP BY upload_num_scores;
+UPDATE scores SET ms = FLOOR(IF( sc >  hi, hi + (sc / std), IF( sc < lo, lo - (sc / std), sc));
+
+UPDATE scores SET ms = FLOOR(IF( sc >  19, 19 + (sc / 8.5), IF( sc < 2, 2 - (sc / 8.5), sc)))
+
+
+        */
+        /*
+            AGE_FACTOR = 1.5
+            The higher the AGE_FACTOR the more recent the results
+            select (cast(upload_num_scores as signed) - 
+                (period_diff( date_format(now(),'%y%m'), date_format(upload_date,'%y%m')))*1.7) as drank, 
+                upload_name, upload_date from cc_tbl_uploads order by drank desc limit 110;        
+        */
     }
 
     function _date_helper($pivot)
@@ -830,7 +881,7 @@ class CCQuery
         $num =  CCUtil::CleanNumber( $this->args['minup'] );
         if( $num > 0 )
         {
-            $this->where[] = 'user_num_uploads > ' . $num;
+            $this->where[] = 'user_num_uploads >= ' . $num;
         }
     }
 
@@ -839,7 +890,7 @@ class CCQuery
         $num =  CCUtil::CleanNumber( $this->args['minrx'] );
         if( $num > 0 )
         {
-            $this->where[] = 'user_num_remixes > ' . $num;
+            $this->where[] = 'user_num_remixes >= ' . $num;
         }
     }
     
@@ -896,12 +947,20 @@ class CCQuery
 
     function _gen_remixmax()
     {
-        $this->where[] = "(upload_num_remixes <= '{$this->args['remixmax']}')";
+        $field = $this->_make_field('num_remixes');
+        $this->where[] = "(${field} <= '{$this->args['remixmax']}')";
     }
 
     function _gen_remixmin()
     {
-        $this->where[] = "(upload_num_remixes >= '{$this->args['remixmin']}')";
+        $field = $this->_make_field('num_remixes');
+        $this->where[] = "(${field} >= '{$this->args['remixmin']}')";
+    }        
+
+    function _gen_uploadmin()
+    {
+        $field = $this->_make_field('num_uploads');
+        $this->where[] = "(${field} >= '{$this->args['uploadmin']}')";
     }        
 
     /*
