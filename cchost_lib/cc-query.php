@@ -554,7 +554,7 @@ class CCQuery
                          'remixesof', 'score', 'lic', 'remixmax', 'remixmin', 'reccby',  
                          'upload', 'thread',
                          'reviewee', '*match', 'reqtags','rand', 'recc', 'collab', 'topic', 
-                         'minitems', 'oneof', 'pool', 'uploadmin'
+                         'minitems', 'oneof', 'pool', 'uploadmin', 'digrank'
                         ) as $arg )
         {
             if( strpos($arg,'*',0) === 0 )
@@ -609,6 +609,7 @@ class CCQuery
         if( !empty($this->args['dump_query']) && CCUser::IsAdmin() )
         {
             CCDebug::Enable(true);
+            $x = CCDebug::IsEnabled();
             CCDebug::PrintVar($this,false);
         }
 
@@ -682,53 +683,43 @@ class CCQuery
     
     function _gen_digrank() 
     {
-        // this is difference in months from now to when it was uploaded
-        // period_diff(date_format(now(),'%y%m'), date_format(upload_date,'%y%m'))
-        
-        /*
-            STD_DEV             = select FORMAT(STD(upload_num_scores),2)
-            FLAT_SCORE          = (upload_num_scores / exp(log(STD_DEV)))
-            MONTHS_SINCE_UPLOAD = PERIOD_DIFF(DATE_FORMAT(NOW(),'%y%m'), DATE_FORMAT(upload_date,'%y%m'))
-
-            RANK -             
+        /*            
+            cooling factor: 
+                1     - all time greatest hits
+                280   - new-ish 
+                10000 - new-ish-er
+                
+            First thing we do is normalize the scores. (The average at ccMixter
+            is 9.7 but there are 10 uploads with well over 100 scores.) We use
+            the standard deviance to smooth it out so the order is the (roughly)
+            the same but the disparity between the scores is no longer there.
             
-            DON'T TOUCH ----------------
-SELECT ( (upload_num_scores / exp(log(8.6))) / EXP(PERIOD_DIFF(DATE_FORMAT(NOW(),'%y%m'), DATE_FORMAT(upload_date,'%y%m'))) ) as rank, upload_num_scores as sc, upload_date, upload_name from cc_tbl_uploads where upload_tags like '%,hip_hop,%' order by rank desc limit 110;
-            DON'T TOUCH ----------------
-
-            DON'T TOUCH ----------------
-SELECT ((upload_num_scores / exp(log(8.6))) * (140 - PERIOD_DIFF(DATE_FORMAT(NOW(),'%y%m'), DATE_FORMAT(upload_date,'%y%m')) + (day(upload_date) / 31.0))) as dd, upload_num_scores as sc, upload_date, upload_name from cc_tbl_uploads order by dd desc limit 20;
-            DON'T TOUCH ----------------
-
-SELECT (140 - PERIOD_DIFF(DATE_FORMAT(NOW(),'%y%m'), DATE_FORMAT(upload_date,'%y%m')) + (day(upload_date) / 31.0)) as dd, upload_num_scores as sc, upload_date, upload_name from cc_tbl_uploads order by upload_date desc limit 20;
-
-
-SELECT ( (upload_num_scores / exp(log(8.6))) / EXP( (PERIOD_DIFF(DATE_FORMAT(NOW(),'%y%m'), DATE_FORMAT(upload_date,'%y%m'))+day(upload_date) / 31.0) ) ) as rank, upload_num_scores as sc, upload_date, upload_name from cc_tbl_uploads where upload_tags like '%,hip_hop,%' order by rank desc limit 110;
-
-std = 8.5
-avg = 9.7
-hi  = 19
-lo  = 2
-
-FLOOR((IF sc >  hi, hi + (sc / 8.5), (IF sc < lo, lo - (sc / 8.5), sc)))
-
-
-
-SELECT STD(upload_num_scores) AS std, AVG(upload_num_scores) + STD(upload_num_scores) AS hi, AVG(upload_num_scores) - STD(upload_num_scores) AS lo FROM cc_tbl_uploads WHERE upload_num_scores > 0;
-CREATE TABLE scores SELECT upload_num_scores AS sc, 100 AS ms FROM cc_tbl_uploads GROUP BY upload_num_scores;
-UPDATE scores SET ms = FLOOR(IF( sc >  hi, hi + (sc / std), IF( sc < lo, lo - (sc / std), sc));
-
-UPDATE scores SET ms = FLOOR(IF( sc >  19, 19 + (sc / 8.5), IF( sc < 2, 2 - (sc / 8.5), sc)))
-
-
+            Then we do the Newton cooling thing against the number of days
+            since today that the upload happened. That's the:
+            
+                normalized_score * exp( -cool_factor * time_diff )
+                
+            the result of that (temperature) is what you sort (desc) 
         */
-        /*
-            AGE_FACTOR = 1.5
-            The higher the AGE_FACTOR the more recent the results
-            select (cast(upload_num_scores as signed) - 
-                (period_diff( date_format(now(),'%y%m'), date_format(upload_date,'%y%m')))*1.7) as drank, 
-                upload_name, upload_date from cc_tbl_uploads order by drank desc limit 110;        
-        */
+    $sql1 =<<<EOF
+SELECT 
+  ROUND(STD(upload_num_scores)) AS std, 
+  ROUND(AVG(upload_num_scores) + STD(upload_num_scores)) AS hi, 
+  ROUND(AVG(upload_num_scores) - STD(upload_num_scores)) AS lo 
+  FROM cc_tbl_uploads WHERE upload_num_scores > 0;  
+EOF;
+        
+        $r = CCDatabase::QueryRow($sql1);
+        $std = $r['std'];
+        $hi = $r['hi'];
+        $lo = (integer)$r['lo'] < 2 ? 2 : $r['lo'];
+        $cool =  (float)sprintf("%f",$this->args['digrank']) / 1000000.0;
+
+        $this->sql_p['columns'] = 
+          "(@sc:=upload_num_scores) as sc," .
+          "(@score:=FLOOR(IF( @sc >  ${hi}, ${hi} + (@sc / ${std}), IF( @sc < ${lo}, ${lo} - (@sc / ${std}), @sc)))) as score," .
+          "(@score * exp(-(${cool}) * datediff(now(),upload_date))) as temperature";
+        $this->sql_p['order'] = 'temperature desc';
     }
 
     function _date_helper($pivot)
