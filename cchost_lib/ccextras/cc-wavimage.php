@@ -28,8 +28,9 @@
 if( !defined('IN_CC_HOST') )
    die('Welcome to CC Host');
 
-CCEvents::AddHandler(CC_EVENT_MAP_URLS,    array( 'CCWaveImage',  'OnMapUrls'),    'cchost_lib/ccextras/cc-waveimage.inc' );
-CCEvents::AddHandler(CC_EVENT_DELETE_FILE, array( 'CCWaveImage',  'OnFileDelete'), 'cchost_lib/ccextras/cc-waveimage.inc' );
-CCEvents::AddHandler(CC_EVENT_FILE_DONE,   array( 'CCWaveImage',  'OnFileDone'),   'cchost_lib/ccextras/cc-waveimage.inc' );
+CCEvents::AddHandler(CC_EVENT_MAP_URLS,      array( 'CCWaveImage',  'OnMapUrls'),      'cchost_lib/ccextras/cc-waveimage.inc' );
+CCEvents::AddHandler(CC_EVENT_DELETE_FILE,   array( 'CCWaveImage',  'OnDeleteFile'),   'cchost_lib/ccextras/cc-waveimage.inc' );
+CCEvents::AddHandler(CC_EVENT_DELETE_UPLOAD, array( 'CCWaveImage',  'OnDeleteUpload'), 'cchost_lib/ccextras/cc-waveimage.inc' );
+CCEvents::AddHandler(CC_EVENT_FILE_DONE,     array( 'CCWaveImage',  'OnFileDone'),     'cchost_lib/ccextras/cc-waveimage.inc' );
 
 ?>

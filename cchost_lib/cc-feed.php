@@ -151,7 +151,7 @@ class CCFeed
      *
      * @param integer $fileid Database ID of file
      */
-    function OnFileDelete($fileid)
+    function OnDeleteFile($fileid)
     {
         $this->_clear_cache($fileid);
     }

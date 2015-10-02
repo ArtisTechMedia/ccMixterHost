@@ -180,7 +180,7 @@ define('CC_EVENT_UPLOAD_DONE',         'uploaddone' );
 *
 * Call back (handler) prototype:
 *<code>
-*function OnFileDone($upload_id, &$sources)
+*function OnSourcesChanged($upload_id, &$sources)
 *</code>
 * @see CCEvents::AddHandler()
 * @see CC_EVENT_UPLOAD_DONE

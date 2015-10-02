@@ -12,22 +12,17 @@ class MP32SVG
         $this->dead = true;
         return;
     }
+    $this->lamePath = $CC_GLOBALS['lame-path'];
 
-    $fullpath = realpath($MP3File);
-    $parts = pathinfo($fullpath);
-    $this->currDir = $parts['dirname'];
-
-    chdir($this->currDir);
-
-    $this->MP3File = $parts['basename'];
     $this->width   = $width;
     $this->height  = $height;
 
-    $this->workDir = './';
-
-    $this->finalSVGfile =  $this->workDir . $parts['filename'] . '.svg';
-
-    $this->lamePath = $CC_GLOBALS['lame-path'];
+    $fullpath           = str_replace(getcwd() . '/','',realpath($MP3File));
+    $parts              = pathinfo($fullpath);
+    $this->parts        = $parts;
+    $this->MP3File      = $fullpath;
+    $this->workDir      = $parts['dirname'] . '/';
+    $this->finalSVGfile = $this->workDir . $parts['filename'] . '.svg';
   }
 
   function removeCachedFile() 
@@ -45,17 +40,13 @@ class MP32SVG
       return;
     }
 
-    //if( !file_exists($this->finalSVGfile) ) 
+    if( !file_exists($this->finalSVGfile) ) 
     {
       $this->makeSVG();
     }
 
-    //header("Content-Type: image/svg+xml");
-
-    //CCDebug::PrintV($this->SVGtext);
-
-    //file( $this->finalSVGfile );
-    print( '<html><body> Wave image: ' . $this->SVGtext . '</body></html>');
+    header("Content-Type: image/svg+xml");
+    file( $this->finalSVGfile );
   }
 
   function cleanup()
@@ -140,16 +131,22 @@ class MP32SVG
 
     $riff = unpack($RPC, $buffer);
 
-    $this->bps = $riff['bitsPerSamp'] >> 3; // byte per sample
+    // bytes per sample per channel
+    $this->bps = $riff['bitsPerSamp'] >> 3; 
 
-    // We step this much for next sample
+    // total number of bytes in a sample 
+    $sampleStep = $riff['numChannels'] * $this->bps;
+
+    $this->numSamples  = $riff['samplesSize'] / $sampleStep;
+    $this->overSample  = 4;
+
+    // the number of samples to skip over to read the next one
+    $this->sampleSkip  = (int)floor($this->numSamples / ($this->width*$this->overSample));
+
     // subtract one bps for the sample we actually
     // process (we're only looking at the left
     // channel for stereo recordings)
 
-    $sampleStep = $riff['numChannels'] * $this->bps;
-    $this->numSamples  = $riff['samplesSize'] / $sampleStep;
-    $this->sampleSkip  = (int)floor($this->numSamples / $this->width);
     $this->stepSize    = ($this->sampleSkip * $sampleStep) - $this->bps;
     $this->riff = $riff;
   }
@@ -159,8 +156,9 @@ class MP32SVG
     $handle     = $this->handle;
     $bps        = $this->bps;
     $seek_dist  = $this->stepSize;
+    $count      = $this->width * $this->overSample;
 
-    for( $n = 0; $n < $this->width && !feof($handle); ++$n )
+    for( $n = 0; $n < $count && !feof($handle); ++$n )
     {
       $bytes = array();
       
@@ -196,7 +194,7 @@ class MP32SVG
     $this->peaks[] = $data;
   }
 
-  function makeImage() 
+  function collectPeaks() 
   {
     $this->peaks = array();
     $this->traverseWAV("yCollector");
@@ -208,41 +206,38 @@ class MP32SVG
         $maxY = $y;
     }
 
-    $scale = $this->height / ($maxY *3);
+    $this->scale = $this->height / ($maxY * 3); // not sure why 3 but it looks better
+  }
+
+  function makeImage() 
+  {
+    $this->collectPeaks();
 
     $baseLine = $this->height / 2;
     $prevY = $baseLine;
 
-    $this->SVGtext  = $this->getSVGHead();
+    $this->SVGtext  = $this->getSVGHead() . "<polyline points=\"";
 
     for( $x = 0; $x < count($this->peaks); $x++ )
     {
-        $y = $baseLine + ($this->peaks[$x] * $scale);
-        $svg =  "\n<line x1=\"{$x}\" y1=\"{$prevY}\" x2=\"{$x}\" y2=\"{$y}\" " .
-            "style=\"stroke:rgba(0,0,0,0.3);stroke-width:3;stroke-linecap:round;\" />";
-
-        $this->SVGtext .= $svg;
-        $prevY = $y;
+        $y  = sprintf("%.2f", $baseLine + ($this->peaks[$x] * $this->scale));
+        $xo = sprintf("%.2f", $x / $this->overSample);
+        $this->SVGtext .= preg_replace('/\.00(,| )/U', '\1', "{$xo},{$y} ");
     }
 
-    $this->SVGtext .= '</svg>';
+    $this->SVGtext .= "\" />" . $this->getSVGTail();
   }
 
   function getSVGHead()
   {
-    $cdataOpen = "<![CDATA[ " ;
-    $cdataClose = "]]> ";
-
-    $head = "<style type=\"text/css\" > " .
-             " line: { stroke:rgba(0,0,0,0.5);stroke-width:1; } " .
-          "  </style>\n" .
-
-      "<svg xmlns=\"http://www.w3.org/2000/svg\" " .
-          "xmlns:xlink=\"http://www.w3.org/1999/xlink\" " .
-          "height=\"{$this->height}\" width=\"{$this->width}\">";
-
-    return $head;    
+    return "<svg viewBox=\"0 0 {$this->width} {$this->height}\" >\n";
   }
+
+  function getSVGTail()
+  {
+    return "\n</svg>";
+  }
+
   function makeTmp($ext) 
   {
     return $this->workDir . substr(md5(time()), 0, 10) . $ext;

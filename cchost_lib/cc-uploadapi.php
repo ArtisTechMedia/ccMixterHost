@@ -342,12 +342,12 @@ EOF;
 
     public static function PostProcessFileDelete( $file_id, &$upload_id )
     {
-        CCEvents::Invoke( CC_EVENT_DELETE_FILE, array( $file_id ) );
         $row = CCDatabase::QueryRow('SELECT file_upload, file_name FROM cc_tbl_files WHERE file_id='.$file_id);
         $upload_id = $row['file_upload'];
         $record =& CCUploadAPI::_get_record($upload_id);
         $relative_dir = $record['upload_extra']['relative_dir'];
         $path = realpath( $relative_dir . '/' . $row['file_name'] );
+        CCEvents::Invoke( CC_EVENT_DELETE_FILE, array( $file_id, $path ) );
         if( file_exists($path) )
             @unlink($path);
 

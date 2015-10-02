@@ -33,15 +33,18 @@ require('cchost_lib/ccextras/mp3-svg.inc');
 class CCWaveImage
 {
 
-    function ImageFor($upload_id)
+    function ImageFor($upload_id,$file_id)
     {
-        $path = $this->_localPathForUpload($upload_id);
+        $path = $this->_localPathForUpload($upload_id,$file_id);
 
         if( $path )
         {
-            $convert = new MP32SVG($path, 200, 50);
+            $width  = empty($_GET['w']) ? 500 : CCUtil::CleanNumber($_GET['w']);
+            $height = empty($_GET['h']) ? 100 : CCUtil::CleanNumber($_GET['h']);
+            $convert = new MP32SVG($path, $width, $height);
             $convert->sendFile();
             $convert->cleanup();
+            exit();
         }
         exit();
 
@@ -49,15 +52,29 @@ class CCWaveImage
 
     function OnFileDone(&$file)
     {
-
+        // this might be a file replace
+        $convert = new MP32SVG($file['local_path'], 0, 0);
+        $convert->removeCachedFile();
     }
 
-    function OnUploadFile( &$file_id )
+    function OnDeleteFile( $file_id, $path )
     {
-
+        $convert = new MP32SVG($path, 0, 0);
+        $convert->removeCachedFile();
     }
 
-    function _localPathForUpload($upload_id)
+    function OnDeleteUpload(&$record)
+    {
+        $all_paths = $this->_localPathForUpload($record['upload_id'],'*');
+        for( $i = 0; $i < count($all_paths); $i++ )
+        {
+            $path = $all_paths[$i];
+            $convert = new MP32SVG($path, 0, 0);
+            $convert->removeCachedFile();
+        }
+    }
+
+    function _localPathForUpload($upload_id,$file_id)
     {
         require_once('cchost_lib/cc-dataview.php');
 
@@ -69,15 +86,24 @@ class CCWaveImage
         $dv = new CCDataView();
         $dv->FilterRecords( $recs, $e );
         $path = '';
+        $paths = array();
+        $all = $file_id == '*';
         foreach( $recs[0]['files'] as $f ) 
         {
             if( strcmp('audio-mp3-mp3', $f['file_format_info']['format-name']) === 0 )
             {
-                $path = $f['local_path'];
-                break;
+                if( $all )
+                {
+                    $paths[] = $f['local_path'];
+                }
+                else if( empty($file_id) || $file_id == $f['file_id'])
+                {
+                    $path = $f['local_path'];
+                    break;
+                }
             }
         }
-        return $path;
+        return $all ? $paths : $path;
     }
     /**
     * Event handler for {@link CC_EVENT_MAP_URLS}
@@ -87,7 +113,7 @@ class CCWaveImage
     function OnMapUrls()
     {
         CCEvents::MapUrl( ccp('waveimage'), array( 'CCWaveImage', 'ImageFor' ),  
-                CC_DONT_CARE_LOGGED_IN, ccs(__FILE__), '{id}', _('Returns a .png image of the sound wav'), CC_AG_UPLOADS  );
+                CC_DONT_CARE_LOGGED_IN, ccs(__FILE__), '{upoadid}/{fileid}', _('Returns a .png image of the sound wav'), CC_AG_UPLOADS  );
 
     }
 

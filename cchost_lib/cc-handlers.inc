@@ -48,7 +48,7 @@ CCEvents::AddHandler(CC_EVENT_FILTER_ED_PICK_DETAIL, array( 'CCEditorials',  'On
 
 CCEvents::AddHandler(CC_EVENT_GET_CONFIG_FIELDS,  array( 'CCFeed', 'OnGetConfigFields'), 'cchost_lib/cc-feed.php' );
 CCEvents::AddHandler(CC_EVENT_DELETE_UPLOAD,      array( 'CCFeed',  'OnUploadDelete'), 'cchost_lib/cc-feed.php');
-CCEvents::AddHandler(CC_EVENT_DELETE_FILE,        array( 'CCFeed',  'OnFileDelete'), 'cchost_lib/cc-feed.php');
+CCEvents::AddHandler(CC_EVENT_DELETE_FILE,        array( 'CCFeed',  'OnDeleteFile'), 'cchost_lib/cc-feed.php');
 CCEvents::AddHandler(CC_EVENT_UPLOAD_DONE,        array( 'CCFeed',  'OnUploadDone'), 'cchost_lib/cc-feed.php');
 
 CCEvents::AddHandler(CC_EVENT_API_QUERY_SETUP,   array( 'CCFeedsAtom', 'OnApiQuerySetup'),'cchost_lib/cc-feeds-atom.php'); 
