@@ -424,7 +424,7 @@ define('CC_EVENT_DELETE_UPLOAD',       'delete' );
 *
 * Event call back (handler) prototype:
 *<code>
-* function OnUploadFile( &$file_id );
+* function OnDeleteFile( &$file_id );
 *</code>
 * @see CCEvents::AddHandler()
 */

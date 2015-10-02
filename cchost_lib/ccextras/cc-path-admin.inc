@@ -118,6 +118,14 @@ class CCPathAdminForm extends CCEditConfigForm
                        'formatter'  => 'sysdir',
                        'flags'      => CCFF_POPULATE );
 
+        $fields['lame-path']  =
+               array(  'label'      => _('Location of Lame'),
+                       'form_tip'   => _("Full path to 'lame' utility (e.g. /usr/bin/lame)"),
+                       'slash'      => false,
+                       'value'      => '',
+                       'formatter'  => 'sysdir',
+                       'flags'      => CCFF_POPULATE );
+
         $fields['curl-path'] =
                array(  'label'      => _('Location of curl'),
                        'form_tip'   => _("Full path to 'curl' utility (e.g. /usr/bin/curl)"),
