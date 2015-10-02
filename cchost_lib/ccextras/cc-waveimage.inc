@@ -26,7 +26,7 @@
 if( !defined('IN_CC_HOST') )
    die('Welcome to CC Host');
 
-require('cchost_lib/ccextras/mp3-png.inc');
+require('cchost_lib/ccextras/mp3-svg.inc');
 
 /**
 */
@@ -39,7 +39,7 @@ class CCWaveImage
 
         if( $path )
         {
-            $convert = new MP32PNG($path, 200, 50);
+            $convert = new MP32SVG($path, 200, 50);
             $convert->sendFile();
             $convert->cleanup();
         }
