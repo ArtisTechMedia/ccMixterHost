@@ -4,7 +4,6 @@
 // (basically, how many bytes/frames to skip processing)
 // the lower the number means longer processing time
 define("DETAIL", 5);
-  
 
 function findValues($byte1, $byte2) {
   $byte1 = hexdec(bin2hex($byte1));                        
@@ -31,14 +30,17 @@ class MP32PNG
     }
 
     $fullpath = realpath($MP3File);
-    $here = getcwd() . '/';
-    $this->MP3File = str_replace($here,'',$fullpath);
+    $parts = pathinfo($fullpath);
+    $this->currDir = $parts['dirname'];
+    // chmod($this->currDir,0x777);
+    chdir($this->currDir);
+
+    $this->MP3File = $parts['basename'];
     $this->width   = $width;
     $this->height  = $height;
 
-    $parts = pathinfo($this->MP3File);
 
-    $this->workDir = $parts['dirname']  . '/';
+    $this->workDir = './';
 
     $this->finalPNGfile =  $this->workDir . $parts['filename'] . '.png';
 
@@ -52,7 +54,6 @@ class MP32PNG
     {
       unlink($this->finalPNGfile);
     }
-
   }
 
   function sendFile() 
@@ -82,6 +83,8 @@ class MP32PNG
 
   function cleanup()
   {
+    //chmod( $this->currDir, cc_default_file_perms() );
+
     if( !empty($this->handle) )
       fclose($this->handle);
 
@@ -120,6 +123,8 @@ class MP32PNG
     $lame = $this->lamePath;
     $cmd = "{$lame} \"{$mp3File}\" -m m -S -f -b 16 --resample 8 \"{$mp3Temp}\" && " .
            "{$lame} -S --decode \"{$mp3Temp}\" \"{$wavFile}\"";
+
+    exec($cmd);
 
     unlink($mp3Temp);
 
@@ -279,7 +284,6 @@ class MP32PNG
 
     exec($cmd);
 
-    ccmod( $pngfinal, cc_default_file_perms());
     unlink($pngorg);
     unlink($pngtrimmed);
   }
