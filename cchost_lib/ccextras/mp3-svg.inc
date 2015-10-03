@@ -48,7 +48,7 @@ class MP32SVG
     if( empty($_GET['wrap']) ) 
     {
       header("Content-Type: image/svg+xml");
-      file( $this->finalSVGfile );
+      print( file_get_contents( $this->finalSVGfile ) );
     }
     else
     {
