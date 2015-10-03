@@ -45,8 +45,38 @@ class MP32SVG
       $this->makeSVG();
     }
 
-    header("Content-Type: image/svg+xml");
-    file( $this->finalSVGfile );
+    if( empty($_GET['wrap']) ) 
+    {
+      header("Content-Type: image/svg+xml");
+      file( $this->finalSVGfile );
+    }
+    else
+    {
+      $html =<<<EOF
+<html>
+<head>
+<style>
+svg {
+  display: inline-block;
+  width: 400;
+  height: 80;
+}
+polyline {
+  stroke: black;
+  stroke-opacity: 0.3;
+  stroke-width:1;
+  fill:none;
+  stroke-linecap: round;
+}
+</style>
+</head>
+<body>
+<div>
+EOF;
+      print( $html );
+      print( file_get_contents( $this->finalSVGfile ) );
+      print( '</div></body></html>');
+    }
   }
 
   function cleanup()
