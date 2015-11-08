@@ -331,10 +331,10 @@ class CCCCPlus
         if( !empty($args['lic']) && $args['lic'] == 'ccplus' ) 
         {
             unset($args['lic']);
-            if( empty($args['tags']) ) {
-                $args['tags'] = '';
+            if( empty($args['reqtags']) ) {
+                $args['reqtags'] = '';
             }
-            $args['tags'] .= ',ccplus';
+            $args['reqtags'] .= ',ccplus';
         }
     }
         
