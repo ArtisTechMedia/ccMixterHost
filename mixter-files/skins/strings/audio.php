@@ -23,7 +23,7 @@ $GLOBALS['str_search_help_generic'] =<<<EOF
     <a href="http://dig.ccmixter.org"><img src="/dig/images/logo-black.png" /></a><br />
     <div>
         <b>Look for music:</b>&nbsp;<input id="digq" value=""/> <a class="small_button"
-            onclick="document.location = 'http://dig.ccmixter.org/dig?dig-query=' + $('digq').value;" href="javascript://">dig</a>
+            onclick="document.location = 'http://dig.ccmixter.org/search?searchp=' + $('digq').value;" href="javascript://">dig</a>
     </div>
 </div>
 EOF;

@@ -32,7 +32,7 @@
     <p style="text-align:center;"><img src="/dig/images/logo-black.png" /></p>
     <p><?= $GLOBALS['str_dig_help'] ?></p>
 </div>
-<form action="http://dig.ccmixter.org/dig" method="get" style="text-align:center">
-    <p><input type="text" style="width:350px" name="dig-query" /><input type="submit" value="dig" />
+<form action="http://dig.ccmixter.org/search" method="get" style="text-align:center">
+    <p><input type="text" style="width:350px" name="searchp" /><input type="submit" value="dig" />
 </form>
 </div>
