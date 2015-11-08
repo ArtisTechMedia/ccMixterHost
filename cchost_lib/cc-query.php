@@ -683,6 +683,12 @@ class CCQuery
     
     function _gen_digrank() 
     {
+        if( $this->args['digrank'] == -1 ) {
+            $this->args['sort'] = 'date';
+            $this->args['ord'] = 'desc';
+            $this->_gen_sort();
+            return;
+        }
         /*            
             cooling factor: 
                 1     - all time greatest hits
