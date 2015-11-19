@@ -14,7 +14,7 @@ function ccPlusGenerateBatch($batch_no_str)
   global $ccmixter_home, $home;
 
     $query = new CCQuery();
-    $args = $query->ProcessAdminArgs('dataview=ids&f=php&limit=300&digrank=1&tags=ccplus,remix');
+    $args = $query->ProcessAdminArgs('dataview=ids&f=php&limit=150&digrank=1&tags=ccplus,remix');
     list( $idrecs ) = $query->Query($args);
     $ids = array();
     $skip = array(16626,22364,37792,18947,30344,26756,33345,30389,34503,46920,34402,25375);
@@ -42,7 +42,7 @@ function ccPlusGenerateBatch($batch_no_str)
                   AND upload_license LIKE 'nonco%' 
                   AND upload_id IN ({$ids}) 
              ORDER BY user_name
-             LIMIT 200
+             LIMIT 100
 EOF;
 
     $rows = CCDatabase::QueryRows($sql);
@@ -60,8 +60,9 @@ EOF;
         $feat = empty($ex['featuring']) ? "" : $ex['featuring'];
         $user = $R['user_real_name']; //  str_replace(',', '\,', $R['user_real_name']);
         $name = $R['upload_name'];    //   str_replace(',', '\,', $R['upload_name']);
+        $name = str_replace('"', '""', $name);
         $feat = str_replace('"', '""', $feat);
-        $str = "{\"{$user}\", \"{$name}\", {$batch_no_str}-{$R['upload_id']}, {$R['upload_license']}, {$R['file_name']}, \"{$feat}\"\n";
+        $str = "\"{$user}\", \"{$name}\", {$batch_no_str}-{$R['upload_id']}, {$R['upload_license']}, {$R['file_name']}, \"{$feat}\"\n";
         
         $csv .= $str;
 
