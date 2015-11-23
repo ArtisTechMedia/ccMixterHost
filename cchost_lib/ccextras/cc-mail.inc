@@ -238,8 +238,10 @@ class CCMailer
         $cc      = empty($this->_cc)  ? '' : implode( ', ', $this->_cc  );
         $to      = $this->_to;
         $message = $this->_message; // do doubt this needs to be messaged...
-        //promo banner
-        $message .= "\n\nMusic connects us: help keep ccMixter.org free! Donate at http://goo.gl/0JsqCg";
+        
+        if( !empty($ttags['mail-tag-line']) ) {
+            $message .= "\n\n" . $ttags['mail-tag-line'];
+        }
 
         $headers  = "MIME-Version: 1.0\r\n";
         $headers .= "Content-type: text/plain; charset=utf-8\r\n";

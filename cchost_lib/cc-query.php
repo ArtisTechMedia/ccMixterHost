@@ -767,7 +767,11 @@ EOF;
 
     function _gen_ids()
     {
-        $ids = $this->_split_ids($this->args['ids']);
+        $ids = array();
+        
+        if( empty($this->args['dataview']) || $this->args['dataview'] != 'tags' ) {
+            $ids = $this->_split_ids($this->args['ids']);
+        }
         if( $ids )
         {
             $field = $this->_make_field('id');
@@ -1467,7 +1471,7 @@ EOF;
             elseif( $this->args['datasource'] == 'pool_items' ) 
               return 'pool_item_timestamp';
         }
-            
+        
 
         return preg_replace('/s?$/', '', $this->args['datasource']) . '_' . $field;
     }
