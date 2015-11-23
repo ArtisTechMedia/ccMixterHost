@@ -27,7 +27,7 @@ class MP32SVG
 
   function removeCachedFile() 
   {
-    if( file_exists($this->finalSVGfile) ) 
+    if( !empty($this->finalSVGfile) && file_exists($this->finalSVGfile) ) 
     {
       unlink($this->finalSVGfile);
     }
