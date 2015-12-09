@@ -2174,7 +2174,10 @@ END;
     {
         global $CC_GLOBALS;
         
-        if( empty($CC_GLOBALS['imagemagick-path']) || !file_exists($CC_GLOBALS['imagemagick-path']) )
+        if( empty($CC_GLOBALS['imagemagick-path']) || 
+            !file_exists($CC_GLOBALS['imagemagick-path']) || 
+            empty($maxwidth) ||
+            empty($maxheight) )
         {
             return null;
         }
