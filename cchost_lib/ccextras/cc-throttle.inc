@@ -56,6 +56,12 @@ class CCAdminThrottleForm extends CCEditConfigForm
            'formatter'  => 'textedit',
            'flags'      => CCFF_POPULATE );
 
+        $fields['user-manual'] = array (
+           'label'      => _('Manual throttle'),
+           'form_tip'   => _('Comma separted list of user login names to throttle indefinitely.'),
+           'formatter'  => 'textedit',
+           'flags'      => CCFF_POPULATE );
+
         $msg = _("You are not authorized to submit this type of file.") . ' ' . 
                _('Please contact the site administrator for details.');
 
@@ -282,6 +288,15 @@ class CCThrottle
         $configs    =& CCConfigs::GetTable();
         $rules      = $configs->GetConfig('throttle_rules');
         $throttle   = $configs->GetConfig('throttle');
+        
+        if( $this->_is_user_manual_throttled() ) {
+            foreach( $type_keys as $type_key )
+            {
+                $submit_types[$type_key]['quota_reached'] = true;
+                $submit_types[$type_key]['quota_message'] = $throttle['quota-msg'];
+            }
+        }
+
         $user_id    = CCUser::CurrentUser();
         $dv         = new CCDataView();
 
@@ -380,6 +395,30 @@ class CCThrottle
 
         return(true);
     }
+
+    function _is_user_manual_throttled() {
+
+        $configs    =& CCConfigs::GetTable();
+        $throttle = $configs->GetConfig('throttle');
+
+        $user_manual = $throttle['user-manual'];
+        $username = CCUser::CurrentUserName();
+
+        if( !empty($throttle['user-manual']) )
+        {
+            require_once('cchost_lib/cc-tags.php');
+
+            $manual = CCTag::TagSplit($throttle['user-manual']);
+            
+            if( in_array( $username, $manual ) )
+            {
+                return(true);
+            }
+        }
+        
+        return (false);
+    }
+
 
     function Admin()
     {
