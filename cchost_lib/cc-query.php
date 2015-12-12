@@ -385,6 +385,10 @@ class CCQuery
                        $dv_name = 'count_pool_items';
                     else if( $A['datasource'] == 'user' )
                         $dv_name = 'count_users';
+                    else if( $A['datasource'] == 'cart' ) {
+                        $dv_name = $A['dataview'];
+                        $A['rettype'] = CCDV_RET_COUNT;
+                    }
                 }   
                 $this->GetSourcesFromDataview($dv_name);
                 $this->_trigger_setup_event();
@@ -554,7 +558,7 @@ class CCQuery
                          'remixesof', 'score', 'lic', 'remixmax', 'remixmin', 'reccby',  
                          'upload', 'thread',
                          'reviewee', '*match', 'reqtags','rand', 'recc', 'collab', 'topic', 
-                         'minitems', 'oneof', 'pool', 'uploadmin', 'digrank'
+                         'minitems', 'oneof', 'pool', 'uploadmin', 'digrank', 'dynamic'
                         ) as $arg )
         {
             if( strpos($arg,'*',0) === 0 )
@@ -763,6 +767,14 @@ EOF;
             $this->where[] = "($field $op '$pivot_date')";
         }
 
+    }
+
+    function _gen_dynamic()
+    {
+        if( $this->args['datasource'] == 'cart' && !empty($this->args['dynamic']) )
+        {
+            $this->where[] = 'LENGTH(cart_dynamic) > 0';
+        }
     }
 
     function _gen_ids()
@@ -1470,6 +1482,11 @@ EOF;
               return 'user_registered';
             elseif( $this->args['datasource'] == 'pool_items' ) 
               return 'pool_item_timestamp';
+        }
+        else
+        {
+            if( $this->args['datasource'] == 'tags' ) 
+              return( 'tags_tag' );
         }
         
 
