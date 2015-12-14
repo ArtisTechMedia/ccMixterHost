@@ -98,9 +98,13 @@ class CCPlaylistHV
         }
         elseif( $row['cart_dynamic'] )
         {
+            $arg_limit = $args['limit'];
             parse_str($row['cart_dynamic'],$cargs);
             $args = array_merge($args, $cargs);
             $args['title'] = $row['cart_name'];
+            if( $arg_limit ) {
+                $args['limit'] = $arg_limit;
+            }
             if( !empty($args['limit']) )
             {
                 if( $args['limit'] == 'default' )
