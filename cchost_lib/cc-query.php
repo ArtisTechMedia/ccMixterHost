@@ -781,9 +781,12 @@ EOF;
     {
         $ids = array();
         
-        if( empty($this->args['dataview']) || $this->args['dataview'] != 'tags' ) {
+        if( $this->args['datasource'] == 'user' ) {
+            $ids = $this->_split_users($this->args['ids']);
+        } elseif( empty($this->args['dataview']) || $this->args['dataview'] != 'tags' ) {
             $ids = $this->_split_ids($this->args['ids']);
         }
+
         if( $ids )
         {
             $field = $this->_make_field('id');
@@ -794,6 +797,15 @@ EOF;
     function _split_ids($ids)
     {
         return array_unique(preg_split('/([^0-9]+)/',$ids,0,PREG_SPLIT_NO_EMPTY));
+    }
+
+    function _split_users($ids)
+    {
+        $arr = array_unique(preg_split('/([^a-zA-Z_0-9]+)/',$ids,0,PREG_SPLIT_NO_EMPTY));
+        $quote = function($s) {
+            return "'" . $s . "'";
+        };
+        return array_map( $quote, $arr );
     }
 
     function _gen_lic()
@@ -1492,13 +1504,15 @@ EOF;
             elseif( $this->args['datasource'] == 'pool_items' ) 
               return 'pool_item_timestamp';
         }
-        else
+        elseif ( $field == 'id' )
         {
-            if( $this->args['datasource'] == 'tags' ) 
+            if( $this->args['datasource'] == 'tags' ) {
               return( 'tags_tag' );
+            } elseif( $this->args['datasource'] == 'user' ) {
+                return( 'user_name' );
+            }
         }
         
-
         return preg_replace('/s?$/', '', $this->args['datasource']) . '_' . $field;
     }
 
