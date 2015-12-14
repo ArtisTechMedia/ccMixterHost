@@ -35,9 +35,23 @@ class MP32SVG
 
   function sendFile() 
   {
+    $file_contents = '';
+
     if( !empty($this->dead) ) 
     {
       return;
+    }
+
+    // viewBox="0 0 100 180"
+    if( file_exists($this->finalSVGfile) ) {
+      $file_contents = file_get_contents($this->finalSVGfile);
+      $matches = [];
+      if( preg_match('/viewBox=\"0 0 ([0-9]+) ([0-9]+)\"/', $file_contents,$matches) == 1 ) {
+        if( $matches[1] != $this->width || $matches[2] != $this->height ) {
+          $file_contents = '';
+          unlink($this->finalSVGfile);
+        }
+      }
     }
 
     if( !file_exists($this->finalSVGfile) ) 
@@ -48,7 +62,10 @@ class MP32SVG
     if( empty($_GET['wrap']) ) 
     {
       header("Content-Type: image/svg+xml");
-      print( file_get_contents( $this->finalSVGfile ) );
+      if( !$file_contents ) {
+        $file_contents = file_get_contents( $this->finalSVGfile );
+      }
+      print( $file_contents );
     }
     else
     {
