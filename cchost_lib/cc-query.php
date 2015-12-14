@@ -1314,6 +1314,10 @@ EOF;
         {
             $this->where[] = "topic_type = '{$this->args['type']}'";
         }
+        elseif( $this->args['datasource'] == 'cart' ) 
+        {
+            $this->where[] = "cart_subtype = '{$this->args['type']}'";
+        }
     }
 
     function _gen_upload()
