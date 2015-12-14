@@ -27,11 +27,33 @@ EOF;
         UPDATE cc_tbl_cart SET cart_subtype = 'featured' where cart_id in ({$ids}) 
 EOF;
       CCDatabase::Query($sql);
+
 }
 
+function populateTags() {
+      $sql =<<<EOF
+        select cart_id, cart_dynamic from cc_tbl_cart where cart_tags = '' && cart_dynamic <> ''
+EOF;
+
+    $rows = CCDatabase::QueryRows($sql);
+
+    foreach($rows as $row) {
+      parse_str($row['cart_dynamic'],$cargs);      
+      if( !empty($cargs['tags']) ) {
+        $tags = $cargs['tags'];
+        $id = $row['cart_id'];
+        $sql = <<<EOF
+        UPDATE cc_tbl_cart SET cart_tags = '{$tags}' WHERE cart_id = {$id}
+EOF;
+        CCDatabase::Query($sql);
+      }
+    }
+
+}
 function perform()
 {
-    setFeatPlaylist();
+   // setFeatPlaylist();
+  populateTags();
 }
 
 perform();
