@@ -885,7 +885,12 @@ EOF;
     {
         if( $this->args['datasource'] == 'cart' && !empty($this->args['minitems']) )
         {
-            $this->where[] = 'cart_num_items >= ' . $this->args['minitems'];
+            if( $this->args['minitems'] == -1 ) {
+                $w = 'cart_num_items >= 1 OR LENGTH(cart_dynamic) > 0';
+            } else {
+                $w = 'cart_num_items >= ' . $this->args['minitems'];
+            }
+            $this->where[] = $w;
         }
     }
 
