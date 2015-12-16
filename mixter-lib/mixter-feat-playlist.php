@@ -28,6 +28,11 @@ function playlist_feature_OnMapUrls()
 
 function playlist_feature_playlist($playlist_id)
 {
+      $sql =<<<EOF
+        UPDATE cc_tbl_cart SET cart_subtype = 'featured' where cart_id = {$playlist_id}
+EOF;
+      CCDatabase::Query($sql);
+/*
     require_once('cchost_lib/ccextras/cc-topics.inc');
 
     $topics = new CCTopics();
@@ -37,6 +42,7 @@ function playlist_feature_playlist($playlist_id)
     $values['topic_type'] = 'feat_playlist';
     list( $values['topic_text'], $values['topic_name'] ) = _get_playlist_stuff($values,$playlist_id);
     $topics->InsertNewTopic($values,0);
+*/
     CCUtil::SendBrowserTo( ccl('view','media','playlists') );
 }
 

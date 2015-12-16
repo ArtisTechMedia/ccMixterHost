@@ -86,6 +86,9 @@ class CCPlaylists
             $qargs = $query->SerializeArgs($qargs);
             $up['cart_id'] = $playlist_id;
             $up['cart_dynamic'] = $qargs;
+            if( !empty($_REQUEST['tags'] ) ) {
+                $up['cart_tags'] = $_REQUEST['tags'];
+            }
             $cart->Update($up);
             $url = ccl('playlist','browse',$playlist_id);
             CCUtil::SendBrowserTo($url);
