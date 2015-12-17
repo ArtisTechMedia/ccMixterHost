@@ -558,7 +558,8 @@ class CCQuery
                          'remixesof', 'score', 'lic', 'remixmax', 'remixmin', 'reccby',  
                          'upload', 'thread',
                          'reviewee', '*match', 'reqtags','rand', 'recc', 'collab', 'topic', 
-                         'minitems', 'oneof', 'pool', 'uploadmin', 'digrank', 'dynamic'
+                         'minitems', 'oneof', 'pool', 'uploadmin', 'digrank', 'dynamic',
+                         'minpl'
                         ) as $arg )
         {
             if( strpos($arg,'*',0) === 0 )
@@ -903,6 +904,17 @@ EOF;
                 $w = 'cart_num_items >= ' . $this->args['minitems'];
             }
             $this->where[] = $w;
+        }
+    }
+
+    function _gen_minpl() 
+    {
+        $num =  CCUtil::CleanNumber( $this->args['minpl'] );
+        if( $num > 0 )
+        {
+            $this->where[] = 'user_id IN (select distinct cart_user from cc_tbl_cart where cart_num_items >= ' 
+                             . $num 
+                             . " OR  cart_dynamic <> '')";
         }
     }
 
