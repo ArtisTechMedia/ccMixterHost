@@ -559,7 +559,7 @@ class CCQuery
                          'upload', 'thread',
                          'reviewee', '*match', 'reqtags','rand', 'recc', 'collab', 'topic', 
                          'minitems', 'oneof', 'pool', 'uploadmin', 'digrank', 'dynamic',
-                         'minpl'
+                         'minpl','lookup'
                         ) as $arg )
         {
             if( strpos($arg,'*',0) === 0 )
@@ -888,6 +888,15 @@ EOF;
         
     }
 
+    function _gen_lookup() {
+
+        $user_mask = $this->args['lookup'];
+
+        $this->where[] = "((user_name LIKE '{$user_mask}%') OR (user_real_name LIKE '{$user_mask}%')) AND " .
+                         "user_num_uploads > 0";
+
+    }
+    
     function _gen_match()
     {
         // this only works for specific dataviews (see search_remix_artist.php)
