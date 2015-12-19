@@ -230,12 +230,21 @@ class CCPlaylists
     {
         require_once('cchost_lib/cc-query.php');
         $query = new CCQuery();
-        $qstring = $query->SerializeArgs($_GET);
+        $args = $_GET;
+        if( !empty($args['title']) ) { unset($args['title']); }
+        if( !empty($args['limit']) ) { unset($args['limit']); }
+        if( !empty($args['u'] ) ) { // query->SerializeArgs()
+            $args['user'] = $args['u'];
+        }
+        $qstring = $query->SerializeArgs($args);
+        
         if( empty($qstring) )
             CCUtil::ReturnAjaxMessage("Error: empty query string");
+
         $new_name = $_REQUEST['title'];
-        $tags = empty($_REQUEST['tags']) ? '' : $_REQUEST['tags'];
-        $row = $this->_create_playlist('playlist',$new_name,'',0,$qstring,$tags);
+        $tags     = empty($_REQUEST['tags']) ? '' : $_REQUEST['tags'];
+        $row      = $this->_create_playlist('playlist',$new_name,'',0,$qstring,$tags);
+        
         CCUtil::ReturnAjaxData($row);        
     }
 

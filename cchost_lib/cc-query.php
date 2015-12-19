@@ -506,6 +506,8 @@ class CCQuery
     {
         if( empty($args) )
             $args =& $this->args;
+        
+        // This line should not be here (see below)
         $keys = array_keys($args);
         $default_args = $this->GetDefaultArgs();
         $str = '';
@@ -513,7 +515,17 @@ class CCQuery
         // alias short to long
         $this->_arg_alias_ref($args);
 
-        $badargs = array( 'qstring', 'ccm', 'format', 'template', 'dataview', 'datasource', '_cache_buster' ); 
+        // This is where this line should be, it is actually a BUG that it is
+        // not here - params passed in, like 'u', are converted to 'user' and 
+        // are therefore not seen by the serialization code below.
+        // HOWEVER there are too many inbound dependencies from the ccMixter
+        // site on this method that it makes me too nervous to just flip it
+        // now. 
+        //
+        // $keys = array_keys($args);
+        //
+
+        $badargs = array( 'qstring', 'ccm', 'format', 'template', 'dataview', 'datasource', '_', '_cache_buster' ); 
 
         foreach( $keys as $K )
         {
@@ -553,14 +565,40 @@ class CCQuery
             $this->$method();
         }
 
-        foreach( array( '*search', '*searchp', 'tags', 'type', 'ids', 'user', 'remixes', 
-                        'sources', 'trackbacksof',
-                         'remixesof', 'score', 'lic', 'remixmax', 'remixmin', 'reccby',  
-                         'upload', 'thread',
-                         'reviewee', '*match', 'reqtags','rand', 'recc', 'collab', 'topic', 
-                         'minitems', 'oneof', 'pool', 'uploadmin', 'digrank', 'dynamic',
-                         'minpl','lookup'
-                        ) as $arg )
+        foreach( array(  
+            '*match', 
+            '*search', 
+            '*searchp',
+            'collab', 
+            'digrank', 
+            'dynamic',
+            'ids', 
+            'lic', 
+            'lookup',
+            'minitems', 
+            'minpl',
+            'oneof', 
+            'pool', 
+            'rand', 
+            'recc', 
+            'reccby',  
+            'remixes', 
+            'remixesof', 
+            'remixmax', 
+            'remixmin', 
+            'reqtags',
+            'reviewee', 
+            'score', 
+            'sources', 
+            'tags', 
+            'thread',
+            'topic', 
+            'trackbacksof',
+            'type', 
+            'upload', 
+            'uploadmin', 
+            'user', 
+            ) as $arg )
         {
             if( strpos($arg,'*',0) === 0 )
                 $arg = substr($arg,1);
@@ -892,11 +930,10 @@ EOF;
 
         $user_mask = $this->args['lookup'];
 
-        $this->where[] = "((user_name LIKE '{$user_mask}%') OR (user_real_name LIKE '{$user_mask}%')) AND " .
-                         "user_num_uploads > 0";
+        $this->where[] = "((user_name LIKE '{$user_mask}%') OR (user_real_name LIKE '{$user_mask}%'))";
 
     }
-    
+
     function _gen_match()
     {
         // this only works for specific dataviews (see search_remix_artist.php)
