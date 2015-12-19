@@ -104,14 +104,18 @@ class CCPlaylists
 
     function OnMapUrls()
     {
+        /* depricated use api/playlist/create instead */
         CCEvents::MapUrl( ccp('api','playlist','new'),
             array( 'CCPlaylists', 'NewPL'),   CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
-            '[upload_id]', _('Create a new playlist, optionally starting with upload_id'), CC_AG_PLAYLIST );
+            '[upload_id]', _('Create a new playlist, optionally starting with upload_id'), CC_AG_deprecated );
+
+        CCEvents::MapUrl( ccp('api','playlist','create'),
+            array( 'CCPlaylists', 'APICreatePlaylist'),   CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
+            '', _('Create a new playlist'), CC_AG_PLAYLIST );
     
         CCEvents::MapUrl( ccp('api','playlist','add'),
             array( 'CCPlaylists', 'Add'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
             '{upload_id},{playlist_id}', _('Add upload to playlist'), CC_AG_PLAYLIST );
-
 
         CCEvents::MapUrl( ccp('api','playlist','type'),
             array( 'CCPlaylists', 'GetType'),  CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
@@ -141,6 +145,10 @@ class CCPlaylists
             array( 'CCPlaylists', 'Save'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__) ,
             '', _('Save dynamic playlist'), CC_AG_PLAYLIST );
     
+        CCEvents::MapUrl( ccp('api','playlist','save'),
+            array( 'CCPlaylists', 'APISave'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__) ,
+            '', _('Save dynamic playlist (ajax api)'), CC_AG_PLAYLIST );
+
         CCEvents::MapUrl( ccp('playlist','editquery'),
             array( 'CCPlaylists', 'EditQuery'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__) ,
             '', _('Display edit query form'), CC_AG_PLAYLIST ); 
@@ -218,6 +226,18 @@ class CCPlaylists
         CCUtil::SendBrowserTo( ccl('playlist','browse',$row['cart_id']));
     }
 
+    function APISave()
+    {
+        require_once('cchost_lib/cc-query.php');
+        $query = new CCQuery();
+        $qstring = $query->SerializeArgs($_GET);
+        if( empty($qstring) )
+            CCUtil::ReturnAjaxMessage("Error: empty query string");
+        $new_name = $_REQUEST['title'];
+        $tags = empty($_REQUEST['tags']) ? '' : $_REQUEST['tags'];
+        $row = $this->_create_playlist('playlist',$new_name,'',0,$qstring,$tags);
+        CCUtil::ReturnAjaxData($row);        
+    }
 
     function Bump($upload_encoded='')
     {
@@ -529,7 +549,7 @@ EOF;
         return $row;
     }
 
-    function & _create_playlist($sub_type='',$title_str = '',$desc ='',$user=0,$query='')
+    function & _create_playlist($sub_type='',$title_str = '',$desc ='',$user=0,$query='',$tags='')
     {
         global $CC_GLOBALS;
 
@@ -542,7 +562,7 @@ EOF;
         $new_row['cart_desc']    = $desc;
         $new_row['cart_date']    = date('Y-m-d H:i:s');
         $new_row['cart_dynamic'] = $query;
-        $new_row['cart_tags']    = '';
+        $new_row['cart_tags']    = $tags;
         $carts->Insert($new_row);
         return $new_row;
     }
@@ -551,8 +571,24 @@ EOF;
     {
         $msg = 'str_pl_new_playlist_created';
 
-        if( !empty($_REQUEST['cart_name']) )
+        $this->_new_pl($upload_id,$msg);
+
+        CCUtil::ReturnAjaxMessage($msg);
+    }
+
+    function APICreatePlaylist() {
+        $msg = '';
+        $playlist =& $this->_new_pl('',$msg);
+        CCUtil::ReturnAjaxData($playlist);
+    }
+
+    function & _new_pl($upload_id='',&$msg)
+    {
+        if( !empty($_REQUEST['cart_name']) ) {
             $new_name = CCUtil::Strip($_REQUEST['cart_name']);
+        } else if( !empty($_REQUEST['name']) ) {
+            $new_name = CCUtil::Strip($_REQUEST['name']);
+        }
 
         if( empty($new_name) )
             $new_name = $this->_gen_name();
@@ -568,8 +604,7 @@ EOF;
             $this->_add($upload_id,$playlist_id);
             $msg = 'str_pl_and_track_added';
         }
-
-        CCUtil::ReturnAjaxMessage($msg);
+        return $new_row;
     }
 
     function _gen_name()
