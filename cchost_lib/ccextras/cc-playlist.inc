@@ -245,7 +245,7 @@ class CCPlaylists
         $tags     = empty($_REQUEST['tags']) ? '' : $_REQUEST['tags'];
         $row      = $this->_create_playlist('playlist',$new_name,'',0,$qstring,$tags);
         
-        CCUtil::ReturnAjaxData($row);        
+        CCUtil::ReturnAjaxObj($row);        
     }
 
     function Bump($upload_encoded='')
@@ -588,7 +588,7 @@ EOF;
     function APICreatePlaylist() {
         $msg = '';
         $playlist =& $this->_new_pl('',$msg);
-        CCUtil::ReturnAjaxData($playlist);
+        CCUtil::ReturnAjaxObj($playlist);
     }
 
     function & _new_pl($upload_id='',&$msg)

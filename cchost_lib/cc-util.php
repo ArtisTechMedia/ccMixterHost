@@ -265,6 +265,7 @@ class CCUtil
         exit;
     }
 
+    // depreicated because, er, returns invalid JSON ;)
     public static function ReturnAjaxData($obj,$inHeader=true)
     {
         require_once('cchost_lib/zend/json-encoder.php');
@@ -273,6 +274,17 @@ class CCUtil
             header( "X-JSON: $text");
         header( 'Content-type: text/plain');
         print( '(' . $text . ')' );
+        exit;
+    }
+
+    public static function ReturnAjaxObj($obj,$inHeader=true)
+    {
+        require_once('cchost_lib/zend/json-encoder.php');
+        $text = CCZend_Json_Encoder::encode($obj);
+        if( $inHeader )
+            header( "X-JSON: $text");
+        header( 'Content-type: text/plain');
+        print( '[' . $text . ']' );
         exit;
     }
 
