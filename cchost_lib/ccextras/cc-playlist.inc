@@ -104,11 +104,6 @@ class CCPlaylists
 
     function OnMapUrls()
     {
-        /* depricated use api/playlist/create instead */
-        CCEvents::MapUrl( ccp('api','playlist','new'),
-            array( 'CCPlaylists', 'NewPL'),   CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
-            '[upload_id]', _('Create a new playlist, optionally starting with upload_id'), CC_AG_deprecated );
-
         CCEvents::MapUrl( ccp('api','playlist','create'),
             array( 'CCPlaylists', 'APICreatePlaylist'),   CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
             '', _('Create a new playlist'), CC_AG_PLAYLIST );
@@ -117,13 +112,14 @@ class CCPlaylists
             array( 'CCPlaylists', 'Add'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
             '{upload_id},{playlist_id}', _('Add upload to playlist'), CC_AG_PLAYLIST );
 
+        CCEvents::MapUrl( ccp('api','playlist','delete'),
+            array( 'CCPlaylists', 'APIDelete'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
+            '{playlist_id}', _('Delete playlist'), CC_AG_PLAYLIST );
+
+
         CCEvents::MapUrl( ccp('api','playlist','type'),
             array( 'CCPlaylists', 'GetType'),  CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
             '{user_name}/{type}', _('Get a specific type of playlist (e.g. favorites'), CC_AG_PLAYLIST );
-
-        CCEvents::MapUrl( ccp('api','playlist','getfavorite'),
-            array( 'CCPlaylists', 'GetFavorite'),  CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
-             '', _(''), CC_AG_deprecated );
 
         CCEvents::MapUrl( ccp('api','playlist','remove'),
             array( 'CCPlaylists', 'Remove'),  CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
@@ -136,6 +132,7 @@ class CCPlaylists
         CCEvents::MapUrl( ccp('api','playlist','with'),
             array( 'CCPlaylists', 'With'),    CC_MUST_BE_LOGGED_IN,   ccs(__FILE__) ,
             '{upload_id}', _('Return playlists with-w/o this upload'), CC_AG_PLAYLIST ); 
+
 
         CCEvents::MapUrl( ccp('playlist','create'),
             array( 'CCPlaylists', 'Create'),   CC_MUST_BE_LOGGED_IN,   ccs(__FILE__) ,
@@ -192,6 +189,15 @@ class CCPlaylists
             'cchost_lib/ccextras/cc-playlist-forms.inc' ,
             '', _('Clean up playlists attached to dead accounts'), CC_AG_PLAYLIST ); 
 
+        /* depricated use api/playlist/create instead */
+        CCEvents::MapUrl( ccp('api','playlist','new'),
+            array( 'CCPlaylists', 'NewPL'),   CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
+            '[upload_id]', _('Create a new playlist, optionally starting with upload_id'), CC_AG_deprecated );
+
+        CCEvents::MapUrl( ccp('api','playlist','getfavorite'),
+            array( 'CCPlaylists', 'GetFavorite'),  CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
+             '', _(''), CC_AG_deprecated );
+
     }
 
 
@@ -246,6 +252,28 @@ class CCPlaylists
         $row      = $this->_create_playlist('playlist',$new_name,'',0,$qstring,$tags);
         
         CCUtil::ReturnAjaxObj($row);        
+    }
+
+    function APIDelete($playlist_id)
+    {
+        $this->_test_pl(0,$playlist_id,false,true,true);
+        $this->_empty_playlist($playlist_id);
+        $carts =& CCPlaylist::GetTable();
+        $carts->DeleteKey($playlist_id);
+        $status = array( 'status' => 'ok' );
+        CCUtil::ReturnAjaxObj($status);        
+    }
+
+    // copied from cc-playlists-forms
+    function _empty_playlist($playlist_id)
+    {
+        $cartitems =& CCPlaylistItems::GetTable();
+        $w['cart_item_cart'] = $playlist_id;
+        $cartitems->DeleteWhere($w);
+        $carts =& CCPlaylist::GetTable();
+        $wx['cart_num_items'] = 0;
+        $wx['cart_id'] = $playlist_id;
+        $carts->Update($wx);
     }
 
     function Bump($upload_encoded='')
