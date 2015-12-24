@@ -104,18 +104,34 @@ class CCPlaylists
 
     function OnMapUrls()
     {
+        /* new API */
+
         CCEvents::MapUrl( ccp('api','playlist','create'),
             array( 'CCPlaylists', 'APICreatePlaylist'),   CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
             '', _('Create a new playlist'), CC_AG_PLAYLIST );
     
-        CCEvents::MapUrl( ccp('api','playlist','add'),
-            array( 'CCPlaylists', 'Add'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
-            '{upload_id},{playlist_id}', _('Add upload to playlist'), CC_AG_PLAYLIST );
+        CCEvents::MapUrl( ccp('api','playlist','save'),
+            array( 'CCPlaylists', 'APISave'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__) ,
+            '', _('Save dynamic playlist (ajax api)'), CC_AG_PLAYLIST );
 
         CCEvents::MapUrl( ccp('api','playlist','delete'),
             array( 'CCPlaylists', 'APIDelete'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
             '{playlist_id}', _('Delete playlist'), CC_AG_PLAYLIST );
 
+        CCEvents::MapUrl( ccp('api','playlist','update'),
+            array( 'CCPlaylists', 'APIUpdate'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
+            '{playlist_id}', _('Update playlist field'), CC_AG_PLAYLIST );
+
+        CCEvents::MapUrl( ccp('api','playlist','reorder'),
+            array( 'CCPlaylists', 'APIReorder'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
+            '{playlist_id}', _('Reorder playlist tracks'), CC_AG_PLAYLIST );
+
+
+        /* legacy */
+
+        CCEvents::MapUrl( ccp('api','playlist','add'),
+            array( 'CCPlaylists', 'Add'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
+            '{upload_id},{playlist_id}', _('Add upload to playlist'), CC_AG_PLAYLIST );
 
         CCEvents::MapUrl( ccp('api','playlist','type'),
             array( 'CCPlaylists', 'GetType'),  CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
@@ -142,10 +158,6 @@ class CCPlaylists
             array( 'CCPlaylists', 'Save'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__) ,
             '', _('Save dynamic playlist'), CC_AG_PLAYLIST );
     
-        CCEvents::MapUrl( ccp('api','playlist','save'),
-            array( 'CCPlaylists', 'APISave'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__) ,
-            '', _('Save dynamic playlist (ajax api)'), CC_AG_PLAYLIST );
-
         CCEvents::MapUrl( ccp('playlist','editquery'),
             array( 'CCPlaylists', 'EditQuery'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__) ,
             '', _('Display edit query form'), CC_AG_PLAYLIST ); 
@@ -254,12 +266,44 @@ class CCPlaylists
         CCUtil::ReturnAjaxObj($row);        
     }
 
+    function APIUpdate($playlist_id)
+    {
+        $this->_test_pl(0,$playlist_id,false,true,true);
+        $carts =& CCPlaylist::GetTable();
+        $values = array( 'cart_id' => $playlist_id );
+        CCUtil::Strip($_REQUEST);
+        if( !empty($_REQUEST['name'] ) ) {
+            $values['cart_name'] = substr($_REQUEST['name'],0,60);
+        }
+        if( !empty($_REQUEST['tags'] ) ) {
+            $values['cart_tags'] = $_REQUEST['tags'];
+        }
+        if( !empty($_REQUEST['description'] ) ) {
+            $values['cart_desc'] = $_REQUEST['description'];
+        }
+        $values['cart_id'] = $playlist_id;
+        $carts->Update($values);
+
+        require_once('cchost_lib/cc-query.php');
+        $query = new CCQuery();
+        $args = $query->ProcessAdminArgs('f=js&dataview=playlist_head&ids='.$playlist_id);
+        $query->Query($args);
+    }
+
     function APIDelete($playlist_id)
     {
         $this->_test_pl(0,$playlist_id,false,true,true);
         $this->_empty_playlist($playlist_id);
         $carts =& CCPlaylist::GetTable();
         $carts->DeleteKey($playlist_id);
+        $status = array( 'status' => 'ok' );
+        CCUtil::ReturnAjaxObj($status);        
+    }
+
+    function APIReorder($playlist_id)
+    {
+        $this->_test_pl(0,$playlist_id,false,true,true);
+        $this->_perform_reorder($playlist_id);        
         $status = array( 'status' => 'ok' );
         CCUtil::ReturnAjaxObj($status);        
     }
@@ -344,28 +388,34 @@ class CCPlaylists
         }
         else
         {
-            // there are much more efficient ways of doing this, but by using
-            // the exact same dataview as the edit screen, we are assured
-            // fidelity between the two (e.g. skipping moderated and hidden tracks)
-            
-            $args = $query->ProcessAdminArgs('dataview=playlist_reorder&f=php&playlist='.$playlist_id);
-            list( $recs, $m ) = $query->Query($args);
-            $ids = array();
-            foreach( $recs as $rec )
-                $ids[] = $rec['cart_item_id'];
-                
-            $ups = array();
-            foreach( $_GET['fo'] as $new_pos => $old_pos )
-            {
-                // $old_pos is '1' indexed
-                $id = $ids[$old_pos-1];
-                $sql = "UPDATE cc_tbl_cart_items SET cart_item_order = $new_pos WHERE cart_item_id = $id";
-                CCDatabase::Query($sql);
-            }
-
+            $this->_perform_reorder($playlist_id);
             $url = ccl('playlist','browse',$playlist_id);
             CCUtil::SendBrowserTo($url);
         }
+    }
+
+    function _perform_reorder($playlist_id)
+    {
+        // there are much more efficient ways of doing this, but by using
+        // the exact same dataview as the edit screen, we are assured
+        // fidelity between the two (e.g. skipping moderated and hidden tracks)
+        $query = new CCQuery();
+        
+        $args = $query->ProcessAdminArgs('dataview=playlist_reorder&f=php&playlist='.$playlist_id);
+        list( $recs, $m ) = $query->Query($args);
+        $ids = array();
+        foreach( $recs as $rec )
+            $ids[] = $rec['cart_item_id'];
+            
+        $ups = array();
+        foreach( $_GET['fo'] as $new_pos => $old_pos )
+        {
+            // $old_pos is '1' indexed
+            $id = $ids[$old_pos-1];
+            $sql = "UPDATE cc_tbl_cart_items SET cart_item_order = $new_pos WHERE cart_item_id = $id";
+            CCDatabase::Query($sql);
+        }
+
     }
 
     function Remove($upload_id='',$playlist_id='')
