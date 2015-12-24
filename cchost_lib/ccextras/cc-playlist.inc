@@ -399,6 +399,7 @@ class CCPlaylists
         // there are much more efficient ways of doing this, but by using
         // the exact same dataview as the edit screen, we are assured
         // fidelity between the two (e.g. skipping moderated and hidden tracks)
+        require_once('cchost_lib/cc-query.php');
         $query = new CCQuery();
         
         $args = $query->ProcessAdminArgs('dataview=playlist_reorder&f=php&playlist='.$playlist_id);
