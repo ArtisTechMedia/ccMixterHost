@@ -320,6 +320,10 @@ EOF;
         }
         else
         {
+            $url = 'http://playlists.ccmixter.org/playlist/browse/' . $playlist_id;
+            CCUtil::SendBrowserTo($url);
+
+            /*
             // displaying a specific playlist
             //
             $this->_build_bread_crumb_trail($playlist_id);
@@ -331,6 +335,7 @@ EOF;
             if( isset($_GET['ids']) )
                 unset($_GET['ids']);
             $template = 'playlist_2_show_one';
+            */
         }
 
         $ex['template'] = $template;

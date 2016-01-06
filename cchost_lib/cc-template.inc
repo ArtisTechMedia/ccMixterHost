@@ -71,13 +71,17 @@ class CCExtrasForm extends CCEditConfigForm
             // the drop target area
             for( $i = 0; $i < count($mac_keys); $i++ )
             {
-                $macro = $macros[$mac_keys[$i]];
-                $target['targetmacros_'.($i+1)] = $extras[$macro];
+                    $macro = $macros[$mac_keys[$i]];
+                if( array_key_exists($macro, $extras) ) 
+                {
+                    $target['targetmacros_'.($i+1)] = $extras[$macro];
 
-                $map[$i+1] = $macro;
+                    $map[$i+1] = $macro;
+                    
+                    // remove it from what will be the sources
+                    unset($extras[$macro]);
+                }
 
-                // remove it from what will be the sources
-                unset($extras[$macro]);
             }
 
             // put what's left into the sources area
