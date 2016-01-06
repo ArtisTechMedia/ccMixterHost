@@ -50,6 +50,7 @@ class CCQueryFormats
             }
             case 'json':
             case 'js':
+            case 'jsex':
             case 'xml':
             case 'textfile':
             case 'csv':
@@ -82,6 +83,13 @@ class CCQueryFormats
 
         switch( $format )
         {
+            case 'jsex':
+            {
+                $mime = 'text/javascript';
+                $json = json_encode( $records, JSON_UNESCAPED_SLASHES|JSON_PARTIAL_OUTPUT_ON_ERROR );
+                $results = array( $json, $mime );
+                break;
+            }
             case 'json':
             case 'js':
             {
@@ -109,6 +117,7 @@ class CCQueryFormats
                 }
                 $text .= ']';
                 $results = array( $text, $mime ); 
+                //$results = array( json_encode($records), $mime ) ;
                 break;
             }
 
