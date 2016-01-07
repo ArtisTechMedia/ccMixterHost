@@ -203,11 +203,14 @@ class CCPlaylistManage
 
     function Edit($playlist_id='')
     {
+        $url = 'http://playlists.ccmixter.org/playlist/browse/' . $playlist_id;
+        CCUtil::SendBrowserTo($url);
+        /*
+
         $api = new CCPlaylists();
-        $api->_test_pl('',$playlist_id, /* test upload: */ false, 
-                                        /* test_playlist */ true,
-                                        /* test_owner */ true);
-        
+        $api->_test_pl('',$playlist_id, /* test upload: * / false, 
+                                        /* test_playlist * / true,
+                                        /* test_owner * / true);
 
         require_once('cchost_lib/cc-page.php');
         $page =& CCPage::GetPage();
@@ -255,6 +258,7 @@ class CCPlaylistManage
             }
             CCUtil::SendBrowserTo($url);
         }
+        */
     }
 
 
