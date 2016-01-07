@@ -810,7 +810,7 @@ EOF;
 
     function _gen_dynamic()
     {
-        if( $this->args['datasource'] == 'cart' && !empty($this->args['dynamic']) )
+        if( $this->args['datasource'] == 'cart' && !empty($this->args['dynamic']) && !array_key_exists('minitems', $this->args) ) 
         {
             $this->where[] = 'LENGTH(cart_dynamic) > 0';
         }
@@ -944,10 +944,9 @@ EOF;
     {
         if( $this->args['datasource'] == 'cart' && !empty($this->args['minitems']) )
         {
-            if( $this->args['minitems'] == -1 ) {
-                $w = 'cart_num_items >= 1 OR LENGTH(cart_dynamic) > 0';
-            } else {
-                $w = 'cart_num_items >= ' . $this->args['minitems'];
+            $w = 'cart_num_items >= ' . $this->args['minitems'];
+            if( !empty($this->args['dynamic']) ) {
+                $w .= ' OR LENGTH(cart_dynamic) > 0';
             }
             $this->where[] = $w;
         }

@@ -75,6 +75,9 @@ class CCPlaylists
             array( 'CCPlaylists', 'APIRemove'),  CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
              '{upload_id},{playlist_id}', _('Remove upload from playlist'), CC_AG_PLAYLIST );
     
+        CCEvents::MapUrl( ccp('api','playlist','feature'),
+            array( 'CCPlaylists', 'APIFeature'),  CC_ADMIN_ONLY,   ccs(__FILE__),
+             '{playlist_id}', _('toggle feature status of playlist'), CC_AG_PLAYLIST );
 
         /* legacy */
 
@@ -210,6 +213,27 @@ class CCPlaylists
         $query = new CCQuery();
         $args = $query->ProcessAdminArgs('f=js&dataview=playlist_head&ids='.$playlist_id);
         $query->Query($args);
+    }
+
+    function APIFeature($playlist_id) 
+    {
+        $status = array();
+        $status['status'] = 'invalid user';
+        if( CCUser::IsAdmin() )
+        {
+            $this->_test_pl(0,$playlist_id, TEST_UPLOAD_NO, TEST_PLAYLIST_YES, TEST_OWNER_NO);
+            $carts =& CCPlaylist::GetTable();
+            $sub_type = $carts->QueryItemFromKey('cart_subtype', $playlist_id); 
+            $w['cart_id'] = $playlist_id;
+            if( $sub_type == 'featured') {
+                $w['cart_subtype'] = '';
+            } else {
+                $w['cart_subtype'] = 'featured';
+            }
+            $carts->Update($w);
+            $status['status'] = 'ok';
+        }
+        CCUtil::ReturnAjaxObj($status);        
     }
 
     function APIDelete($playlist_id)

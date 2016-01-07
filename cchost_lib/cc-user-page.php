@@ -385,6 +385,9 @@ END;
                                            'id'    => 'fav' );
         }
 
+        $row['is_admin'] = CCUser::IsAdmin($row['user_name']);
+        $row['is_super'] = CCUser::IsSuper($row['user_name']);
+        
         $row['user_tag_links'] = array();
 
         $favs = CCTag::TagSplit($row['user_favorites']);
