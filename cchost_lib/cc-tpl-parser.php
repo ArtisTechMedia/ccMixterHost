@@ -85,10 +85,11 @@ function cc_tpl_parse_first($bang, $item)
 
 function cc_tpl_parse_call_if_exists_macro($prefix, $mac)
 {
-    if( file_exists($mac) ) {
-        return cc_tpl_parse_call_macro($prefix,$mac);
-    }
-    return '';
+    $prefix = _cc_tpl_flip_prefix($prefix);
+    if( $mac{0} != "'" )
+        $mac = cc_tpl_parse_var('',$mac,'');
+
+    return "$prefix if( CCTemplate::SearchStatic($mac) ) { \$T->Call($mac); } ?>";
 }
 
 function cc_tpl_parse_call_macro($prefix, $mac)
