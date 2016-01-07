@@ -71,6 +71,10 @@ class CCPlaylists
             array( 'CCPlaylists', 'APIReorder'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
             '{playlist_id}', _('Reorder playlist tracks'), CC_AG_PLAYLIST );
 
+        CCEvents::MapUrl( ccp('api','playlist','removetrack'),
+            array( 'CCPlaylists', 'APIRemove'),  CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
+             '{upload_id},{playlist_id}', _('Remove upload from playlist'), CC_AG_PLAYLIST );
+    
 
         /* legacy */
 
@@ -82,10 +86,6 @@ class CCPlaylists
             array( 'CCPlaylists', 'GetType'),  CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
             '{user_name}/{type}', _('Get a specific type of playlist (e.g. favorites'), CC_AG_PLAYLIST );
 
-        CCEvents::MapUrl( ccp('api','playlist','remove'),
-            array( 'CCPlaylists', 'Remove'),  CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
-             '{upload_id},{playlist_id}', _('Remove upload from playlist'), CC_AG_PLAYLIST );
-    
         CCEvents::MapUrl( ccp('api','playlist','bump'),
             array( 'CCPlaylists', 'Bump'),    CC_DONT_CARE_LOGGED_IN, ccs(__FILE__) ,
             '{update_id}', _('Bump playlist count'), CC_AG_PLAYLIST ); 
@@ -94,6 +94,9 @@ class CCPlaylists
             array( 'CCPlaylists', 'With'),    CC_MUST_BE_LOGGED_IN,   ccs(__FILE__) ,
             '{upload_id}', _('Return playlists with-w/o this upload'), CC_AG_PLAYLIST ); 
 
+        CCEvents::MapUrl( ccp('api','playlist','remove'),
+            array( 'CCPlaylists', 'Remove'),  CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
+             '{upload_id},{playlist_id}', _('Remove upload from playlist'), CC_AG_PLAYLIST );
 
         CCEvents::MapUrl( ccp('playlist','create'),
             array( 'CCPlaylists', 'Create'),   CC_MUST_BE_LOGGED_IN,   ccs(__FILE__) ,
@@ -227,9 +230,28 @@ class CCPlaylists
         CCUtil::ReturnAjaxObj($status);        
     }
 
+    function APIRemove($upload_id='',$playlist_id='')
+    {
+        $this->_remove_track($upload_id,$playlist_id);
+        $status = array( 'status' => 'ok' );
+        CCUtil::ReturnAjaxObj($status);        
+    }
+
     /*
         API HELPERS
     */
+
+    function _remove_track($upload_id,$playlist_id)
+    {
+        $this->_test_pl($upload_id,$playlist_id, TEST_UPLOAD_YES, TEST_PLAYLIST_YES, TEST_OWNER_YES);
+        $cart_items =& CCPlaylistItems::GetTable();
+        $w['cart_item_upload'] = $upload_id;
+        $w['cart_item_cart'] = $playlist_id;
+        $cart_items->DeleteWhere($w);
+        $carts =& CCPlaylist::GetTable();
+        $carts->Dec('cart_num_items',$playlist_id);
+        $this->_sync_upload($upload_id);        
+    }
 
     function & _create_playlist($sub_type='',$title_str = '',$desc ='',$user=0,$query='',$tags='')
     {
@@ -404,9 +426,9 @@ EOF;
     }
 
 
-    /*
+    /********************************************************************
          legacy
-    */
+    *********************************************************************/
     function Create()
     {
         global $CC_GLOBALS;
@@ -545,14 +567,7 @@ EOF;
 
     function Remove($upload_id='',$playlist_id='')
     {
-        $this->_test_pl($upload_id,$playlist_id,true,true,true);
-        $cart_items =& CCPlaylistItems::GetTable();
-        $w['cart_item_upload'] = $upload_id;
-        $w['cart_item_cart'] = $playlist_id;
-        $cart_items->DeleteWhere($w);
-        $carts =& CCPlaylist::GetTable();
-        $carts->Dec('cart_num_items',$playlist_id);
-        $this->_sync_upload($upload_id);
+        $this->_remove_track($upload_id,$playlist_id);
         $args['command'] = 'delete';
         $args['upload_id'] = $upload_id;
         $args['cart_id'] = $playlist_id;
