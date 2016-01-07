@@ -83,6 +83,14 @@ function cc_tpl_parse_first($bang, $item)
     return "<? if( {$bang}(\$i_{$item} == 0) ) { ?>";
 }
 
+function cc_tpl_parse_call_if_exists_macro($prefix, $mac)
+{
+    if( file_exists($mac) ) {
+        return cc_tpl_parse_call_macro($prefix,$mac);
+    }
+    return '';
+}
+
 function cc_tpl_parse_call_macro($prefix, $mac)
 {
     $prefix = _cc_tpl_flip_prefix($prefix);
@@ -325,6 +333,7 @@ function cc_tpl_parse_text($text,$bfunc)
         $ttable4_cb = array(
             "/<\? loop{$op}{$ac}{$a}{$cp}%/"                 =>    function($M) { return cc_tpl_parse_loop($M[1],$M[2]); },
             "/(<\?=?) call(?:_macro)?{$op}{$a}{$cp}%/"       =>    function($M) { return cc_tpl_parse_call_macro($M[1] . ' ',$M[2]); },
+            "/(<\?=?) call_if_exists(?:_macro)?{$op}{$a}{$cp}%/"       =>    function($M) { return cc_tpl_parse_call_if_exists_macro($M[1] . ' ',$M[2]); },
             "/<\? if_(not_)?(?:empty|null){$op}{$a}{$cp}%/"  =>    function($M) { return cc_tpl_parse_if_null($M[1],$M[2]); },
             "/<\? (?:define|map){$op}{$ac}{$a}{$cp}%/"       =>    function($M) { return cc_tpl_parse_define($M[1],$M[2]); },
             "/(<\?=?) chop{$op}{$ac}{$a}{$cp}%/"             =>    function($M) { return cc_tpl_parse_chop($M[1], $M[2],$M[3]); },
