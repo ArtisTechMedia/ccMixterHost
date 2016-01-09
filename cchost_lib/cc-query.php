@@ -727,16 +727,21 @@ class CCQuery
     function _gen_digrank() 
     {
         if( $this->args['digrank'] == -1 ) {
+            unset($this->args['digrank']);
             $this->args['sort'] = 'date';
             $this->args['ord'] = 'desc';
             $this->_gen_sort();
             return;
         }
         if( $this->args['digrank'] == 1 ) {
+            unset($this->args['digrank']);
             $this->args['sort'] = 'rank';
             $this->args['ord'] = 'desc';
             $this->_gen_sort();
             return;
+        }
+        if( !empty($this->args['sort'])) {
+            unset($this->args['sort']);
         }
         /*            
             cooling factor: 
@@ -1282,6 +1287,12 @@ EOF;
         if( !empty($this->sql_p['order']) )
         {
             // this can happen when a formatter hacks in during ApiQuerySetup
+            return;
+        }
+
+        if( !empty($this->args['digrank']) )
+        {
+            // stuff will happen later - see _gen_digrank
             return;
         }
 
