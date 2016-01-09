@@ -732,6 +732,12 @@ class CCQuery
             $this->_gen_sort();
             return;
         }
+        if( $this->args['digrank'] == 1 ) {
+            $this->args['sort'] = 'rank';
+            $this->args['ord'] = 'desc';
+            $this->_gen_sort();
+            return;
+        }
         /*            
             cooling factor: 
                 1     - all time greatest hits
