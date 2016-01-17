@@ -301,7 +301,9 @@ class CCQueryFormats
                 header( "Content-type: $mime" );
         }
 
-        print($value);
+        if( empty($noprint) )
+            print($value);
+        
         if( empty($noexit) )
             exit;
 

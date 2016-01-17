@@ -175,13 +175,16 @@ class CCQuery
     /**
     * Call this to fetch and clean args that were passed in through the browser
     */
-    function ProcessUriArgs($extra_args = array())
+    function ProcessUriArgs($extra_args = array(), $req = array())
     {
         global $CC_GLOBALS;
 
         $this->_from_url = true;
 
-        $req = !empty($_POST) ? $_POST : $_GET;
+        if( empty($req) )
+        {
+            $req = !empty($_POST) ? $_POST : $_GET;
+        }
 
         // some bots have been passing in empty args
         // like user= without values
@@ -1616,6 +1619,9 @@ EOF;
         CCEvents::MapUrl( ccp('api','query'),   array( 'CCQuery', 'QueryURL'), 
             CC_DONT_CARE_LOGGED_IN, ccs(__FILE__), '', _('Query API'), CC_AG_QUERY );
 
+        CCEvents::MapUrl( ccp('api','queries'),  'CCQuery_QueryURLs',
+            CC_DONT_CARE_LOGGED_IN, ccs(__FILE__), '', _('Query API (multiple queries)'), CC_AG_QUERY );
+
         cc_tcache_kill(); // this is probably an ?update=1 so kill the cache...
     }
 
@@ -1739,6 +1745,84 @@ function cc_tcache_kill()
         foreach( $files as $file )
             unlink($file);
 }
+
+/**
+* Entry point for api/queries
+*
+* In order to reduce the number of database connections this API will
+* accept multiple queries all at once. This allows ajax callers to
+* omnibus several queries into one call & db connection
+*
+* N.B. js (or jsex or json) response only
+*
+* takes in named queries in the form of
+*
+*  <query1>=<encoded-query>&<query2>=<encoded-query>&
+*
+* where 'queryN' is any name and encoded-query is an url encoded query string
+*
+* the return is a json object 
+*
+* [ {
+*     "query1": [ results... ],
+*     "query2": [ results...]
+*   }]
+*
+*/
+function CCQuery_QueryURLs()
+{
+    $req = $_GET;
+    $keys = array_keys($req);
+    $results = array();
+    for( $i = 0; $i < count($keys); $i++ )
+    {
+        $key = $keys[$i];
+        if( $key == 'ccm') {
+            continue;
+        }
+        $qstring = urldecode($req[$key]);
+        if( empty($qstring) ) 
+        {
+            $results[$key] = '';
+        }
+        else 
+        {
+            $args = array();
+            parse_str($qstring,$args);
+            if( empty($args['format']) ) 
+            {
+                if( empty($args['f']) ) {
+                    $args['format'] = 'php';
+                } else {
+                    $args['format'] = $args['f'];
+                    unset($args['f']);
+                }
+            }
+            if( $args['format'] != 'count' ) {
+                $args['format'] = 'php';
+            } 
+            $query = new CCQuery();
+            $query->ProcessUriArgs(array(),$args);
+
+            list( $value, $mime ) = $query->Query();
+
+            if( $args['format'] == 'count' ) 
+            {
+                preg_match('/[0-9]+/', $value, $m);
+                $value = array( (int)$m[0] );
+            }
+            $results[$key] = $value;
+        }
+    }
+
+    // JSON_PARTIAL_OUTPUT_ON_ERROR not defined on php 5.4
+    $results = array( $results );
+    $json = json_encode( $results, JSON_UNESCAPED_SLASHES|1024 );
+    header( "Content-type: text/javascript" );
+    print($json);
+    exit;
+}
+
 
 
 ?>
