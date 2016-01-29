@@ -37,11 +37,13 @@
     </p>
     <div id="sources">
 <?
+/*
     $module = 'cchost_lib/snoopy/Snoopy.class.php';
     require_once($module);
     $snoopy = new Snoopy();
     $snoopy->fetch('http://ccmixter.org/media/buckyjonson');
     print $snoopy->results;
+*/
 ?>
     </div>
     <p>
