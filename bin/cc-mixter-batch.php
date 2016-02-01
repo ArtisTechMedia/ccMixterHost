@@ -8,16 +8,28 @@ require_once('cchost_lib/ccextras/cc-ccplus-api.inc');
 require_once('cchost_lib/cc-query.php');
 $home = getenv("HOME");
 
-function ccPlusGenerateBatch($batch_no,$num_uploads)
+function ccPlusGenerateBatch($batch_no,$num_uploads,$extra_ids)
 {
     global $ccmixter_home, $home;
 
     $batch_no_str = str_pad('' + $batch_no, 3, '0', STR_PAD_LEFT );
 
-    $qstring = 'dataview=injections&f=php&limit='.$num_uploads.'&digrank=1&tags=ccplus,remix,non_commercial&sort=user';
+    $num_uploads -= count($extra_ids);
+
+    $qstring = 'dataview=injections&f=php&limit=' . $num_uploads .
+               '&digrank=280&tags=ccplus,remix,non_commercial'; // &sort=user';
     $query = new CCQuery();
     $args = $query->ProcessAdminArgs($qstring);
     list( $rows ) = $query->Query($args);
+
+    if( !empty($extra_ids) ) {
+        $qstring2 = 'dataview=injections&f=php&ids=' . join(',',$extra_ids);
+        $query2 = new CCQuery();
+        $args2 = $query->ProcessAdminArgs($qstring2);
+        list( $rows2 ) = $query2->Query($args2);
+        $rows = array_merge($rows,$rows2);
+    }
+    //print_r($query); exit(0);
     usort($rows, function( $a, $b ) {
         return strcasecmp($a['user_name'], $b['user_name']);
     });
@@ -31,6 +43,7 @@ function ccPlusGenerateBatch($batch_no,$num_uploads)
     $chuck_count = 0;
     $CHUNK_SIZE = 250;
     $ids = array();
+    //print_r($rows[0]); exit();
     foreach($rows as $R)
     {
         $id = $R['upload_id'];
@@ -41,7 +54,7 @@ EOF;
         $ex = $R['upload_extra'];
         $feat = empty($ex['featuring']) ? "" : $ex['featuring'];
         $user = $R['user_real_name']; //  str_replace(',', '\,', $R['user_real_name']);
-        $name = $R['upload_name'] . '-N';    //   str_replace(',', '\,', $R['upload_name']);
+        $name = $R['upload_name'] . (strstr($R['upload_license'],'noncomm') ? '-N' : '-B');    //   str_replace(',', '\,', $R['upload_name']);
         $name = str_replace('"', '""', $name);
         $feat = str_replace('"', '""', $feat);
         $url  = "http://ccmixter.org/files/" . $R['user_name'] . '/' . $R['upload_id'];
@@ -98,7 +111,7 @@ function perform()
 EOF;
     $next = CCDatabase::QueryItem($sql2) + 1;
 
-    if( $argc !== 3 ) {
+    if( $argc < 3 ) {
         print("\n\nUsage:\n");
         print("   php -f " . $argv[0] . " <batch-number> <number-of-uploads>\n\n");
         print("The next available batch number is " . $next . "\n\n");
@@ -118,7 +131,9 @@ EOF;
         exit(1);
     }
 
-    ccPlusGenerateBatch( $argv[1], $argv[2] );
+    $extra_ids = empty($argv[3]) ? array() : explode(',', $argv[3]);
+
+    ccPlusGenerateBatch( $argv[1], $argv[2], $extra_ids );
 }
 
 perform();
