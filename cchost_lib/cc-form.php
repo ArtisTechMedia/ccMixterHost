@@ -1415,7 +1415,7 @@ END;
 
             // also see cc-facebook.php
             //
-            $bad_email = "/(@cz\.|@lv\.|@sk\.|\.info$|\.pl$|\.eu$)/";
+            $bad_email = "/(@cz\.|@lv\.|@sk\.|\.info$|\.pl$|\.eu|\.top|\.win$)/";
 
             if( !preg_match( $regex, $value ) || preg_match($bad_email, $value) )
             {

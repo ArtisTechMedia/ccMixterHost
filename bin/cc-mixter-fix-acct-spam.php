@@ -28,7 +28,10 @@ function fixAcctSpam()
        user_email LIKE '%.eu' OR
        user_email LIKE '%@lv.%' OR
        user_email LIKE '%@sk.%' OR
-       user_email LIKE '%.info' 
+       user_email LIKE '%.info' OR 
+       user_email LIKE '%.top' OR 
+       user_email LIKE '%.win' OR 
+       user_last_known_ip = '202.67.40.50'
        )
       AND user_num_uploads = 0 
       AND user_description > ''
