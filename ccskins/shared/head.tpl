@@ -64,6 +64,7 @@ var user_name = %if_not_null(logged_in_as)% '%(logged_in_as)%'; %else% null; %en
     </style>
 %end_loop%
 
+<script src='https://www.google.com/recaptcha/api.js'></script>  
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
   <script type="text/javascript">
 	var $j = jQuery.noConflict();

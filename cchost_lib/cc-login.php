@@ -30,6 +30,43 @@ if( !defined('IN_CC_HOST') )
 require_once('cchost_lib/cc-user.inc');
 require_once('cchost_lib/cc-seckeys.php');
 
+function generator_recaptcha2($form, $varname, $value='',$class='')
+{
+    $html = '<div class="g-recaptcha" data-sitekey="6Le3ihwTAAAAAPk3emDQWuFkttPgN8FhQx5wbs3n"></div>';
+    return $html;
+}
+
+
+function validator_recaptcha2($form,$fieldname)
+{
+    $key = file_get_contents('./cchost_lib/captcha.txt');
+    require_once('cchost_lib/snoopy/Snoopy.class.php');
+    $snoopy = new Snoopy();
+    global $CC_GLOBALS;
+    
+    if( !empty($CC_GLOBALS['curl-path']) )
+    {
+        $snoopy->curl_path = $CC_GLOBALS['curl-path'];
+    }
+    $snoopy->maxredirs = 8;
+    $snoopy->offsiteok = true;
+    
+    $value = $form->GetFormValue($fieldname);
+    $link = 'https://www.google.com/recaptcha/api/siteverify';
+
+    @$snoopy->submit($link, array( 'secret' => $key,
+                                   'response' => $value,
+                                   'remoteip' => '151.30.80.166' )); // $_SERVER['REMOTE_ADDR']));
+
+    if( !empty($snoopy->results) && (strstr($snoopy->results,'"success": true') !== FALSE) ) {
+        return true;
+    }
+
+    $form->SetFieldError($fieldname, _("Yea.... no"));
+    return false;
+
+}
+
 /**
 * Registeration form
 */
@@ -70,6 +107,14 @@ class CCNewUserForm extends CCUserForm
                 );
         }
 
+        $fields += array(
+                'g-recaptcha-response' =>
+                    array( 'label' => '',
+                            'formatter' => 'recaptcha2',
+                            'form_tip' => '',
+                            'flags' => CCFF_NOUPDATE | CCFF_REQUIRED )
+            );
+        /*
         $fields += array( 
                     'user_mask' =>
                        array( 'label'       => '',
@@ -84,6 +129,7 @@ class CCNewUserForm extends CCUserForm
                                'form_tip'   => CCSecurityVerifierForm::GetSecurityTipStr(),
                                'flags'      => CCFF_REQUIRED | CCFF_NOUPDATE)
             );
+        */
 
         if( $has_mail )
         {
@@ -167,6 +213,7 @@ function validator_newusername($form, $fieldname)
 
     return( false );
 }
+
 
 /**
 * Login form 
@@ -347,6 +394,7 @@ class CCLogin
 
         require_once('cchost_lib/cc-page.php');
         $page =& CCPage::GetPage();
+
         $this->_bread_crumbs_login($page,'str_login_create_acc');
         $page->SetTitle('str_login_create_acc');
         $form = new CCNewUserForm();
