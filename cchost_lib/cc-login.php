@@ -56,7 +56,7 @@ function validator_recaptcha2($form,$fieldname)
 
     @$snoopy->submit($link, array( 'secret' => $key,
                                    'response' => $value,
-                                   'remoteip' => '151.30.80.166' )); // $_SERVER['REMOTE_ADDR']));
+                                   'remoteip' => $_SERVER['REMOTE_ADDR']));
 
     if( !empty($snoopy->results) && (strstr($snoopy->results,'"success": true') !== FALSE) ) {
         return true;
