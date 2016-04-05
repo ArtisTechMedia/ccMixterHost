@@ -211,6 +211,19 @@ class CCUserProfileForm extends CCUploadForm
 {
     var $record;
 
+    function _ok_to_edit_description($user_id)
+    {
+        $users =& CCUsers::GetTable();
+
+        $row = $users->QueryKeyRow($user_id);
+
+        if( $row['user_num_uploads'] > 0 ) {
+            return true;
+        }
+
+        return strtotime($row['user_registered']) < strtotime('36 hours ago');
+    }
+
     function CCUserProfileForm($userid,$avatar_dir)
     {
         global $CC_GLOBALS;
@@ -247,13 +260,27 @@ class CCUserProfileForm extends CCUploadForm
                                'upload_dir' => $avatar_dir,
                                'maxwidth'   => 93,
                                'maxheight'  => 94,
-                               'flags'      => CCFF_POPULATE | CCFF_SKIPIFNULL  ),
+                               'flags'      => CCFF_POPULATE | CCFF_SKIPIFNULL  )
+                    );
 
-                    'user_description' =>
-                        array( 'label'      => 'str_prof_about_you',
-                               'formatter'  => 'textarea',
-                               'want_formatting' => true,
-                               'flags'      => CCFF_POPULATE ),
+        if( $this->_ok_to_edit_description($userid) ) {
+            $fields += array(
+                'user_description' =>
+                    array( 'label'      => 'str_prof_about_you',
+                           'formatter'  => 'textarea',
+                           'want_formatting' => true,
+                           'flags'      => CCFF_POPULATE )
+                );
+        } else {
+            $fields += array(
+               array( 'label'       => 'str_prof_about_you',
+                       'value'      => _('Come back later to edit your details...'),
+                       'formatter'  => 'statictext',
+                       'flags'      => CCFF_STATIC | CCFF_NOUPDATE)
+               );
+        }
+
+        $fields += array( 
 
                     'user_homepage' =>
                        array(  'label'      => 'str_prof_home_page_url',
