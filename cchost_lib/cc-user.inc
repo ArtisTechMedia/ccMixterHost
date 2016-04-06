@@ -269,7 +269,12 @@ class CCUserProfileForm extends CCUploadForm
                     array( 'label'      => 'str_prof_about_you',
                            'formatter'  => 'textarea',
                            'want_formatting' => true,
-                           'flags'      => CCFF_POPULATE )
+                           'flags'      => CCFF_POPULATE ),
+                    'user_homepage' =>
+                       array(  'label'      => 'str_prof_home_page_url',
+                               'form_tip'   => 'str_prof_make_sure_it',
+                               'formatter'  => 'textedit',
+                               'flags'      => CCFF_POPULATE ),
                 );
         } else {
             $fields += array(
@@ -279,15 +284,6 @@ class CCUserProfileForm extends CCUploadForm
                        'flags'      => CCFF_STATIC | CCFF_NOUPDATE)
                );
         }
-
-        $fields += array( 
-
-                    'user_homepage' =>
-                       array(  'label'      => 'str_prof_home_page_url',
-                               'form_tip'   => 'str_prof_make_sure_it',
-                               'formatter'  => 'textedit',
-                               'flags'      => CCFF_POPULATE ),
-            );
 
         if( !empty($CC_GLOBALS['lang_per_user']) )
         {
