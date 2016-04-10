@@ -405,12 +405,12 @@ class CCUserAPI
         $arr =  array_unique( array_merge(CCTag::TagSplit($F['user_whatido']),
                                           CCTag::TagSplit($F['user_whatilike']),
                                           CCTag::TagSplit($F['user_lookinfor']) ));
-        if( in_array('http', $arr) ) {
+        if( in_array('http', $arr) || in_array('https', $arr) ) {
             CCEvents::Invoke( CC_EVENT_USER_DELETED, array( $F['user_id'], &$F ) );
             $users =& CCUsers::GetTable();
             $where['user_id'] = $F['user_id'];
             $users->DeleteWhere($where);
-            CCUtil::SendBrowserTo( ccd('/emails') );
+            CCUtil::SendBrowserTo( ccd('/emails/indexe.php') );
         }
     }
 
