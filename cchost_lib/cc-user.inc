@@ -384,8 +384,9 @@ class CCUserAPI
 
                 $old_info = CCDatabase::QueryRow('SELECT * FROM cc_tbl_user WHERE user_id='.$id);
                 $old_info['user_extra'] = unserialize($old_info['user_extra']);
+                $this->_sec_check($fields);
                 $users->Update($fields);
-                CCEvents::Invoke(CC_EVENT_USER_PROFILE_CHANGED, array( $id, &$old_info));
+                CCEvents::Invoke(CC_EVENT_USER_PROFILE_CHANGED, array( $id, &$old_info ));
                 
                 if( !empty($CC_GLOBALS['lang_per_user']) )
                     CCEvents::Invoke(CC_EVENT_TRANSLATE);
@@ -397,6 +398,20 @@ class CCUserAPI
 
         if( !$ok )
             $page->AddForm( $form->GenerateForm() );
+    }
+
+    function _sec_check($F) {
+        require_once('cchost_lib/cc-tags.php');
+        $arr =  array_unique( array_merge(CCTag::TagSplit($F['user_whatido']),
+                                          CCTag::TagSplit($F['user_whatilike']),
+                                          CCTag::TagSplit($F['user_lookinfor']) ));
+        if( in_array('http', $arr) ) {
+            CCEvents::Invoke( CC_EVENT_USER_DELETED, array( $F['user_id'], &$F ) );
+            $users =& CCUsers::GetTable();
+            $where['user_id'] = $F['user_id'];
+            $users->DeleteWhere($where);
+            CCUtil::SendBrowserTo( ccd('/emails') );
+        }
     }
 
     function AddToFavs($user_to_add_or_remove)
