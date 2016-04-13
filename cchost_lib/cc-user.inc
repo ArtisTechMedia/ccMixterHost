@@ -221,7 +221,7 @@ class CCUserProfileForm extends CCUploadForm
             return true;
         }
 
-        return strtotime($row['user_registered']) < strtotime('36 hours ago');
+        return strtotime($row['user_registered']) < strtotime('1 month ago');
     }
 
     function CCUserProfileForm($userid,$avatar_dir)
@@ -405,7 +405,8 @@ class CCUserAPI
         $arr =  array_unique( array_merge(CCTag::TagSplit($F['user_whatido']),
                                           CCTag::TagSplit($F['user_whatilike']),
                                           CCTag::TagSplit($F['user_lookinfor']) ));
-        if( in_array('http', $arr) || in_array('https', $arr) ) {
+        $m = preg_match('/https?:\/\//',$F['user_real_name']);
+        if( in_array('http', $arr) || in_array('https', $arr) || $m ) {
             CCEvents::Invoke( CC_EVENT_USER_DELETED, array( $F['user_id'], &$F ) );
             $users =& CCUsers::GetTable();
             $where['user_id'] = $F['user_id'];
