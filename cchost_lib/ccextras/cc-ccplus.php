@@ -33,8 +33,10 @@ CCEvents::AddHandler(CC_EVENT_FORM_POPULATE,      array( 'CCCCPlus', 'OnFormPopu
 CCEvents::AddHandler(CC_EVENT_FORM_VERIFY,        array( 'CCCCPlus', 'OnFormVerify'), 'cchost_lib/ccextras/cc-ccplus.inc'  );
 
 CCEvents::AddHandler(CC_EVENT_SOURCES_CHANGED,    array( 'CCCCPlus', 'OnSourcesChanged'), 'cchost_lib/ccextras/cc-ccplus.inc'  );
-
+CCEvents::AddHandler(CC_EVENT_DELETED_FILE,       array( 'CCCCPlus', 'OnDeletedFile'), 'cchost_lib/ccextras/cc-ccplus.inc'  );
 CCEvents::AddHandler(CC_EVENT_UPLOAD_DONE,        array( 'CCCCPlus', 'OnUploadDone'), 'cchost_lib/ccextras/cc-ccplus.inc'  );
+CCEvents::AddHandler(CC_EVENT_FILE_CHANGED_TYPE,  array( 'CCCCPlus', 'OnFileChangedType'), 'cchost_lib/ccextras/cc-ccplus.inc'  );
+
 CCEvents::AddHandler(CC_EVENT_MAP_URLS,           array( 'CCCCPlus', 'OnMapUrls'), 'cchost_lib/ccextras/cc-ccplus.inc'  );
 CCEvents::AddHandler(CC_EVENT_USER_ADMIN_MENU,    array( 'CCCCPlus', 'OnUserAdminMenu'), 'cchost_lib/ccextras/cc-ccplus.inc'  );
 CCEvents::AddHandler(CC_EVENT_API_QUERY_SETUP,    array( 'CCCCPlus', 'OnApiQuerySetup'), 'cchost_lib/ccextras/cc-ccplus.inc'  );

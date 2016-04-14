@@ -124,11 +124,14 @@ class CCUser
         }
     }
 
-    public static function IDFromName($username)
+    public static function IDFromName($username_or_id)
     {
+        if( (int)$username_or_id > 0 ) {
+            return $username_or_id;
+        }
         return CCDatabase::QueryItem(
                   'SELECT user_id FROM cc_tbl_user WHERE user_name = \'' .
-                  strtolower($username) . '\'' );
+                  strtolower($username_or_id) . '\'' );
     }
 
     /**

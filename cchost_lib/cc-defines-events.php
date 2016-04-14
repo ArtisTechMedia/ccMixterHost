@@ -202,6 +202,20 @@ define('CC_EVENT_SOURCES_CHANGED',      'srcchange' );
 define('CC_EVENT_FILE_DONE',           'filedone' );
 
 /**
+* Notification Event: A new physical file has been uploaded or changed.
+*
+* Triggered when a physical file has been added, replaced or edited. 
+*
+* Call back (handler) prototype:
+*<code>
+*function OnFileChangedType(&$file,$newtype)
+*</code>
+* @see CCEvents::AddHandler()
+* @see CC_EVENT_UPLOAD_DONE
+*/
+define('CC_EVENT_FILE_CHANGED_TYPE', 'filechangedtype');
+
+/**
 * @access private
 */
 define('CC_EVENT_ED_PICK',             'edpick' );
@@ -424,11 +438,22 @@ define('CC_EVENT_DELETE_UPLOAD',       'delete' );
 *
 * Event call back (handler) prototype:
 *<code>
-* function OnDeleteFile( &$file_id );
+* function OnDeleteFile( $file_id, $path );
 *</code>
 * @see CCEvents::AddHandler()
 */
 define('CC_EVENT_DELETE_FILE',         'deletefile' );
+
+/**
+* Notification Event: Physical file has been deleted 
+*
+* Event call back (handler) prototype:
+*<code>
+* function OnDeletedFile( $upload_id, $path);
+*</code>
+* @see CCEvents::AddHandler()
+*/
+define('CC_EVENT_DELETED_FILE',        'deletedfile' );
 
 /**
 * Notification Event: User record is about to be deleted

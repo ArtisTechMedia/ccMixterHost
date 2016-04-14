@@ -32,12 +32,11 @@ class CCPlusUserAdminForm extends CCUserForm
                                        'formatter'  => 'checkbox',
                                        'flags'      => CCFF_NONE,
                                 ),
-                    '_ccplus_tag' =>
-                       array(  'label'       => '',
-                               'formatter'  => 'button',
-                               'url'        => ccl('admin','user','ccplus', 'tagfiles',$user_id),
-                               'value'      => _('Tag all uploads'),
-                               'flags'      => CCFF_NONE | CCFF_NOUPDATE  | CCFF_STATIC),
+                    'ccplus_tagfiles' =>
+                                array( 'label'      => _('Tag files'),
+                                       'formatter'  => 'checkbox',
+                                       'flags'      => CCFF_NONE,
+                                ),
                         );
 
         $this->AddFormFields( $fields );
@@ -82,7 +81,8 @@ class CCCCPlus
             $opt_in = $values['ccplus_optin'];
             if( $opt_in )
             {
-                ccPlusOptInUser($username,false);
+                $tag_files = $values['ccplus_tagfiles'];
+                ccPlusOptInUser($username,$tag_files);
                 $prompt .= _(' Opt-in successful');
             }
             else
@@ -100,29 +100,6 @@ class CCCCPlus
         }
     }
     
-    function ccPlusUserFilesTag($user_id)
-    {
-        global $CC_GLOBALS;
-        $page =& CCPage::GetPage();
-        $title = _("ccPlus User Admin");
-        $username = CCUser::GetUserName($user_id);
-
-        $k[] = array( 'url' => ccl(), 'text' => 'str_home' );
-        $k[] = array( 'url' => ccl('people'), 'text' => 'str_people' );
-        $k[] = array( 'url' => ccl('people', $username ), 'text' => $username );
-        $k[] = array( 'url' => ccl('people', $username, 'admin'), 'text' => 'str_admin' );
-        $k[] = array( 'url' => '', 'text' => _('ccPlus') );
-        $page->AddBreadCrumbs($k);
-
-        $page->SetTitle($title);
-        
-        $results =  ccPlusTagAllUploadsForUser($user_id);
-        
-        $str = sprintf( _('Tagged %d samples and pells, %d remixes'), count($results[SAMPLES_TAGGED]), count($results[REMIXES_TAGGED]) );
-        
-        $this->ccPlusUserAdmin($user_id,$str);
-    }
-
     function OnUserAdminMenu( $user_id, &$args )
     {
         $args[] = array( 'action' => ccl( 'admin', 'user', 'ccplus', $user_id ), 
@@ -151,32 +128,6 @@ class CCCCPlus
     }
 
     /**
-    * Event handler for {@link CC_EVENT_UPLOAD_DONE}
-    * 
-    * @param integer $upload_id ID of upload row
-    * @param string $op One of {@link CC_UF_NEW_UPLOAD}, {@link CC_UF_FILE_REPLACE}, {@link CC_UF_FILE_ADD}, {@link CC_UF_PROPERTIES_EDIT'} 
-    * @param array &$parents Array of remix sources
-    */
-    function OnUploadDone($upload_id, $op)
-    {
-        global $CC_GLOBALS;
-
-        if( empty($CC_GLOBALS['do-ccplus']) )
-            return;
-        if( ($op == CC_UF_NEW_UPLOAD || $op == CC_UF_PROPERTIES_EDIT) )
-        {
-            if(  array_key_exists('upload_ccplus',$_POST) && !empty($_POST['upload_ccplus']) )
-            {
-                ccPlusMarkUpload($upload_id);
-            }
-            else
-            {
-                ccPlusUnmarkUpload($upload_id);
-            }
-        }
-    }
-
-    /**
     * Event handler for {@link CC_EVENT_FORM_FIELDS}
     *
     * @param object &$form CCForm object
@@ -197,18 +148,18 @@ class CCCCPlus
             if( empty($fields['upload_ccplus']) )
             {
                 $fields['upload_ccplus'] = 
-                            array( 'label'  => _('CC Plus'),
-                                   'form_tip'   => _('Add CC Plus license (<a href="http://tunetrack.net/mnodes/29673/download/">terms</a>)'),
-                                    'class'     => '',
-                                   'formatter'  => 'checkbox',
-                                   'flags'      => CCFF_NOUPDATE);
+                            array( 'label'     => _('ccPlus Opt-In'),
+                                   'form_tip'  => _('Upload and stems will be marked as ccPlus if eligible'),
+                                   'class'     => '',
+                                   'formatter' => 'checkbox',
+                                   'flags'     => CCFF_NOUPDATE);
             }
         }
         else if( is_a($form,'CCAdminUploadForm') )
         {
             $str = ',' . $fields['ccud']['value'] . ',';
             $value = '';
-            if( strstr($str,',ccplus_verified') )
+            if( strstr($str,',ccplus_verified,') )
             {
                 $value = 'verified';
             }
@@ -216,11 +167,11 @@ class CCCCPlus
             {
                 $value = 'verify';
             }
-            else if( strstr($str,',ccplus_nooptin,') )
+            else if( strstr($str,',ccplus_stem,') )
             {
-                $value = 'nooptin';
+                $value = 'stem';
             }
-            else if( strstr($str,',ccplus,') )
+            else if( strstr($str,',ccplus,') ) // this check must be last
             {
                 $value = 'ccplus';
             }
@@ -229,7 +180,6 @@ class CCCCPlus
                 $value = 'none';
             }
 
-
             $fields['ccud']['value'] = $this->_cleanccPlusTags($str);
             
             $fields['ccplus'] =
@@ -237,11 +187,11 @@ class CCCCPlus
                 'label'  => _('CCPlus options'),
                 'value'      => $value,
                 'formatter'  => 'radio',
-                'options'    => array( 'none' => 'No ccPlus',
-                                        'ccplus' => 'Regular ccPlus',
-                                        'verified' => 'Verified ccPlus (for remixes with non-ccPlus sources)',
-                                        'verify' => 'This upload awaiting verification',
-                                        'nooptin' => 'The artist is not opted in'
+                'options'    => array(  'none'     => 'No ccPlus',
+                                        'ccplus'   => 'Regular ccPlus',
+                                        'stem'     => 'Stems of this remix are ccPlus (but not the remix)',
+                                        'verify'   => 'This upload awaiting verification',
+                                        'verified' => 'Verified as ccPlus (even though the sources are not or the artist is not opt-ed in)'
                                     ),
                 'flags'      => CCFF_POPULATE );
         }
@@ -251,7 +201,7 @@ class CCCCPlus
     {
         require_once('cchost_lib/cc-tags.inc');
         $tags = CCTag::TagSplit($str);
-        $ccplustags = array( 'ccplus','ccplus_nooptin','ccplus_verify','ccplus_verified');
+        $ccplustags = array( 'ccplus','ccplus_verify','ccplus_verified','ccplus_stem');
         $tags = array_diff($tags, $ccplustags);
         return implode(',',$tags);
     }
@@ -274,6 +224,9 @@ class CCCCPlus
                     break;
                 case 'nooptin':
                     $newtag = 'ccplus_nooptin';
+                    break;
+                case 'stem':
+                    $newtag = 'ccplus_stem,ccplus';
                     break;
                 case 'ccplus':
                     $newtag = 'ccplus';
@@ -302,27 +255,76 @@ class CCCCPlus
     {
         global $CC_GLOBALS;
 
-        if( empty($CC_GLOBALS['do-ccplus']) )
+        if( empty($CC_GLOBALS['do-ccplus']) ) {
             return;
+        }
 
         if( !is_subclass_of($form,'CCUploadMediaForm') &&
                     !is_subclass_of($form,'ccuploadmediaform') )
         {
             return;
         }
-        require_once('cchost_lib/cc-tags.php');
-        $form->SetFormValue('upload_ccplus', CCTag::InTag('ccplus', $values['upload_tags']) ? 1 : 0 );
+        $ok = ccPlusUploadIsOptedIn($values['upload_id']);
+        $form->SetFormValue('upload_ccplus', $ok ? '1' : '0' );
     }
 
 
+    /**
+    * Event handler for {@link CC_EVENT_UPLOAD_DONE}
+    * 
+    * @param integer $upload_id ID of upload row
+    * @param string $op One of {@link CC_UF_NEW_UPLOAD}, {@link CC_UF_FILE_REPLACE}, {@link CC_UF_FILE_ADD}, {@link CC_UF_PROPERTIES_EDIT'} 
+    * @param array &$parents Array of remix sources
+    */
+    function OnUploadDone($upload_id, $op)
+    {
+        global $CC_GLOBALS;
+
+        if( empty($CC_GLOBALS['do-ccplus']) ) {
+            return;
+        }
+
+        if( ($op == CC_UF_NEW_UPLOAD || $op == CC_UF_PROPERTIES_EDIT) )
+        {
+            if(  array_key_exists('upload_ccplus',$_POST) )
+            {
+                if( empty($_POST['upload_ccplus']) ) {
+                    ccPlusOptOutUpload($upload_id);
+                } else {
+                    ccPlusOptInUpload($upload_id);
+                }
+            }
+        } 
+        else 
+        {
+            // stems changed
+
+            $this->_checkAndVerifyUpload($upload_id);
+        }
+    }
+
+    function OnDeletedFile($upload_id)
+    {
+        // stem was deleted
+        $this->_checkAndVerifyUpload($upload_id);
+    }
+
     function OnSourcesChanged($remixid,&$remix_sources)
     {
-        if( CCUpload::HasTag($remixid,'ccplus') )
-        {
-            if( !CCRemix::AreAllSourcesTaggedWith('ccplus',$remix_sources,'attribution_3') )
-            {
-                ccPlusUnmarkUpload($remixid);
-            }            
+        // remixes sources changed
+
+        $this->_checkAndVerifyUpload($remixid);
+    }
+
+    function OnFileChangedType($file_id,$upload_id) {
+        $this->_checkAndVerifyUpload($upload_id);
+    }
+
+    function _checkAndVerifyUpload($upload_id) {
+
+        if( ccPlusUploadIsOptedIn($upload_id) ) {
+            ccPlusUnmarkUpload($upload_id);
+            ccPlusVerifyTree($upload_id,false);
         }
     }
 
@@ -342,8 +344,6 @@ class CCCCPlus
     {
         CCEvents::MapUrl( 'admin/user/ccplus',     array('CCCCPlus', 'ccPlusUserAdmin'), 
             CC_ADMIN_ONLY, ccs(__FILE__), '{user_id}', _('ccPlus user admin form'), CC_AG_USER );
-        CCEvents::MapUrl( 'admin/user/ccplus/tagfiles',     array('CCCCPlus', 'ccPlusUserFilesTag'), 
-            CC_ADMIN_ONLY, ccs(__FILE__), '{user_id}', _('ccPlus tag user files'), CC_AG_USER );
     }
 
 }

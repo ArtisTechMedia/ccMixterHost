@@ -17,7 +17,7 @@ function ccPlusGenerateBatch($batch_no,$num_uploads,$extra_ids)
     $num_uploads -= count($extra_ids);
 
     $qstring = 'dataview=injections&f=php&limit=' . $num_uploads .
-               '&digrank=280&tags=ccplus,remix,non_commercial'; // &sort=user';
+               '&digrank=280&tags=ccplus,-ccplus_stem,remix,non_commercial&type=all'; // &sort=user';
     $query = new CCQuery();
     $args = $query->ProcessAdminArgs($qstring);
     list( $rows ) = $query->Query($args);

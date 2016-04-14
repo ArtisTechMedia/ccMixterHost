@@ -492,6 +492,7 @@ class CCPhysicalFile
         // Update the main upload tags, very heavy handed but safe
         require_once('cchost_lib/cc-uploadapi.php');
         CCUploadAPI::UpdateCCUD($upload_id,'','');
+        return $upload_id;
 
     }
 
@@ -507,7 +508,8 @@ class CCPhysicalFile
         $this->CheckFileAccess($file_id,0);
         if( $new_type == '-' )
             $new_type = '';
-        $this->_change_type($file_id,$new_type);
+        $upload_id = $this->_change_type($file_id,$new_type);
+        CCEvents::Invoke( CC_EVENT_FILE_CHANGED_TYPE, array( $file_id, $upload_id, $new_type ) );
         CCUtil::ReturnAjaxMessage(_('File type has been updated'));
     }
 

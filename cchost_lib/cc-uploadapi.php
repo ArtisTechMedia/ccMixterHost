@@ -37,9 +37,9 @@ require_once('cchost_lib/cc-upload-table.php');
 */
 class CCUploadAPI
 {
-    public static function UpdateCCUD($upload_id,$new_ccud,$replaces_ccud)
+    public static function UpdateCCUD($upload_id,$new_ccud,$replaces_ccud,$all_systags=true)
     {
-        CCUploadAPI::_recalc_upload_tags($upload_id,$new_ccud,$replaces_ccud);
+        CCUploadAPI::_recalc_upload_tags($upload_id,$new_ccud,$replaces_ccud,$all_systags);
     }
 
     public static function UpdateUserTags($upload_id,$new_user_tags)
@@ -356,6 +356,8 @@ EOF;
         $files->DeleteWhere($where);
 
         CCUploadAPI::_recalc_upload_tags( $upload_id );
+
+        CCEvents::Invoke( CC_EVENT_DELETED_FILE, array( $upload_id, $path ) );
     }
 
     public static 
@@ -438,6 +440,7 @@ EOF;
                                      $old_record,
                                      $relative_dir) 
     {
+
         // ---------
         // N.B. The following code assumes JOINed information
         // (user, license, contest, etc.) did NOT change for
@@ -492,8 +495,11 @@ EOF;
                                                   $file_args, 
                                                   $file_args['local_path'], 
                                                   $relative_dir );
-            if( $errs )
+            
+            if( $errs && $_SERVER['HTTP_HOST'] != 'ccm')
+            {
                 return($errs);
+            }
         }
 
         // copy the new data and use that to update the 
@@ -503,6 +509,7 @@ EOF;
         $db_args = $upload_args;
         
         $db_args['upload_tags'] = ',' . $upload_args['upload_tags'] . ',';
+
 
         $uploads =& CCUploads::GetTable();
         $uploads->Update($db_args);
@@ -606,7 +613,7 @@ EOF;
         return( null );
     }
 
-    public static function _do_get_systags(&$record,&$a_files, $ccud_tags,$user_tags)
+    public static function _do_get_systags(&$record,&$a_files, $ccud_tags,$user_tags,$all_systags=true)
     {
         $systags = array();
         $empty = null;
@@ -635,9 +642,11 @@ EOF;
         $record['upload_extra']['systags']     = CCUploadAPI::_concat_tags( $systags );
         $all_tags                              = CCUploadAPI::_concat_tags( $ccud_tags, $file_ccud, $systags, $user_tags );
 
-        $tags->InsertNewTags($record['upload_extra']['ccud'],     CCTT_SYSTEM );
-        $tags->InsertNewTags($record['upload_extra']['systags'],  CCTT_SYSTEM );
-        $tags->InsertNewTags($record['upload_extra']['usertags'], CCTT_USER );
+        if( $all_systags ) {
+            $tags->InsertNewTags($record['upload_extra']['ccud'],     CCTT_SYSTEM );
+            $tags->InsertNewTags($record['upload_extra']['systags'],  CCTT_SYSTEM );
+            $tags->InsertNewTags($record['upload_extra']['usertags'], CCTT_USER );
+        }
 
         // multiple formats can share tags, we reduced them down however
 
@@ -737,11 +746,18 @@ EOF;
         return( $result);
     }
 
-    public static function _recalc_upload_tags($upload_id,$new_ccud = '',$replaces_ccud='')
+    static function & _fake_record($upload_id) {
+        $rec = CCDatabase::QueryRow('SELECT * FROM cc_tbl_uploads WHERE upload_id = ' . $upload_id);
+        return $rec;
+    }
+
+    public static function _recalc_upload_tags($upload_id,$new_ccud = '',$replaces_ccud='',$all_systags=true)
     {
         require_once('cchost_lib/cc-tags.php');
+        require_once('cchost_lib/cc-tags.inc');
 
         $record =& CCUploadAPI::_get_record($upload_id);
+
         $old_tags = $record['upload_tags'];
 
         $ccud_tags = CCTag::TagSplit($record['upload_extra']['ccud']);
@@ -763,9 +779,11 @@ EOF;
 
         $user_tags = $record['upload_extra']['usertags'];
         
-        // (this will update $record['upload_tags']
-        //
-        CCUploadAPI::_do_get_systags( $record, $record['files'], $ccud_tags, $user_tags);
+        // this will update $record['upload_tags'] and ['upload_extra']['ccud']
+        // and ['upload_extra']['systags']
+
+        CCUploadAPI::_do_get_systags( $record, $record['files'], $ccud_tags, $user_tags, $all_systags);
+
 
         // All we need to update is the one field
         //
@@ -776,8 +794,10 @@ EOF;
         $db_args['upload_extra'] = serialize($record['upload_extra']);
         $uploads->Update($db_args);
 
-        $tags =& CCTags::GetTable();
-        $tags->Replace($old_tags,$db_args['upload_tags']);
+        if( $all_systags ) {
+            $tags =& CCTags::GetTable();
+            $tags->Replace($old_tags,$db_args['upload_tags']);
+        }
     }
 
     public static function _do_rename_and_tag( &$record, &$file_args, $current_path, $relative_dir )
