@@ -425,6 +425,10 @@ class CCConfigs extends CCTable
 */
 function cc_check_site_enabled()
 {
+    if( defined('CC_HOST_CMD_LINE') ) {
+        return;
+    }
+
     global $CC_GLOBALS;
 
     $enable_password = $CC_GLOBALS['enable-password'];
