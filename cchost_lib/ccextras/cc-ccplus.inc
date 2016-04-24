@@ -330,13 +330,16 @@ class CCCCPlus
 
     function OnApiQuerySetup( &$args, &$queryObj, $validate)
     {
-        if( !empty($args['lic']) && $args['lic'] == 'ccplus' ) 
+        if( !empty($args['lic']) &&  preg_match('/^ccplus(_nostems)?$/', $args['lic'], $match) )
         {
             unset($args['lic']);
             if( empty($args['reqtags']) ) {
                 $args['reqtags'] = '';
             }
             $args['reqtags'] .= ',ccplus';
+            if( $match[0] == 'ccplus_nostems' ) {
+                $args['reqtags'] .= ',-ccplus_stem';
+            }
         }
     }
         
