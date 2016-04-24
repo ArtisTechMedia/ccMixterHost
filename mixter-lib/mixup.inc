@@ -757,7 +757,7 @@ function mixup_helper_gen_assignments($mixup_id)
     }
     $filter = join( ' OR ', $filters);
     $cutoff_file = dirname(__FILE__) . '/mixup_cutoff';
-    $cutoff = file_exists( $cutoff_file ) ? file_get_contents( $cutoff_file ) : 4;
+    $cutoff = file_exists( $cutoff_file ) ? file_get_contents( $cutoff_file ) : 24;
     $lo = array();
     $hi = array();
     foreach( $users as $K => $U )
