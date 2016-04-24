@@ -403,9 +403,13 @@ class CCQuery
                 break;
             case 'php':
             case 'phps':
-                if( empty($A['dataview']) )
-                    $A['dataview'] = 'default';
-                $this->GetSourcesFromDataview($A['dataview']);
+                if( !empty($A['template']) ) {
+                    $this->GetSourcesFromTemplate($A['template']);
+                } else {
+                    if( empty($A['dataview']) )
+                        $A['dataview'] = 'default';
+                    $this->GetSourcesFromDataview($A['dataview']);
+                }
                 // fall through
             default:
                 $this->_trigger_setup_event();
