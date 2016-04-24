@@ -78,16 +78,6 @@ ccRemixSearch.prototype = {
                 
                 var url = home_url + '/remixlicenses' + q + 'remix_sources=' + remix_sources + '&pool_sources=' + pool_sources;
                 new Ajax.Request(url, { method: 'get', onComplete: this.onLicenseResults.bind(this) } );
-
-                if( $('upload_ccplus') )
-                {                
-                    url = home_url + '/remixrequiredtag' + q 
-                                 +  'tag=ccplus'
-                                 + '&remix_sources=' + remix_sources 
-                                 + '&strictest_license=attribution_3';
-                                 
-                    new Ajax.Request(url, { method: 'get', onComplete: this.onCCPlusResults.bind(this) } );
-                }
             }
 
             $('remix_search_toggle').style.display = numChecked ? 'block' : 'none';
@@ -109,19 +99,6 @@ ccRemixSearch.prototype = {
             this._toggle_open();
     },
 
-    onCCPlusResults: function( resp, json ) {
-        console.log(json);
-        if( json.remixAllowed )
-        {
-            $('upload_ccplus').disabled = false;
-        }
-        else
-        {
-            $('upload_ccplus').checked = false;
-            $('upload_ccplus').disabled = true;
-        }
-    },
-    
     onLicenseResults: function(resp,json) {
         if( json.options )
         {
