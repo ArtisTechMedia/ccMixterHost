@@ -84,6 +84,7 @@ function ccPlusVerifyTree($upload_id,$tagSources=true,$recurseLevel=0) {
 EOF;
     $R = CCDatabase::QueryRow($sql1);
 
+
     if( preg_match('/,ccplus,/',$R['upload_tags']) ) {
         return true;
     }
@@ -197,7 +198,7 @@ function ccPlusTagAllUploadsForUser($user_id)
 EOF;
     $ids = CCDatabase::QueryItems($sql);
     foreach ($ids as $id) {
-        ccPlusTagTree($id);
+        ccPlusOptInUpload($id);
     }
 }
 

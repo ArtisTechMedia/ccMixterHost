@@ -288,11 +288,11 @@ class CCCCPlus
         {
             if(  array_key_exists('upload_ccplus',$_POST) )
             {
-                if( empty($_POST['upload_ccplus']) ) {
-                    ccPlusOptOutUpload($upload_id);
-                } else {
-                    ccPlusOptInUpload($upload_id);
-                }
+                ccPlusOptInUpload($upload_id);
+            }
+            else
+            {
+                ccPlusOptOutUpload($upload_id);
             }
         } 
         else 
