@@ -93,10 +93,7 @@ class CCTrackBack
         exit;
     }
 
-    function _get_item_name($name,$link)
-    {
-        if( !empty($name) )
-            return $name;
+    function _getASnoopy() {
         require_once('cchost_lib/snoopy/Snoopy.class.php');
         $snoopy = new Snoopy();
         global $CC_GLOBALS;
@@ -107,11 +104,24 @@ class CCTrackBack
         }
         $snoopy->maxredirs = 8;
         $snoopy->offsiteok = true;
-        
+        return $snoopy;        
+    }
+
+    function _get_item_name($name,$link)
+    {
+        if( !empty($name) )
+            return $name;
+        $snoopy = $this->_getASnoopy();
         @$snoopy->fetch($link);
 
-        if( $snoopy->status == "301" )
+        if( $snoopy->status == "301" || ($snoopy->headers && preg_match('/302 Found/',$snoopy->headers[0])) )
         {
+            if( preg_match('/Location: (.*)$/',$snoopy->headers[1],$m) ) {
+                $snoopy = $this->_getASnoopy();
+                $xxx = preg_replace('/\s/','',$m[1]);
+                @$snoopy->fetch($xxx);
+            }
+
             if( $snoopy->_redirectaddr )
             {
                // return $this->_get_item_name($name,$snoopy->_redirectaddr);
