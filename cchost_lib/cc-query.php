@@ -1778,10 +1778,11 @@ function CCQuery_QueryURLs()
     $req = $_GET;
     $keys = array_keys($req);
     $results = array();
+
     for( $i = 0; $i < count($keys); $i++ )
     {
         $key = $keys[$i];
-        if( $key == 'ccm') {
+        if( $key == 'ccm'|| $key == '_') {
             continue;
         }
         $qstring = urldecode($req[$key]);
@@ -1822,7 +1823,9 @@ function CCQuery_QueryURLs()
     // JSON_PARTIAL_OUTPUT_ON_ERROR not defined on php 5.4
     $results = array( $results );
     $json = json_encode( $results, JSON_UNESCAPED_SLASHES|1024 );
-    header( "Content-type: text/javascript" );
+    if( !headers_sent() ) {
+        header( "Content-type: text/javascript" );
+    }
     print($json);
     exit;
 }
