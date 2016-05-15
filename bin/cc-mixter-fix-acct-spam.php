@@ -19,40 +19,27 @@ function _addQuotes($str)
 }
 
 
-function fixAcctSpam()
+function fixAcctSpam($_ips,$_emails)
 {
-    $IPs = array_map( function($s) { return sprintf("user_last_known_ip LIKE '%s%%'", CCUtil::EncodeIP($s)); },
-            array( 
-              '103.238.68.234',
-              '202.62.17.209',
-              '111.93.250.130',
-              '171.61.26.228',
-              '202.67.40.50',
-              '190.85.79.100',
-            ));
+    if( $_ips ) {
+      $IPs = array_map( function($s) { return sprintf("user_last_known_ip LIKE '%s%%'", CCUtil::EncodeIP($s)); }, $_ips);
+      $IPs = implode(' OR ', $IPs);
+    } else {
+      $IPs = '0';
+    }
 
-    $IPs = implode(' OR ', $IPs);
-
-    $where =<<<EOF
-      ({$IPs} OR
-       user_whatido LIKE 'http%' OR
-       user_real_name LIKE 'http%' OR
-       user_name IN (
-         'osephdbeck10', 'juntiles01', 'inspira888', 
-         'upercamp01', 'JannetteEReid', 'mjanifar', 
-         'jason1025', 'GiftFlowersUSA',
-         'priyamuna1998', 'oliviagomez1', 'nicolewis18', 
-         'sadieerin', 'maximilianruth', 
-         'Tagnotez', 'buyprem', 
-         'sereialab', '_voice', 'cre8syndic8', 
-         'juntiles02', 'walkerparasabata17'
-        )
-       )
-EOF;
+    if( $_emails ) {
+      $emails = array_map( function($s) { return sprintf("user_email LIKE '%%%s%%'",$s); }, $_emails );
+      $emails = implode(' OR ', $emails);
+    } else {
+      $emails = '0';
+    }
 
     $sql =<<<EOF
-      SELECT user_id FROM cc_tbl_user WHERE ({$where}) AND user_id > 1000
+      SELECT user_id FROM cc_tbl_user WHERE ({$IPs} OR {$emails}) AND user_id > 1000
 EOF;
+
+    //print "\nSQL: -------\n{$sql}\n\n";// exit;
 
     $count = 'SELECT COUNT(*) FROM cc_tbl_user';
     $before = CCDatabase::QueryItem($count);
@@ -64,7 +51,7 @@ EOF;
       $sql = <<<EOF
         DELETE FROM cc_tbl_user WHERE user_id IN (${ids_str});
 EOF;
-      print_r($sql); exit;
+      //print_r($sql); exit;
 
       CCDatabase::Query($sql);
     }
@@ -76,7 +63,25 @@ EOF;
 
 function perform()
 {
-    fixAcctSpam('002');
+  global $argv,$argc;
+
+  //var_dump($argv); exit;
+
+  $ips = null;
+  $emails = null;
+
+  for( $i = 1; $i < $argc; $i++ ) {
+    $arg = $argv[$i];
+    if( preg_match('/^(ips|emails)=(.*)$/',$arg,$m) ) {
+      if( $m[1] == 'ips') {
+        $ips = explode(';', $m[2] );
+      } else if( $m[1] == 'emails') {
+        $emails = explode(';', $m[2]);
+      }
+    }
+  }
+  
+  fixAcctSpam($ips,$emails);
 }
 
 perform();

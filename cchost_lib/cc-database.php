@@ -208,6 +208,27 @@ class CCDatabase
         return( $results );
     }
 
+    /* pre port to mysqli */
+   public static function QueryCached($sql) {
+        return CCDatabase::Query($sql);
+    }
+
+    public static function FetchCachedRow($qr) {
+        return mysql_fetch_row($qr);
+    }
+
+    public static function FetchCachedRowArray($qr) {
+        return mysql_fetch_array($qr);
+    }
+
+    public static function FetchCachedRowAssoc($qr) {
+        return mysql_fetch_assoc($qr);
+    }
+
+    public static function NumCachedRows($qr) {
+        return mysql_num_rows($qr);
+    }
+
     /**
     * Retrieves multiple rows. Use with SELECT statment.
     *  

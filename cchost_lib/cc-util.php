@@ -310,7 +310,7 @@ class CCUtil
                 if( $line )
                     $file .= ' (' . $line . ')';
             }
-            print(_('file not found') . $file );
+            print(_('file not found (404)') . $file );
             exit;
         }
     }
@@ -569,6 +569,20 @@ class CCUtil
         return null;
     }
 
+
+    static function HTTPClient() {
+        require_once('cchost_lib/snoopy/Snoopy.class.php');
+        $snoopy = new Snoopy();
+        global $CC_GLOBALS;
+        
+        if( !empty($CC_GLOBALS['curl-path']) )
+        {
+            $snoopy->curl_path = $CC_GLOBALS['curl-path'];
+        }
+        $snoopy->maxredirs = 8;
+        $snoopy->offsiteok = true;
+        return $snoopy;        
+    }
 }
 
 if( !function_exists('array_combine') )

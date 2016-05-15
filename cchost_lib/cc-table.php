@@ -600,11 +600,7 @@ class CCTable
     function QueryKeys($where='')
     {
         $sql = $this->_get_select($where,$this->_key_field);
-        $qr = CCDatabase::Query($sql);
-        $keys = array();
-        while( $r = mysql_fetch_row($qr) )
-            $keys[] = $r[0];
-        return($keys);
+        return CCDatabase::QueryItems($sql);
     }
 
     /**

@@ -29,160 +29,21 @@ if( !defined('IN_CC_HOST') )
    die('Welcome to CC Host');
 
 define('CC_EVENT_FILTER_CART_MENU','cartmenu');
-define('CC_EVENT_FILTER_CART_NSFW','cartnsfw');
 /**
 *
 */
-CCEvents::AddHandler(CC_EVENT_MAP_URLS,           array( 'CCPlaylists',  'OnMapUrls'),          'cchost_lib/ccextras/cc-playlist.inc' );
-CCEvents::AddHandler(CC_EVENT_DELETE_UPLOAD,      array( 'CCPlaylists',  'OnUploadDelete'),     'cchost_lib/ccextras/cc-playlist.inc' );
-
 CCEvents::AddHandler(CC_EVENT_UPLOAD_MENU,        array( 'CCPlaylistHV', 'OnUploadMenu'));
 CCEvents::AddHandler(CC_EVENT_USER_PROFILE_TABS,  array( 'CCPlaylistHV', 'OnUserProfileTabs'));
-CCEvents::AddHandler(CC_EVENT_FILTER_MACROS,      array( 'CCPlaylistHV', 'OnFilterMacros')      );
 CCEvents::AddHandler(CC_EVENT_FILTER_USER_PROFILE,array( 'CCPlaylistHV', 'OnFilterUserProfile') );
-CCEvents::AddHandler(CC_EVENT_SEARCH_META,        array( 'CCPlaylistHV',  'OnSearchMeta') );
 CCEvents::AddHandler(CC_EVENT_FILTER_PLAY_URL,    array( 'CCPlaylistHV', 'OnFilterPlayURL'));
-CCEvents::AddHandler(CC_EVENT_API_QUERY_SETUP,    array( 'CCPlaylistHV', 'OnApiQuerySetup')); 
 
 CCEvents::AddHandler(CC_EVENT_FILTER_CART_MENU,   array( 'CCPlaylistBrowse', 'OnFilterCartMenu'), 'cchost_lib/ccextras/cc-playlist-browse.inc' );
-CCEvents::AddHandler(CC_EVENT_FILTER_CART_NSFW,   array( 'CCPlaylistBrowse', 'OnFilterCartNSFW'), 'cchost_lib/ccextras/cc-playlist-browse.inc' );
-
-CCEvents::AddHandler(CC_EVENT_ADMIN_MENU,         array( 'CCPlaylistManage',  'OnAdminMenu'),     'cchost_lib/ccextras/cc-playlist-forms.inc' );
-CCEvents::AddHandler(CC_EVENT_USER_DELETED,       array( 'CCPlaylistManage' , 'OnUserDelete'),     'cchost_lib/ccextras/cc-playlist-forms.inc' );
+CCEvents::AddHandler(CC_EVENT_MAP_URLS,           array( 'CCPlaylists',      'OnMapUrls'),        'cchost_lib/ccextras/cc-playlist.inc' );
+CCEvents::AddHandler(CC_EVENT_ADMIN_MENU,         array( 'CCPlaylistManage', 'OnAdminMenu'),      'cchost_lib/ccextras/cc-playlist-forms.inc' );
 
 
 class CCPlaylistHV 
 {
-    function OnApiQuerySetup( &$args, &$queryObj, $requiresValidation )
-    {
-        if( !empty($args['dataview']) && ($args['dataview'] == 'passthru') )
-            return;
-
-        if( !empty($args['playlist_type']) )
-        {
-            if( !empty($args['user']) )
-            {
-                $user_id = CCUser::IDFromName($args['user']);
-                if( empty($user_id) )
-                    return; // er, no error?
-                $args['playlist'] = $this->_get_type_for_user($user_id,$args['playlist_type'],false,null);
-                
-                unset($args['user']);
-            }
-        }
-
-        if( $args['format'] == 'playlist' )
-        { 
-            if( empty($args['template']) )
-                return;
-             $queryObj->GetSourcesFromTemplate($args['template']);
-        }
-
-        if( empty($args['playlist']) ) 
-            return;
-        
-        $id = sprintf('0%d',$args['playlist']);
-        $ok = $id > 0;
-        if( $ok )
-        {
-            $row = CCDatabase::QueryRow('SELECT * FROM cc_tbl_cart WHERE cart_id='.$id);
-            $ok = !empty($row);
-        }
-        
-        if( !$ok )
-            CCUtil::Send404(true,'Invalid playlist id');
-
-        if( !empty($row['cart_subtype']) && ($row['cart_subtype'] == 'default') )
-        {
-            $args += $_GET;
-        }
-        elseif( $row['cart_dynamic'] )
-        {
-            $arg_limit = $args['limit'];
-            parse_str($row['cart_dynamic'],$cargs);
-            $args = array_merge($args, $cargs);
-            $args['title'] = $row['cart_name'];
-            if( $arg_limit ) {
-                $args['limit'] = $arg_limit;
-            }
-            if( !empty($args['limit']) )
-            {
-                if( $args['limit'] == 'default' )
-                {
-                    $page =& CCPage::GetPage();
-                    $args['limit'] = $page->GetPageQueryLimit();
-                }
-            }
-        }
-        else
-        {
-            //if( empty($args['sort']) )
-            $queryObj->sql_p['order'] = 'cart_item_order';
-            $queryObj->sql_p['limit'] = CCDatabase::QueryItem('SELECT COUNT(*) FROM cc_tbl_cart_items WHERE cart_item_cart='.$id);
-            $queryObj->where[] = 'cart_item_cart = '.$id;
-            $queryObj->sql_p['joins'][] = 'cc_tbl_cart_items ON cart_item_upload=upload_id';
-        }
-
-    }
-
-    function OnSearchMeta(&$search_meta)
-    {
-        $count = CCDatabase::QueryItem('SELECT COUNT(*) FROM cc_tbl_cart');
-        if( $count < 2 ) // dynamic playlist
-            return;
-            
-        $search_meta[] = 
-            array(
-                'template'   => 'search_playlists',
-                'title'      => 'str_search_playlists',
-                'datasource' => 'cart',
-                'group'      => 'cart',
-                'match'      => 'cart_name,cart_tags,cart_desc ',
-            );
-    }
-
-    function OnFilterPlayURL( &$records ) 
-    {
-        if( !cc_is_player_embedded() )
-            return;
-
-        global $CC_GLOBALS;
-        if( empty($CC_GLOBALS['embedded_player']) )
-        {
-            $CC_GLOBALS['embedded_player'] = 'ccskins/shared/players/player_none.php';
-        }
-        $is_native = $CC_GLOBALS['embedded_player'] == 'ccskins/shared/players/player_native.php';
-        $c = count($records);
-        $k = array_keys($records);
-        for( $i = 0; $i < $c; $i++ )
-        {
-            $rec =& $records[$k[$i]];
-            $cf = count($rec['files']);
-            $ck = array_keys($rec['files']);
-            for( $n = 0; $n < $cf; $n++ )
-            {
-                $R =& $rec['files'][$ck[$n]];
-
-                foreach( array('file_extra','file_format_info') as $f )
-                    if( is_string($R[$f]) )
-                        $R[$f] = unserialize($R[$f]);
-                if( $R['file_format_info']['media-type'] != 'audio' )
-                    continue;
-                if( !$is_native ||
-                    (
-                        !empty($R['file_format_info']['sr']) && 
-                        ($R['file_format_info']['format-name'] == 'audio-mp3-mp3') && 
-                        1 // ($R['file_format_info']['sr'] == '44k')
-                    )
-                  )
-                {
-                    $rec['fplay_url'] = $R['download_url'];
-                    break;
-                }
-            }
-        }
-    }
-
 
     /**
     * Event handler for {@link CC_EVENT_FILTER_USER_PROFILE}
@@ -276,70 +137,51 @@ EOF;
         require_once('cchost_lib/ccextras/cc-playlist.inc');
         $pls = new CCPlaylists();
         $menu['playlist_menu']['mi'] =& $pls->_playlist_with($record['upload_id']);
-
     }
 
-    function OnFilterMacros(&$records)
+    function OnFilterPlayURL( &$records ) 
     {
-        if( !cc_playlist_enabled() )
+        if( !cc_is_player_embedded() )
             return;
 
-        $k = array_keys($records);
-        $c = count($k);
-
-        if( $c && !isset($records[$k[0]]['upload_num_playlists']) )
+        global $CC_GLOBALS;
+        if( empty($CC_GLOBALS['embedded_player']) )
         {
-            // NOTE: this code should probably in cc-filter somewhere ? maybe ?
-
-            // there's no playlist info in the record, we
-            // have to dig it out
-
-            if( !isset($records[$k[0]]['upload_id']) )
-            {
-                // there's nothing we can do...
-                return;
-            }
-            $ids = array();
-            for( $i = 0; $i < $c; $i++ )
-                $ids[] = $records[$k[$i]]['upload_id'];
-            $plcs = CCDatabase::QueryRows( 'SELECT upload_id,upload_num_playlists FROM cc_tbl_uploads WHERE upload_id IN (' .
-                                              join(',',$ids) . ')' );
-            $plcounts = array();
-            foreach( $plcs as $plc )
-                $plcounts[$plc['upload_id']] = $plc['upload_num_playlists'];
-            for( $i = 0; $i < $c; $i++ )
-            {
-                $R =& $records[$k[$i]];
-                $R['upload_num_playlists'] = $plcounts[ $R['upload_id'] ];
-            }
+            $CC_GLOBALS['embedded_player'] = 'ccskins/shared/players/player_none.php';
         }
-
+        $is_native = $CC_GLOBALS['embedded_player'] == 'ccskins/shared/players/player_native.php';
+        $c = count($records);
+        $k = array_keys($records);
         for( $i = 0; $i < $c; $i++ )
         {
-            $R =& $records[$k[$i]];
+            $rec =& $records[$k[$i]];
+            $cf = count($rec['files']);
+            $ck = array_keys($rec['files']);
+            for( $n = 0; $n < $cf; $n++ )
+            {
+                $R =& $rec['files'][$ck[$n]];
 
-            if( empty($R['upload_num_playlists']) )
-                continue;
-
-            $R['file_macros'][] = 'file_macros.php/print_num_playlists';
+                foreach( array('file_extra','file_format_info') as $f )
+                    if( is_string($R[$f]) )
+                        $R[$f] = unserialize($R[$f]);
+                if( $R['file_format_info']['media-type'] != 'audio' )
+                    continue;
+                if( !$is_native ||
+                    (
+                        !empty($R['file_format_info']['sr']) && 
+                        ($R['file_format_info']['format-name'] == 'audio-mp3-mp3') && 
+                        1 // ($R['file_format_info']['sr'] == '44k')
+                    )
+                  )
+                {
+                    $rec['fplay_url'] = $R['download_url'];
+                    break;
+                }
+            }
         }
     }
 
-    function _get_type_for_user( $user_id, $type, $auto_create, $name )
-    {
-        $sql = "SELECT cart_id FROM cc_tbl_cart WHERE cart_user = '{$user_id}' and cart_subtype = '{$type}'";
-        $cart_id = CCDatabase::QueryItem($sql);
-        if( empty($cart_id) && $auto_create)
-        {
-            require_once('cchost_lib/ccextras/cc-playlist.inc');
-            $api = new CCPlaylists();
-            //global $CC_GLOBALS;
-            //$name = sprintf( _("%s's Favorites"), $CC_GLOBALS['user_real_name'] );
-            $cart_id = $api->_create_playlist($type,$name);
-        }
-        return $cart_id;
-    }
-
+    
 }
 
 function cc_is_player_embedded()

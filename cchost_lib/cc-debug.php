@@ -197,16 +197,20 @@ class CCDebug
     * @see Enable
     * @param mixed $var Reference to variable to dump to screen
     * @param bool $template_safe true means you are NOT debugging code that displays HTML
+    * @param bool $exit true means exit after print
     */
-    public static function PrintVar(&$var, $template_safe = false)
+    public static function PrintVar(&$var, $template_safe = false, $exit = true )
     {
         if( !CCDebug::IsEnabled() )
             return;
 
         $t =& CCDebug::_textize($var);
-
-        $html = '<pre style="font-size: 10pt;text-align:left;">' .
-                htmlspecialchars($t) .
+        $sc = htmlspecialchars($t);
+        if( $sc ) {
+            $t = $sc;
+        }
+        $html = '<pre style="font-size: 10pt;text-align:left;">' . 
+                $t .
                 '</pre>';
 
         if( $template_safe )
@@ -219,13 +223,15 @@ class CCDebug
         {
             print("<html><body>$html</body></html>");
         }
-        exit;
+        if( $exit ) {
+            exit;
+        }
     }
 
-    public static function PrintV(&$var, $template_safe = false)
+    public static function PrintV(&$var, $template_safe = false, $exit = true)
     {
         CCDebug::Enable(true);
-        CCDebug::PrintVar($var,$template_safe);
+        CCDebug::PrintVar($var,$template_safe,$exit);
     }
 
     /**
@@ -432,13 +438,20 @@ function cc_error_handler($errno, $errstr='', $errfile='', $errline='', $errcont
     // same goes for PEAR in php 5
     if( strpos($errfile,'PEAR') !== false )
         return;
-    
+
     // errno will be 0 when caller uses the '@' prefix
     // comment these two lines if want these errors logged
     // anyway
-    if( !$errno ) // || ($errno == 2048) ) // E_STRICT, sorry, we don't care about 
+    if( !$errno || $errno === 8192 ) // || ($errno == 2048) ) // E_STRICT, sorry, we don't care about 
     {                                 // deprecated stuff
         return;
+    }
+
+    if( 1 && ($_SERVER['HTTP_HOST'] == 'ccm') ) {
+        $pack = array( $errno, $errstr, $errfile, $errline, $errcontext );
+        CCDebug::PrintV($pack,false,false);
+        CCDebug::Enable(true);
+        CCDebug::StackTrace();
     }
 
     // just return if system error is below threshold
@@ -483,7 +496,7 @@ function cc_error_handler($errno, $errstr='', $errfile='', $errline='', $errcont
         error_log($err, 3, $logdir. CC_ERROR_FILE);
     }
 
-    if( $states['enabled'] === true )
+    if( $_SERVER['HTTP_HOST'] == 'ccm' || ($states['enabled'] === true) )
     {
         die($err);
     }

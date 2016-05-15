@@ -137,36 +137,6 @@ class CCPlaylistBrowse
         $this->_add_menu($records[0],$records[0]['cart_id']);
     }
     
-    function OnFilterCartNSFW(&$records)
-    {
-        if( empty($records[0]['cart_id']) )
-            return;
-        $val = $this->_calc_is_nsfw($records[0]['cart_id']);
-        $records[0]['cart_nsfw'] = $val;
-    }
-
-    function _calc_is_nsfw($playlist_id)
-    {
-        $sql =<<<EOF
-            SELECT upload_extra
-            FROM cc_tbl_uploads
-            JOIN cc_tbl_cart_items ON upload_id=cart_item_upload
-            JOIN cc_tbl_cart ON cart_item_cart=cart_id
-            WHERE cart_id = $playlist_id
-EOF;
-
-        $extas = CCDatabase::QueryItems($sql);
-        foreach( $extas as $ex ) {
-            $ex = unserialize($ex);
-            if( !empty($ex['nsfw'])) {
-                return '1';
-            }
-        }
-        
-        return '0';
-
-    }
-
     function _add_menu(&$row,$playlist_id,$is_popup=false)
     {
         $is_dynamic = !empty($row['cart_dynamic']);

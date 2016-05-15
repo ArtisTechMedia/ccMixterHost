@@ -1757,13 +1757,14 @@ function cc_tcache_kill()
 * accept multiple queries all at once. This allows ajax callers to
 * omnibus several queries into one call & db connection
 *
-* N.B. js (or jsex or json) response only
+* N.B. js (or jsex or json) accepted, jsex (json in the body, not headers)
+*      is returned
 *
 * takes in named queries in the form of
 *
 *  <query1>=<encoded-query>&<query2>=<encoded-query>&
 *
-* where 'queryN' is any name and encoded-query is an url encoded query string
+* where 'queryN' is any name and 'encoded-query' is an encoded query param string
 *
 * the return is a json object 
 *
@@ -1820,16 +1821,50 @@ function CCQuery_QueryURLs()
         }
     }
 
-    // JSON_PARTIAL_OUTPUT_ON_ERROR not defined on php 5.4
     $results = array( $results );
-    $json = json_encode( $results, JSON_UNESCAPED_SLASHES|1024 );
-    if( !headers_sent() ) {
-        header( "Content-type: text/javascript" );
-    }
+    $json = safe_json_encode( $results );
+    header( "Content-type: text/javascript" );
     print($json);
     exit;
 }
 
 
+function safe_json_encode($value){
+    // JSON_PARTIAL_OUTPUT_ON_ERROR not defined on php 5.4
+    if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
+        $encoded = json_encode($value, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|1024);
+    } else {
+        $encoded = json_encode($value,JSON_UNESCAPED_SLASHES|1024);
+    }
+    switch (json_last_error()) {
+        case JSON_ERROR_NONE:
+            return $encoded;
+        case JSON_ERROR_DEPTH:
+            return 'Maximum stack depth exceeded'; // or trigger_error() or throw new Exception()
+        case JSON_ERROR_STATE_MISMATCH:
+            return 'Underflow or the modes mismatch'; // or trigger_error() or throw new Exception()
+        case JSON_ERROR_CTRL_CHAR:
+            return 'Unexpected control character found';
+        case JSON_ERROR_SYNTAX:
+            return 'Syntax error, malformed JSON'; // or trigger_error() or throw new Exception()
+        case JSON_ERROR_UTF8:
+            $clean = utf8ize($value);
+            return safe_json_encode($clean);
+        default:
+            return 'Unknown error'; // or trigger_error() or throw new Exception()
+
+    }
+}
+
+function utf8ize($mixed) {
+    if (is_array($mixed)) {
+        foreach ($mixed as $key => $value) {
+            $mixed[$key] = utf8ize($value);
+        }
+    } else if (is_string ($mixed)) {
+        return utf8_encode($mixed);
+    }
+    return $mixed;
+}
 
 ?>

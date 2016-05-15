@@ -28,12 +28,14 @@
 if( !defined('IN_CC_HOST') )
    die('Welcome to CC Host');
 
-define('TEST_UPLOAD_YES', true);
-define('TEST_UPLOAD_NO',  false);
-define('TEST_PLAYLIST_YES', true);
-define('TEST_PLAYLIST_NO', false);
-define('TEST_OWNER_YES',   true);
-define('TEST_OWNER_NO', false);
+if( !defined('TEST_UPLOAD_YES') ) {
+    define('TEST_UPLOAD_YES', true);
+    define('TEST_UPLOAD_NO',  false);
+    define('TEST_PLAYLIST_YES', true);
+    define('TEST_PLAYLIST_NO', false);
+    define('TEST_OWNER_YES',   true);
+    define('TEST_OWNER_NO', false);
+}
 
 /**
 *
@@ -44,41 +46,6 @@ class CCPlaylists
 {
     function OnMapUrls()
     {
-        /* new API */
-
-        CCEvents::MapUrl( ccp('api','playlist','create'),
-            array( 'CCPlaylists', 'APICreatePlaylist'),   CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
-            '', _('Create a new playlist'), CC_AG_PLAYLIST );
-    
-        CCEvents::MapUrl( ccp('api','playlist','create','dynamic'),
-            array( 'CCPlaylists', 'APICreateDynamic'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__) ,
-            '', _('Create a new dynamic playlist (ajax api)'), CC_AG_PLAYLIST );
-
-        CCEvents::MapUrl( ccp('api','playlist','delete'),
-            array( 'CCPlaylists', 'APIDelete'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
-            '{playlist_id}', _('Delete playlist'), CC_AG_PLAYLIST );
-
-        CCEvents::MapUrl( ccp('api','playlist','update'),
-            array( 'CCPlaylists', 'APIUpdate'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
-            '{playlist_id}', _('Update playlist field'), CC_AG_PLAYLIST );
-
-        CCEvents::MapUrl( ccp('api','playlist','update','dynamic'),
-            array( 'CCPlaylists', 'APIUpdateDynamic'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
-            '{playlist_id}', _('Update playlist dynamic query field'), CC_AG_PLAYLIST );
-
-
-        CCEvents::MapUrl( ccp('api','playlist','reorder'),
-            array( 'CCPlaylists', 'APIReorder'),     CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
-            '{playlist_id}', _('Reorder playlist tracks'), CC_AG_PLAYLIST );
-
-        CCEvents::MapUrl( ccp('api','playlist','removetrack'),
-            array( 'CCPlaylists', 'APIRemove'),  CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
-             '{upload_id},{playlist_id}', _('Remove upload from playlist'), CC_AG_PLAYLIST );
-    
-        CCEvents::MapUrl( ccp('api','playlist','feature'),
-            array( 'CCPlaylists', 'APIFeature'),  CC_ADMIN_ONLY,   ccs(__FILE__),
-             '{playlist_id}', _('toggle feature status of playlist'), CC_AG_PLAYLIST );
-
         /* legacy */
 
         CCEvents::MapUrl( ccp('api','playlist','add'),
@@ -161,104 +128,6 @@ class CCPlaylists
             array( 'CCPlaylists', 'GetFavorite'),  CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
              '', _(''), CC_AG_deprecated );
 
-    }
-
-
-    function APICreatePlaylist() {
-        $msg = '';
-        $playlist =& $this->_new_pl('',$msg);
-        CCUtil::ReturnAjaxObj($playlist);
-    }
-
-    function APICreateDynamic()
-    {
-        $qstring  = $this->_serializeQueryString();
-        $new_name = $_REQUEST['title'];
-        $tags     = empty($_REQUEST['tags']) ? '' : $_REQUEST['tags'];
-        $row      = $this->_create_playlist('playlist',$new_name,'',0,$qstring,$tags);
-        
-        CCUtil::ReturnAjaxObj($row);        
-    }
-
-    function APIUpdateDynamic($playlist_id) 
-    {
-        $this->_test_pl(0,$playlist_id, TEST_UPLOAD_NO, TEST_PLAYLIST_YES, TEST_OWNER_YES);
-        $string = $this->_serializeQueryString();
-        $carts  =& CCPlaylist::GetTable();
-        $values = array( 'cart_id' => $playlist_id, 
-                         'cart_dynamic' => $string );
-        $carts->Update($values);
-        $status = array( 'status' => 'ok' );
-        CCUtil::ReturnAjaxObj($status);        
-    }
-
-    function APIUpdate($playlist_id)
-    {
-        $this->_test_pl(0,$playlist_id, TEST_UPLOAD_NO, TEST_PLAYLIST_YES, TEST_OWNER_YES);
-        $carts =& CCPlaylist::GetTable();
-        $values = array( 'cart_id' => $playlist_id );
-        CCUtil::Strip($_REQUEST);
-        if( !empty($_REQUEST['name'] ) ) {
-            $values['cart_name'] = substr($_REQUEST['name'],0,60);
-        }
-        if( !empty($_REQUEST['tags'] ) ) {
-            $values['cart_tags'] = $_REQUEST['tags'];
-        }
-        if( !empty($_REQUEST['description'] ) ) {
-            $values['cart_desc'] = $_REQUEST['description'];
-        }
-        $carts->Update($values);
-
-        require_once('cchost_lib/cc-query.php');
-        $query = new CCQuery();
-        $args = $query->ProcessAdminArgs('f=js&dataview=playlist_head&ids='.$playlist_id);
-        $query->Query($args);
-    }
-
-    function APIFeature($playlist_id) 
-    {
-        $status = array();
-        $status['status'] = 'invalid user';
-        if( CCUser::IsAdmin() )
-        {
-            $this->_test_pl(0,$playlist_id, TEST_UPLOAD_NO, TEST_PLAYLIST_YES, TEST_OWNER_NO);
-            $carts =& CCPlaylist::GetTable();
-            $sub_type = $carts->QueryItemFromKey('cart_subtype', $playlist_id); 
-            $w['cart_id'] = $playlist_id;
-            if( $sub_type == 'featured') {
-                $w['cart_subtype'] = '';
-            } else {
-                $w['cart_subtype'] = 'featured';
-            }
-            $carts->Update($w);
-            $status['status'] = 'ok';
-        }
-        CCUtil::ReturnAjaxObj($status);        
-    }
-
-    function APIDelete($playlist_id)
-    {
-        $this->_test_pl(0,$playlist_id, TEST_UPLOAD_NO, TEST_PLAYLIST_YES, TEST_OWNER_YES);
-        $this->_empty_playlist($playlist_id);
-        $carts =& CCPlaylist::GetTable();
-        $carts->DeleteKey($playlist_id);
-        $status = array( 'status' => 'ok' );
-        CCUtil::ReturnAjaxObj($status);        
-    }
-
-    function APIReorder($playlist_id)
-    {
-        $this->_test_pl(0,$playlist_id, TEST_UPLOAD_NO, TEST_PLAYLIST_YES, TEST_OWNER_YES);
-        $this->_perform_reorder($playlist_id);        
-        $status = array( 'status' => 'ok' );
-        CCUtil::ReturnAjaxObj($status);        
-    }
-
-    function APIRemove($upload_id='',$playlist_id='')
-    {
-        $this->_remove_track($upload_id,$playlist_id);
-        $status = array( 'status' => 'ok' );
-        CCUtil::ReturnAjaxObj($status);        
     }
 
     /*
@@ -718,149 +587,5 @@ EOF;
     }
 
 
-    /**
-    * Event hander for {@link CC_EVENT_DELETE_UPLOAD}
-    * 
-    * @param array $record Upload database record
-    */
-    function OnUploadDelete(&$record)
-    {
-        $sql =<<<EOF
-            SELECT cart_item_cart
-            FROM cc_tbl_cart_items
-            WHERE cart_item_upload = {$record['upload_id']}
-EOF;
-        $carts = CCDatabase::QueryItems($sql);
-        if( !empty($carts) )
-        {
-            $cart_set = join(',',$carts);
-            $sql =<<<EOF
-                UPDATE cc_tbl_cart 
-                SET cart_num_items = cart_num_items-1
-                WHERE cart_id IN ({$cart_set})
-EOF;
-            CCDatabase::Query($sql);
-            $sql =<<<EOF
-                DELETE FROM cc_tbl_cart_items
-                WHERE cart_item_upload = {$record['upload_id']}
-EOF;
-            CCDatabase::Query($sql);
-        }
-    }
 }
-
-/*
-    function _get_playlist_info($playlist_id,$is_popup=false)
-    {
-        $carts = new CCPlaylist(true);
-        $args['playlist'] = $carts->QueryKeyRow($playlist_id);
-        if( empty($args['playlist']) )
-            return null;
-        $args['playlist']['artist_page_url'] = ccl('people',$args['playlist']['user_name']);
-        if( $args['playlist']['cart_dynamic'] || ($args['playlist']['cart_subtype'] == 'default') )
-        {
-            require_once('cchost_lib/cc-query.php');
-            $query = new CCQuery();
-            if( $args['playlist']['cart_subtype'] == 'default' )
-                $qstring = $query->ProcessUriArgs(array('format' => 'playlist'));
-            else
-                $qstring = $args['playlist']['cart_dynamic'];
-            $qargs = $query->ProcessAdminArgs($qstring,array('format'=>'php'),false);
-            list( $args['records'] ) = $query->Query($qargs);
-            $args['feed_q'] = url_args( ccl('api','query'), $qstring . '&f=rss' );
-        }
-        else
-        {
-
-            $purl = ccl('files') . '/';
-            $ccp = ccl('people') . '/';
-            $sql =<<<EOF
-                SELECT upload_name, user_name, user_real_name, upload_id, upload_contest,
-                  CONCAT('$ccp',user_name) as artist_page_url ,
-                  CONCAT('$purl',user_name,'/',upload_id) as file_page_url
-                  FROM cc_tbl_cart_items
-                  JOIN cc_tbl_uploads on cart_item_upload = upload_id
-                  JOIN cc_tbl_user ON upload_user = user_id 
-                  WHERE cart_item_cart = $playlist_id
-                  ORDER BY cart_item_order ASC
-EOF;
-
-            $args['records'] =& CCDatabase::QueryRows($sql);
-            $args['feed_q'] = url_args( ccl('api','query'), 'f=rss&playlist=' . $playlist_id );
-        }
-        $dv = new CCDataView();
-        $filters = array( 'e' => array( CC_EVENT_FILTER_FILES, CC_EVENT_FILTER_DOWNLOAD_URL, CC_EVENT_FILTER_PLAY_URL ) ); // sic
-        $dv->FilterRecords($args['records'],$filters);
-        return $this->_add_menu($args,$playlist_id,$is_popup);
-    }
-
-    function _get_default_playlist($id_only=false)
-    {
-        $ccp = ccl('people');
-
-        $cart_fields =<<<EOF
-cc_tbl_cart.*, user_real_name,
-                  CONCAT('$ccp','/',user_name) as artist_page_url,
-                  DATE_FORMAT(cart_date, '%W, %M %e, %Y @ %l:%i %p') as cart_date_format
-EOF;
-
-        if( $id_only )
-        {
-            $sql =<<<EOF
-                SELECT cart_id
-                  FROM cc_tbl_cart
-                  JOIN cc_tbl_user ON cart_user = user_id 
-                  WHERE cart_type = 'playlist' AND cart_subtype = 'default'
-                  LIMIT 1
-EOF;
-            $id = CCDatabase::QueryItem($sql);
-            return $id;
-        }
-        else
-        {
-            $sql =<<<EOF
-                SELECT {$cart_fields}
-                  FROM cc_tbl_cart
-                  JOIN cc_tbl_user ON cart_user = user_id 
-                  WHERE cart_type = 'playlist' AND cart_subtype = 'default'
-                  LIMIT 1
-EOF;
-            $row = CCDatabase::QueryRow($sql);
-            if( $row )
-                return $row;
-
-        }
-
-        // find an admin
-        $users =& CCUsers::GetTable();
-        $w2['user_name'] = 'admin';
-        $admin_id = $users->QueryKey($w2);
-        if( empty($admin_id) )
-        {
-            $config =& CCConfigs::GetTable();
-            $settings = $config->GetConfig('settings');
-            $admins = preg_split('/(\W|,)/', $settings['admins'] );
-            $w2['user_name'] = $admins[0];
-            $admin_id = $users->QueryKey($w2);
-            if( empty($admin_id) )
-                CCUtil::Send404();
-        }
-    
-        $newrow = $this->_create_playlist('default','str_pl_dynamic_playlist','',$admin_id);
-
-        if( $id_only )
-            return $new_row['cart_id'];
-
-        $sql =<<<EOF
-            SELECT {$cart_fields}
-              FROM cc_tbl_cart
-              JOIN cc_tbl_user ON cart_user = user_id 
-              WHERE cart_id = {$newrow['cart_id']}
-              LIMIT 1
-EOF;
-        $row = CCDatabase::QueryRow($sql);
-        return $row;
-    }
-
-*/
 ?>
