@@ -125,7 +125,7 @@ CCConfigs::Init();
 *  disable the site while doing other work (like a SVN 
 *  update)
 */
-if( file_exists('ccadmin') )
+if( ($_SERVER['HTTP_HOST'] !== 'ccm') && file_exists('ccadmin') )
 {
     die('<html><body>' . _('ccHost installation is not complete.') . ' ' . 
         _('For security reasons, you should rename "ccadmin".') .  

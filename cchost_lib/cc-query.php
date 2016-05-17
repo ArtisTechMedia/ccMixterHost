@@ -388,7 +388,7 @@ class CCQuery
                        $dv_name = 'count_pool_items';
                     else if( $A['datasource'] == 'user' )
                         $dv_name = 'count_users';
-                    else if( $A['datasource'] == 'cart' ) {
+                    else if( in_array($A['datasource'], array('cart','feed') ) ) {
                         $dv_name = $A['dataview'];
                         $A['rettype'] = CCDV_RET_COUNT;
                     }

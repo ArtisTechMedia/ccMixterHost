@@ -54,13 +54,22 @@ class CCFeedTable extends CCTable
         $id = $this->NextID();
         $where = array(
                 'feed_id'   => $id,
-                'feed_user' => $user_id,
+                'feed_user' => (int)$user_id,
                 'feed_type' => $type,
-                'feed_key'  => $foreign_key,
+                'feed_key'  => (int)$foreign_key,
                 'feed_date' => $date
             );
         $this->Insert($where);
         return $id;
+    }
+
+    function HasItem($user_id,$type,$foreign_key) {
+        $where = array(
+                'feed_user' => (int)$user_id,
+                'feed_type' => $type,
+                'feed_key'  => (int)$foreign_key,
+            );
+        return (int)$this->CountRows($where) > 0;
     }
 
     function MarkAsSticky($feed_id,$sticky=true) {

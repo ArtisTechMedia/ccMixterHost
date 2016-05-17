@@ -24,9 +24,18 @@ class CCEventsFeed
         if( !empty($args['datasource']) && $args['datasource'] === 'feed')
         {
             $lib = new CCLibFeed();
-            $lib->PrePopulate(empty($args['user']) ? null : $args['user']);
             $sticky = empty($args['sticky']) ? 0 : 1;
+            if( !$sticky ) {
+                if( empty($args['user']) ) {
+                    $queryObj->dead = true;
+                    return;
+                }
+                $lib->PrePopulate($args['user']);
+            }
             $queryObj->where[] = "feed_sticky = {$sticky}";
+            if( !empty($args['unseen']) ) {
+                $queryObj->where[] = "feed_seen = 0";
+            }
         }
     }
 

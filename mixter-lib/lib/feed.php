@@ -62,27 +62,30 @@ class CCLibFeed
       return $status;
     }
 
-    $followers  = $status->data;
-    $parent_ids = empty($parents)
+    $followers  = array_map( CCUser::IDForName, $status->data );
+    $parent_owners = empty($parents)
                     ? array()
-                    : array_map(function($u) { return $u['upload_id']; }, $parents);
+                    : array_unique(array_map(function($u) { return $u['upload_user']; }, $parents));
 
     $table =& CCFeedTable::GetTable(); 
-    foreach ($followers as $follower) { 
+
+    foreach ($followers as $user_id) { 
+        if( in_array($user_id, $parent_owners) ) {
+            continue;
+        }
+        $type = '';
         if( $op === CC_UF_NEW_UPLOAD ) {
-            if( in_array($upload_id, $parent_ids) ) {
-                continue;
-            }
-            $user_id = CCUser::IDForName($follower);
-            $table->AddItem($user_id,FEED_TYPE_FOLLOWER_UPLOAD,$upload_id);
+            $type = FEED_TYPE_FOLLOWER_UPLOAD;
         } else if( $op === CC_UF_FILE_ADD || $op === CC_UF_FILE_REPLACE ) {
-            $user_id = CCUser::IDForName($follower);
-            $table->AddItem($user_id,FEED_TYPE_FOLLOWER_UPDATE,$upload_id);
+            $type = FEED_TYPE_FOLLOWER_UPDATE;
+        }
+        if( $type ) {
+          $table->AddItem($user_id,$type,$upload_id);
         }
 
     }
-    foreach ($parents as $parent ) {
-        $table->AddItem($parent['upload_user'],FEED_TYPE_REMIXED);
+    foreach ($parent_owners as $remixee ) {
+        $table->AddItem($remixee,FEED_TYPE_REMIXED);
     }
     return _make_ok_status();
   }
@@ -90,9 +93,11 @@ class CCLibFeed
   function _feed_preload ($sql,$table,$userid,$sticky=false) {
     $rows = CCDatabase::QueryRows($sql);
     foreach( $rows as $R ) {
-      $id = $table->AddItem($userid,$R['type'],$R['id'],$R['date']);
-      if( $sticky ) {
-        $table->MarkAsSticky($id,$sticky);
+      if( !$table->HasItem($userid,$R['type'],$R['id']) ) {
+        $id = $table->AddItem($userid,$R['type'],$R['id'],$R['date']);
+        if( $sticky ) {
+          $table->MarkAsSticky($id,$sticky);
+        }
       }
     }
   }
@@ -144,7 +149,7 @@ EOF;
     $this->_admin_feed_preload($table);
 
     $crows = (int)$table->CountRows(array('feed_user' => $userid));
-    if( !empty( $crows ) ) {
+    if( $crows > 5 ) {
       return;
     }
 
@@ -158,7 +163,7 @@ EOF;
       $favs = array_map(function($f) { return "'{$f}'"; }, $favs);
       $favs = implode(',', $favs);
       $sql =<<<EOF
-        SELECT upload_id as id, upload_date as date, 'fup' as type
+        SELECT upload_id as id, upload_date as date, 'fol' as type
           FROM cc_tbl_uploads
           JOIN cc_tbl_user ON upload_user=user_id
           WHERE user_name IN ({$favs})
