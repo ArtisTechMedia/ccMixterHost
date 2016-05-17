@@ -8,13 +8,15 @@
 if( !defined('IN_CC_HOST') )
    die('Welcome to CC Host');
 
-define('FEED_TYPE_FOLLOWER_UPLOAD', 'fup'); // upload_id
+define('FEED_TYPE_FOLLOWER_UPLOAD', 'fol'); // upload_id
+define('FEED_TYPE_FOLLOWER_UPDATE', 'fup'); // upload_id
 define('FEED_TYPE_REVIEW',          'rev'); // topic_id
 define('FEED_TYPE_RECOMMEND',       'rec'); // ratings_id
 define('FEED_TYPE_REMIXED',         'rmx'); // upload_id
 define('FEED_TYPE_REPLY',           'rpy'); // topic_id
 define('FEED_TYPE_ADMIN_MSG',       'adm'); // topic_id
 define('FEED_TYPE_MSG',             'msg'); // topic_id
+define('FEED_TYPE_EDPICK',          'edp'); // upload_id
 
 /*
   CREATE TABLE cc_tbl_feed (
@@ -32,13 +34,13 @@ define('FEED_TYPE_MSG',             'msg'); // topic_id
 
 class CCFeedTable extends CCTable
 {
-    function CCFeedTable()
-    {
+    function CCFeedTable() {
+        global $CC_SQL_DATE;        
         $this->CCTable('cc_tbl_feed','feed_id');
+        $this->AddExtraColumn("DATE_FORMAT(feed_date, '$CC_SQL_DATE') as feed_date_format");
     }
 
-    public static function & GetTable()
-    {
+    public static function & GetTable() {
         static $_table;
         if( !isset($_table) )
             $_table = new CCFeedTable();
@@ -49,13 +51,21 @@ class CCFeedTable extends CCTable
         if( empty($date) ) {
             $date = date( 'Y-m-d H:i:s' );
         }
+        $id = $this->NextID();
         $where = array(
+                'feed_id'   => $id,
                 'feed_user' => $user_id,
                 'feed_type' => $type,
                 'feed_key'  => $foreign_key,
                 'feed_date' => $date
             );
         $this->Insert($where);
+        return $id;
+    }
+
+    function MarkAsSticky($feed_id,$sticky=true) {
+        $flds =array( 'feed_id' => $feed_id, 'feed_sticky' => $sticky ? 1 : 0 );
+        $this->Update($flds);        
     }
 
     function MarkAsSeen($feed_id) {

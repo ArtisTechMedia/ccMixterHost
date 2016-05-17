@@ -30,12 +30,6 @@ if( !defined('IN_CC_HOST') )
 
 require_once( 'mixter-lib/lib/status.inc' );
 
-define('USER_NOT_LOGGED_IN',    'not logged in');
-define('USER_MISSING_NAME',     'missing login name');
-define('USER_UNKNOWN_USER',     'unknown user');
-define('USER_MISSING_PASSWORD', 'missing password');
-define('USER_INVALID_PASSWORD', 'invalid password');
-
 class CCLibUser
 {
     function CurrentUser() {
@@ -83,6 +77,19 @@ class CCLibUser
         $val = serialize(array($username,$password));
         cc_setcookie(CC_USER_COOKIE,$val,$time);
         return _make_ok_status();
+    }
+
+    function Followers($useridOrName='') {
+        if( empty($useridOrName) ) {
+            $username = CCUser::CurrentUserName();
+        } else {
+            $username = CCUser::NameForID($useridOrName);
+        }
+        if( empty($username) ) {
+            return _make_err_status(USER_UNKNOWN_USER);
+        }
+        $followers = CCDatabase::Query( "SELECT user_name FROM cc_tbl_user WHERE LOWER(CONCAT(',',user_favorites,',')) LIKE LOWER('%,{$username},%')" );
+        return _make_ok_status($followers);
     }
 
 }

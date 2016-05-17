@@ -79,9 +79,11 @@ class CCReviewFormAPI
 
         require_once('cchost_lib/ccextras/cc-reviews.inc');
 
-        list( $user_real_name, $upload_name, $user_name ) = CCDatabase::QueryRow(
-            'SELECT user_real_name, upload_name, user_name FROM cc_tbl_uploads JOIN cc_tbl_user ON upload_user=user_id WHERE upload_id='
+        $upload_row = CCDatabase::QueryRow(
+            'SELECT user_real_name, upload_name, user_name, upload_user FROM cc_tbl_uploads JOIN cc_tbl_user ON upload_user=user_id WHERE upload_id='
             . $upload_id, false);
+
+        list( $user_real_name, $upload_name, $user_name, $upload_user ) = $upload_row;
 
         if( empty($_POST['review']) || !$form->ValidateFields() )
         {
@@ -137,7 +139,7 @@ class CCReviewFormAPI
                     $row['user_real_name'] = $user_real;
                     $row['topic_permalink'] = ccl('reviews',$user_name, $upload_id ) . '#' . $values['topic_id'];
 
-                    CCEvents::Invoke( CC_EVENT_REVIEW, array( &$row ) );
+                    CCEvents::Invoke( CC_EVENT_REVIEW, array( &$row, &$upload_row ) );
                 
                     if( empty($_GET['ajax']) )
                     {

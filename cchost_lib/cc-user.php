@@ -124,8 +124,10 @@ class CCUser
         }
     }
 
+    // N.B. we don't validate if the argument is valid if it's already
+    // numeric (and I'm too afraid to change this behavoir at this point)
     public static function IDFromName($username_or_id)
-    {
+    {        
         if( (int)$username_or_id > 0 ) {
             return $username_or_id;
         }
@@ -134,6 +136,21 @@ class CCUser
                   strtolower($username_or_id) . '\'' );
     }
 
+    public static function NameForID($username_or_id)
+    {
+        if( empty($username_or_id) ) {
+            return null;
+        }
+        if( (int)$username_or_id > 0 ) {
+            $sql = 'SELECT user_name FROM cc_tbl_user WHERE user_id = ' . $username_or_id;
+        } else {
+            $sql = 'SELECT user_name FROM cc_tbl_user WHERE LOWER(user_name) = \'' .
+                 strtolower($username_or_id) . '\'';
+        }
+
+        return CCDatabase::QueryItem($sql);
+    }
+    
     /**
     * Digs around the cookies looking for an auto-login. If succeeds, populate CC_GLOBALS with user data
     */

@@ -4,18 +4,124 @@ require_once('mixter-lib/lib/feed-table.php');
 require_once('mixter-lib/lib/status.inc');
 
 
-function _feed_preload($sql,$table,$userid) {
-  $rows = CCDatabase::QueryRows($sql);
-  foreach( $rows as $R ) {
-    $table->AddItem($userid,$R['type'],$R['id'],$R['date']);
-  }
-}
+define('ADMIN_ID', 1);
+define('ADMIN_FORUM', 1);
+
+define('FEED_INVALID_ID', 'invalid feed id');
 
 class CCLibFeed
 {
-  function APIFeed($username='') {
+  function CCLibFeed() {
+  }
 
+  function MarkItemAsSeen($feed_id) {
+    $table =& CCFeedTable::GetTable(); 
+    if( empty($feed_id) || !$table->KeyExists($feed_id) ) {
+      return _make_err_status(FEED_INVALID_ID);
+    } 
+    $user = $table->QueryItemFromKey('feed_user',$feed_id);
+    if( $user != CCUser::CurrentUser() ) {
+      return _make_err_status(USER_UNKNOWN_USER);
+    }
+    $table->MarkAsSeen($feed_id);
+    return _make_ok_status();    
+  }
 
+  function AddEdPick($upload_id) {
+    $table =& CCFeedTable::GetTable(); 
+    $table->AddItem(ADMIN_ID,FEED_TYPE_EDPICK,$upload_id,true);
+    return _make_ok_status();
+  }
+
+  function AddRecommends($user_id, $ratings_id) {
+    $table =& CCFeedTable::GetTable(); 
+    $table->AddItem($user_id,FEED_TYPE_RECOMMEND,$ratings_id);
+    return _make_ok_status();    
+  }
+
+  function AddReview($user_id,$review_topic_id) {
+    $table =& CCFeedTable::GetTable(); 
+    $table->AddItem($user_id,FEED_TYPE_REVIEW,$review_topic_id);
+    return _make_ok_status();        
+  }
+
+  function AddAdminMessage($topic_id) {
+    $table =& CCFeedTable::GetTable(); 
+    $table->AddItem(ADMIN_ID,FEED_TYPE_ADMIN_MSG,$topic_id,true);
+    return _make_ok_status();    
+  }
+
+  function AddItemsBasedOnUpload($upload_id,$op,$parents) {
+    require_once('mixter-lib/lib/user.php');
+
+    $user_id    = CCDatabase::QueryItem("SELECT upload_user FROM cc_tbl_uploads WHERE upload_id={$upload_id}");
+    $userlib    = new CCLibUser();
+    $status     = $userlib->Followers($user_id);
+
+    if( !$status->ok() ) {
+      return $status;
+    }
+
+    $followers  = $status->data;
+    $parent_ids = empty($parents)
+                    ? array()
+                    : array_map(function($u) { return $u['upload_id']; }, $parents);
+
+    $table =& CCFeedTable::GetTable(); 
+    foreach ($followers as $follower) { 
+        if( $op === CC_UF_NEW_UPLOAD ) {
+            if( in_array($upload_id, $parent_ids) ) {
+                continue;
+            }
+            $user_id = CCUser::IDForName($follower);
+            $table->AddItem($user_id,FEED_TYPE_FOLLOWER_UPLOAD,$upload_id);
+        } else if( $op === CC_UF_FILE_ADD || $op === CC_UF_FILE_REPLACE ) {
+            $user_id = CCUser::IDForName($follower);
+            $table->AddItem($user_id,FEED_TYPE_FOLLOWER_UPDATE,$upload_id);
+        }
+
+    }
+    foreach ($parents as $parent ) {
+        $table->AddItem($parent['upload_user'],FEED_TYPE_REMIXED);
+    }
+    return _make_ok_status();
+  }
+
+  function _feed_preload ($sql,$table,$userid,$sticky=false) {
+    $rows = CCDatabase::QueryRows($sql);
+    foreach( $rows as $R ) {
+      $id = $table->AddItem($userid,$R['type'],$R['id'],$R['date']);
+      if( $sticky ) {
+        $table->MarkAsSticky($id,$sticky);
+      }
+    }
+  }
+
+  function _admin_feed_preload($table) {
+
+    if( empty(CCDatabase::QueryItem("SELECT COUNT(*) FROM cc_tbl_feed WHERE feed_sticky = 1")) ) {
+      $sql =<<<EOF
+        SELECT upload_id as id, upload_date as date, 'edp' as type
+          FROM cc_tbl_uploads
+          WHERE upload_tags LIKE '%,editorial_pick,%'
+          ORDER BY upload_date DESC
+          LIMIT 10
+EOF;
+      $this->_feed_preload($sql,$table,ADMIN_ID,true);
+
+      $forum = ADMIN_FORUM;
+      $sql =<<<EOF
+        SELECT topic_id as id, topic_date as date, 'adm' as type
+            FROM cc_tbl_topics
+            JOIN cc_tbl_forums ON topic_forum=forum_id
+            WHERE topic_forum = {$forum} AND 
+                  topic_name NOT LIKE '%(Reply)%'
+            ORDER BY topic_date DESC
+            LIMIT 4
+EOF;
+      $this->_feed_preload($sql,$table,ADMIN_ID,true);
+
+    }
 
   }
 
@@ -27,13 +133,24 @@ class CCLibFeed
       $username = CCUser::CurrentUserName();
     }
 
+    $username = strtolower($username);
+    $sql = "SELECT user_id, user_favorites FROM cc_tbl_user WHERE LOWER(user_name) = LOWER('{$username}')";
+    $x  =CCDatabase::QueryRow($sql);
+
+    $userid = $x['user_id'];
+
     $table =& CCFeedTable::GetTable();
 
-    $username = strtolower($username);
-    $sql = "SELECT user_id, user_favorites FROM cc_tbl_user WHERE LOWER(user_name) = '{$username}'";
-    $x  =CCDatabase::QueryRow($sql);
-    $userid = $x['user_id'];
+    $this->_admin_feed_preload($table);
+
+    $crows = (int)$table->CountRows(array('feed_user' => $userid));
+    if( !empty( $crows ) ) {
+      return;
+    }
+
+
     $current_favs = $x['user_favorites']; 
+
 
     // FAVORITES' UPLOADS
     if( !empty($current_favs) ) {
@@ -48,7 +165,7 @@ class CCLibFeed
           ORDER BY upload_date DESC
           LIMIT 10
 EOF;
-      _feed_preload($sql,$table,$userid);
+      $this->_feed_preload($sql,$table,$userid);
     }
 
     // reviews 
@@ -61,7 +178,7 @@ EOF;
         ORDER BY topic_date DESC
         LIMIT 10
 EOF;
-      _feed_preload($sql,$table,$userid);
+      $this->_feed_preload($sql,$table,$userid);
 
 
     $sql =<<<EOF
@@ -72,7 +189,7 @@ EOF;
         ORDER BY ratings_id DESC
         LIMIT 10;
 EOF;
-      _feed_preload($sql,$table,$userid);
+      $this->_feed_preload($sql,$table,$userid);
 
         $x =<<<EOF
 
@@ -88,14 +205,14 @@ EOF;
         LIMIT 10;
 
 EOF;
-    _feed_preload($sql,$table,$userid);
+    $this->_feed_preload($sql,$table,$userid);
 
     $sql =<<<EOF
       SELECT topics.topic_id as id, topics.topic_date as date, 'rpy' as type
           FROM (  SELECT topic_left, topic_right
                       FROM cc_tbl_topics
                       WHERE topic_right - topic_left > 1 AND
-                            topic_user = 9
+                            topic_user = {$userid}
                       ORDER BY topic_date DESC
                       LIMIT 3
                       ) 
@@ -107,10 +224,8 @@ EOF;
           LIMIT 10;
 EOF;
 
-    _feed_preload($sql,$table,$userid);
+    $this->_feed_preload($sql,$table,$userid);
 
-      $x = 'feed should be populated for ';
-      CCDebug::PrintV($x);
   }
 }
 ?>
