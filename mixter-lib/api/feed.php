@@ -14,28 +14,28 @@ class CCEventsFeed
 {
     function OnMapUrls()
     {
+        /*
         CCEvents::MapUrl( ccp('api','user','feed','markseen'),
             array( 'CCAPIFeed', 'APIMarkSeen'),   CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
             '', _('Mark a feed item as seen'), CC_AG_USER );
+        */
     }
 
     function OnApiQuerySetup( &$args, &$queryObj, $requiresValidation )
     {
         if( !empty($args['datasource']) && $args['datasource'] === 'feed')
         {
-            $lib = new CCLibFeed();
+            if( 0 ) {
+                $lib = new CCLibFeed();
+                $lib->PrePopulate();
+                $x = array(
+                    CCDatabase::QueryRows('select * from cc_tbl_feed_action'),
+                    CCDatabase::QueryRows('select * from cc_tbl_feed'),
+                    );
+                CCDebug::PrintV($x);
+            }
             $sticky = empty($args['sticky']) ? 0 : 1;
-            if( !$sticky ) {
-                if( empty($args['user']) ) {
-                    $queryObj->dead = true;
-                    return;
-                }
-                $lib->PrePopulate($args['user']);
-            }
-            $queryObj->where[] = "feed_sticky = {$sticky}";
-            if( !empty($args['unseen']) ) {
-                $queryObj->where[] = "feed_seen = 0";
-            }
+            $queryObj->where[] = "action_sticky = {$sticky}";
         }
     }
 
@@ -48,13 +48,13 @@ class CCEventsFeed
     function OnRated($ratingRec, $score, &$uploadRecord )
     {
         $lib = new CCLibFeed();
-        $lib->AddRecommend($uploadRecord['upload_user'],$ratingRec['ratings_id']);
+        $lib->AddRecommend($uploadRecord,$ratingRec);
     }
 
     function OnReview(&$topic,&$upload_rec)
     {
         $lib = new CCLibFeed();
-        $lib->AddReview($upload_rec['upload_user'],$topic['topic_id']);
+        $lib->AddReview($upload_rec,$topic);
     }
 
     function OnForumPost(&$topic)
@@ -80,11 +80,5 @@ class CCEventsFeed
 
 class CCAPIFeed
 {
-    function APIMarkSeen($feed_item_id) {
-        $feed_item_id = CCUtil::CleanNumber($feed_item_id);
-        $lib = new CCLibFeed();
-        $status = $lib->MarkItemAsSeen($feed_item_id);
-        CCUtil::ReturnAjaxObj($status);
-    }
 }
 ?>

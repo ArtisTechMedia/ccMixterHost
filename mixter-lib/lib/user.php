@@ -88,7 +88,7 @@ class CCLibUser
         if( empty($username) ) {
             return _make_err_status(USER_UNKNOWN_USER);
         }
-        $followers = CCDatabase::Query( "SELECT user_name FROM cc_tbl_user WHERE LOWER(CONCAT(',',user_favorites,',')) LIKE LOWER('%,{$username},%')" );
+        $followers = CCDatabase::QueryItems( "SELECT user_name FROM cc_tbl_user WHERE LOWER(CONCAT(',',user_favorites,',')) LIKE LOWER('%,{$username},%')" );
         return _make_ok_status($followers);
     }
 

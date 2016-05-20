@@ -126,7 +126,7 @@ class CCUser
 
     // N.B. we don't validate if the argument is valid if it's already
     // numeric (and I'm too afraid to change this behavoir at this point)
-    public static function IDFromName($username_or_id)
+    public static function IDForName($username_or_id)
     {        
         if( (int)$username_or_id > 0 ) {
             return $username_or_id;
@@ -150,6 +150,14 @@ class CCUser
 
         return CCDatabase::QueryItem($sql);
     }
+
+    public static function IDFromName($username_or_id) {
+        return CCUser::IDForName($username_or_id);
+    }
+    public static function NameFromID($username_or_id) {
+        return CCUser::NameForID($username_or_id);
+    }
+
     
     /**
     * Digs around the cookies looking for an auto-login. If succeeds, populate CC_GLOBALS with user data

@@ -6,111 +6,111 @@
 [/meta]
 */
 
-function userfeed_dataview() 
+/*
+
+SELECT action_actor, action_verb, action_object_type, 
+                action_sticky,  action_date,
+
+                topic_id, topic_thread, topic_user,
+                CASE feed_user
+                    WHEN 9 THEN feed_reason
+                    ELSE @FEED_REASON_FOLLOW
+                END as reason,
+                IF( action_object_type = @FEED_TYPE_FORUM_POST, topic_name, '') as topic_name,
+                CASE action_object_type
+                    WHEN @FEED_TYPE_REVIEW  THEN topic_upload
+                    WHEN @FEED_TYPE_UPLOAD  THEN action_object
+                    ELSE 0
+                END as upload_id
+
+            FROM cc_tbl_feed_action
+            LEFT JOIN cc_tbl_feed    ON action_id=feed_action
+            LEFT JOIN cc_tbl_topics  ON action_object=topic_id   AND 
+                                         action_object_type IN (@FEED_TYPE_REVIEW,@FEED_TYPE_FORUM_POST)
+            WHERE (action_sticky = 0) AND ((feed_user = '9'))             OR action_actor IN (SELECT follow_follows FROM cc_tbl_follow WHERE follow_user = 9)
+            ORDER BY action_date DESC
+            LIMIT 200 OFFSET 0;
+
+            */
+
+function userfeed_dataview($queryObj) 
 {
     global $CC_SQL_DATE;        
 
-    $feed_date_format = "DATE_FORMAT(feed_date, '$CC_SQL_DATE') as feed_date_format";
+    require_once('mixter-lib/lib/feed-types.inc');
 
-    $avatar = cc_get_user_avatar_sql( '',
-                                      'user_avatar_url',
-                                      "SUBSTRING_INDEX(SUBSTRING_INDEX(_user_info, ':', 3), ':', -1)",
-                                      "SUBSTRING_INDEX(SUBSTRING_INDEX(_user_info, ':', 2), ':', -1)"
-                                      );
+    /*
+    $actor_avatar = cc_get_user_avatar_sql('actor', 'actor_avatar_url');
+    $artist_avatar = cc_get_user_avatar_sql('artist', 'artist_avatar_url');
+    $poster_avatar = cc_get_user_avatar_sql('poster', 'poster_avatar_url');
+    */
+
+    $user_id = 0;
+    if( !empty($queryObj->args['user']) ) {
+        $user_id = CCUser::IDForName($queryObj->args['user']);
+        $followers =<<<EOF
+            OR action_actor IN (SELECT follow_follows FROM cc_tbl_follow WHERE follow_user = {$user_id})
+EOF;
+    }
+
+    CCDatabase::Query('SELECT @FEED_REASON_FOLLOW := 5, @FEED_TYPE_UPLOAD := 1, @FEED_TYPE_REVIEW := 2, @FEED_TYPE_FORUM_POST := 3;');
 
     $sql =<<<EOF
+    SELECT action_verb        as verb, 
+            action_object_type as objtype, 
+            action_sticky      as sticky,
+            reason,
+            CASE action_object_type
+                WHEN @FEED_TYPE_FORUM_POST  THEN topic_name
+                WHEN @FEED_TYPE_UPLOAD      THEN upl.upload_name
+                WHEN @FEED_TYPE_REVIEW      THEN upl.upload_name
+                ELSE ''
+            END as name,
+            topic_id, topic_thread, _d_.upload_id,
+            DATE_FORMAT(action_date, '%W, %M %e, %Y @ %l:%i %p') as date_format,
 
-SELECT feed_id, feed_type, feed_seen, feed_sticky, item_name,
-   SUBSTRING_INDEX(SUBSTRING_INDEX(_user_info, ':', 1), ':', -1) AS user_real_name,
-   SUBSTRING_INDEX(SUBSTRING_INDEX(_user_info, ':', 2), ':', -1) AS user_name,
-   {$avatar}, {$feed_date_format}
-FROM
-  (SELECT *,
-        IF(   feed_type = 'fup' OR feed_type = 'fol' OR feed_type = 'edp', 
-                (
-                    SELECT CONCAT(user_real_name,':',user_name,':',user_image)
-                        FROM cc_tbl_uploads 
-                        JOIN cc_tbl_user ON upload_user=user_id 
-                        WHERE upload_id=feed_key
-                ),
-                IF( feed_type = 'rev' OR feed_type = 'rpy',
-                        (
-                            SELECT CONCAT(user_real_name,':',user_name,':',user_image)
-                                FROM cc_tbl_topics
-                                JOIN cc_tbl_user ON topic_user=user_id
-                                WHERE topic_id = feed_key
-                        ),
-                        IF( feed_type = 'rec',
-                            (
-                                SELECT CONCAT(user_real_name,':',user_name,':',user_image)
-                                    FROM cc_tbl_ratings
-                                    JOIN cc_tbl_user ON ratings_user=user_id
-                                    WHERE ratings_id = feed_key
-                            ),
-                            IF( feed_type = 'rmx', 
-                                (
-                                    SELECT CONCAT(user_real_name,':',user_name,':',user_image)
-                                        FROM cc_tbl_tree
-                                        JOIN cc_tbl_uploads ON tree_child=upload_id
-                                        JOIN cc_tbl_user ON upload_user=user_id
-                                        WHERE tree_id = feed_key
-                                ),
-                                ''
-                            )
-                        )
-                    )
-                
-            ) AS _user_info,
-        IF(feed_type = 'fup' OR feed_type = 'fol' OR feed_type = 'edp', 
-                (
-                    SELECT upload_name
-                        FROM cc_tbl_uploads 
-                        WHERE upload_id=feed_key
-                ),
-                IF(feed_type = 'rev',
-                        (
-                            SELECT upload_name
-                                FROM cc_tbl_topics
-                                JOIN cc_tbl_uploads ON topic_upload=upload_id
-                                WHERE topic_id = feed_key
-                        ),
-                        IF( feed_type = 'rec',
-                            (
-                                SELECT upload_name 
-                                    FROM cc_tbl_ratings
-                                    JOIN cc_tbl_uploads ON ratings_upload=upload_id
-                                    WHERE ratings_id = feed_key
-                            ),
-                            IF( feed_type = 'rmx', 
-                                (
-                                    SELECT upload_name
-                                        FROM cc_tbl_tree
-                                        JOIN cc_tbl_uploads ON tree_parent=upload_id
-                                        WHERE tree_id = feed_key
-                                ),
-                                IF( feed_type = 'adm',
-                                    (
-                                        SELECT topic_name
-                                            FROM cc_tbl_topics
-                                            WHERE topic_id = feed_key
-                                    ),
-                                    ''
-                                )
-                            )
-                        )
-                    )
-            ) AS item_name
-        FROM cc_tbl_feed 
-        %where%
-        ORDER BY feed_date DESC
-        %limit%
-        ) AS _fun_fun;
+            actor.user_name      as actor_user_name,
+            actor.user_real_name as actor_real_name,
+
+            artist.user_name      as user_name,
+            artist.user_real_name as user_real_name
+
+        FROM (
+
+         SELECT action_actor, action_verb, action_object_type, 
+                action_sticky,  action_date,
+
+                topic_id, topic_thread, topic_user,
+                CASE feed_user
+                    WHEN {$user_id} THEN feed_reason
+                    ELSE @FEED_REASON_FOLLOW
+                END as reason,
+                IF( action_object_type = @FEED_TYPE_FORUM_POST, topic_name, '') as topic_name,
+                CASE action_object_type
+                    WHEN @FEED_TYPE_REVIEW  THEN topic_upload
+                    WHEN @FEED_TYPE_UPLOAD  THEN action_object
+                    ELSE 0
+                END as upload_id
+
+            FROM cc_tbl_feed_action
+            LEFT JOIN cc_tbl_feed    ON action_id=feed_action
+            LEFT JOIN cc_tbl_topics  ON action_object=topic_id   AND 
+                                         action_object_type IN (@FEED_TYPE_REVIEW,@FEED_TYPE_FORUM_POST)
+            %where% ${followers}
+            ORDER BY action_date DESC
+            %limit%
+
+        ) as _d_
+             JOIN cc_tbl_user    actor    ON action_actor    = actor.user_id
+        LEFT JOIN cc_tbl_uploads upl      ON _d_.upload_id   = upl.upload_id 
+        LEFT JOIN cc_tbl_user    artist   ON upl.upload_user = artist.user_id
 EOF;
 
     $sql_count =<<<EOF
     SELECT COUNT(*) 
-FROM cc_tbl_feed
-%where%
+        FROM cc_tbl_feed_action
+            LEFT JOIN cc_tbl_feed ON action_id=feed_action
+        %where% ${followers}
 EOF;
 
     return array( 'sql' => $sql,
