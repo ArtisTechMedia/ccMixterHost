@@ -79,19 +79,60 @@ class CCLibFeed
     return _make_ok_status();        
   }
 
-  function AddAdminMessage($topic_id) {
-    $table =& CCFeedTable::GetTable(); 
-    $table->AddItem(ADMIN_ID,FEED_TYPE_ADMIN_MSG,$topic_id,true);
+  function AddAdminMessage($topic) {
+    $actions =& CCFeedActionTable::GetTable(); 
+    $where = array(
+        'action_actor' => ADMIN_ID,
+        'action_verb'  => FEED_VERB_FORUM_POST,
+        'action_object' => $topic['topic_id'],
+        'action_object_type' => FEED_TYPE_FORUM_POST,
+        'action_sticky' => 1
+      );    
+    $action = $actions->AddAction($where);
     return _make_ok_status();    
   }
 
-  function AddTopicReply($user_id,$topic_id) {
+  function AddTopicReply($original,$topic) {
+
     require_once('cchost_lib/ccextras/cc-topics.inc');
+    $posters = array();
+    $top =& $original;
     $topics =& CCTopics::GetTable();
-    $reply = $topics->QueryKeyRow($topic_id);
-    $type = $reply['topic_thread'] ? FEED_TYPE_REPLY : FEED_TYPE_REPLY_REV;
-    $table =& CCFeedTable::GetTable(); 
-    $table->AddItem($user_id,$type,$topic_id,true);
+    while( $top )
+    {
+      if( ($top['topic_user'] != $topic['topic_user']) )
+          $posters[] = $top['topic_user'];
+
+      if( $top['topic_type'] != 'reply' )
+          break;
+
+      list( $parent_id ) = $topics->GetParentTopic($top['topic_id']);
+      if( empty($parent_id) )
+          break;
+
+      $row = $topics->QueryKeyRow($parent_id);
+      $top =& $row;
+    }
+
+    $actions =& CCFeedActionTable::GetTable(); 
+    $where = array(
+        'action_actor' => $topic['topic_user'],
+        'action_verb'  => FEED_VERB_TOPIC_REPLY,
+        'action_object' => $topic['topic_id'],
+        'action_object_type' => $top['topic_type'] == 'review' ? FEED_TYPE_REVIEW : FEED_TYPE_FORUM_POST,
+      );    
+    $action = $actions->AddAction($where);
+
+    $feed =& CCFeedTable::GetTable();
+    foreach ($posters as $poster) {
+      $where = array(
+          'feed_action' => $action,
+          'feed_user'   => $poster,
+          'feed_reason' => FEED_REASON_REPLIED
+        );
+      $feed->AddItem($where);      
+    }
+
     return _make_ok_status(); 
   }
 
@@ -139,17 +180,6 @@ class CCLibFeed
     }
     
     return _make_ok_status();
-  }
-
-  function _get_followers($user_id) {
-    // Get followers of this uploaders
-    require_once('mixter-lib/lib/user.php');
-    $userlib    = new CCLibUser();
-    $status     = $userlib->Followers($user_id);
-    if( !$status->ok() ) {
-      return array();
-    }
-    return array_map( function($i) { return CCUser::IDFromName($i); }, $status->data );
   }
 
   function PrePopulate() {

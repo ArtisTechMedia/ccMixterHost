@@ -322,14 +322,17 @@ class CCTopics extends CCTable
     // helper
     function GetParentTopic($topic_id)
     {
-        // I think this is how to get the immediate parent
+        /*
+            topicA 10 15
+                -> TopicAReply1 11 12
+                -> TopicAReply2 13 14
+        */
         list( $left, $right ) = CCDatabase::QueryRow('SELECT topic_left,topic_right FROM cc_tbl_topics WHERE topic_id='.$topic_id,false);
         if( empty($left) || empty($right) ) // orphaned topic
             return array( 0, 0, 0 );
         $sql = "SELECT topic_id FROM cc_tbl_topics WHERE topic_left < $left AND topic_right > $right ORDER BY topic_left DESC LIMIT 1";
         return array( CCDatabase::QueryItem($sql), $left, $right );
     }
-
 
 }
 

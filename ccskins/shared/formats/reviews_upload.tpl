@@ -5,7 +5,6 @@
     datasource    = topics
     dataview      = reviews_upload
     embedded      = 1
-    valid_args    = match
     required_args = match
 [/meta]
 [dataview]

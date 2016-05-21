@@ -61,20 +61,20 @@ class CCEventsFeed
     {
         if( !empty($topic['topic_forum']) &&  $topic['topic_forum'] == ADMIN_FORUM ) {
             $lib = new CCLibFeed();
-            $lib->AddAdminMessage($topic['topic_id']);
+            $lib->AddAdminMessage($topic);
         }
     }
 
     function OnTopicReply(&$replyTopic,&$originalTopic)
     {
         $lib = new CCLibFeed();
-        $lib->AddTopicReply($originalTopic['topic_user'],$replyTopic['topic_id']);
+        $lib->AddTopicReply($originalTopic,$replyTopic);
     }
 
     function OnUploadDone($upload_id,$op,$parents)
     {
         $lib = new CCLibFeed();
-        $lib->AddItemsBasedOnUpload($upload_id,$op,$parents);
+        $lib->AddUpload($upload_id,$op,$parents);
     }
 }
 

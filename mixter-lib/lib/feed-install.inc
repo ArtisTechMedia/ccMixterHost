@@ -11,13 +11,11 @@ select concat("'",replace(user_favorites,",","','" ),"'") as str
 */
 function UserFeedPrePopulate($lib) {
 
-
   CCDatabase::Query('LOCK TABLES cc_tbl_follow WRITE, cc_tbl_feed WRITE, cc_tbl_feed_action WRITE, cc_tbl_user READ, cc_tbl_uploads READ, cc_tbl_ratings READ, cc_tbl_tree READ, cc_tbl_topics READ');
 
   CCDatabase::Query('TRUNCATE TABLE cc_tbl_follow');
   CCDatabase::Query('TRUNCATE TABLE cc_tbl_feed');
   CCDatabase::Query('TRUNCATE TABLE cc_tbl_feed_action');
-
 
   $sql =<<<EOF
     SELECT user_id, CONCAT("'",replace(user_favorites,',',"','"),"'") as str FROM cc_tbl_user WHERE user_favorites > '';
@@ -31,6 +29,36 @@ EOF;
           WHERE user_name IN ({$row['str']})
 EOF;
     CCDatabase::Query($sql);
+  }
+
+  $sql =<<<EOF
+    SELECT * FROM cc_tbl_topics WHERE topic_type = 'reply' ORDER BY topic_date DESC LIMIT 100;
+EOF;
+  $topics = CCDatabase::QueryRows($sql);
+  require_once('cchost_lib/ccextras/cc-topics.inc');
+  $topix =& CCTopics::GetTable();
+  foreach ($topics as $topic) {
+    list( $parent_id ) = $topix->GetParentTopic($topic['topic_id']);
+    $parent = $topix->QueryKeyRow($parent_id);
+    $lib->AddTopicReply($parent,$topic);
+  }
+
+
+  $sql =<<<EOF
+    SELECT upload_id FROM cc_tbl_uploads WHERE upload_tags LIKE '%,editorial_pick,%' ORDER BY upload_date LIMIT 10;
+EOF;
+  $upload_ids = CCDatabase::QueryItems($sql);
+  foreach ($upload_ids as $upload_id) {
+    $lib->AddEdPick($upload_id);
+  }
+
+  $sql =<<<EOF
+    SELECT * FROM cc_tbl_topics WHERE topic_forum = 1 AND 
+      topic_name NOT LIKE '%(Reply)%'  ORDER BY topic_date DESC LIMIT 10;
+EOF;
+  $topics = CCDatabase::QueryRows($sql);
+  foreach ($topics as $topic) {
+    $lib->AddAdminMessage($topic);
   }
 
   $sql =<<<EOF
