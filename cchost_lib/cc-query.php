@@ -1582,6 +1582,8 @@ EOF;
         {
             if( $this->args['datasource'] == 'user' ) 
               return 'user_registered';
+            elseif( $this->args['datasource'] == 'feed' ) 
+              return 'action_date';
             elseif( $this->args['datasource'] == 'pool_items' ) 
               return 'pool_item_timestamp';
         }

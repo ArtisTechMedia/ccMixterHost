@@ -6,33 +6,6 @@
 [/meta]
 */
 
-/*
-
-SELECT action_actor, action_verb, action_object_type, 
-                action_sticky,  action_date,
-
-                topic_id, topic_thread, topic_user,
-                CASE feed_user
-                    WHEN 9 THEN feed_reason
-                    ELSE @FEED_REASON_FOLLOW
-                END as reason,
-                IF( action_object_type = @FEED_TYPE_FORUM_POST, topic_name, '') as topic_name,
-                CASE action_object_type
-                    WHEN @FEED_TYPE_REVIEW  THEN topic_upload
-                    WHEN @FEED_TYPE_UPLOAD  THEN action_object
-                    ELSE 0
-                END as upload_id
-
-            FROM cc_tbl_feed_action
-            LEFT JOIN cc_tbl_feed    ON action_id=feed_action
-            LEFT JOIN cc_tbl_topics  ON action_object=topic_id   AND 
-                                         action_object_type IN (@FEED_TYPE_REVIEW,@FEED_TYPE_FORUM_POST)
-            WHERE (action_sticky = 0) AND ((feed_user = '9'))             OR action_actor IN (SELECT follow_follows FROM cc_tbl_follow WHERE follow_user = 9)
-            ORDER BY action_date DESC
-            LIMIT 200 OFFSET 0;
-
-            */
-
 function userfeed_dataview($queryObj) 
 {
     global $CC_SQL_DATE;        
@@ -45,15 +18,10 @@ function userfeed_dataview($queryObj)
     $poster_avatar = cc_get_user_avatar_sql('poster', 'poster_avatar_url');
     */
 
-    $user_id = 0;
-    if( !empty($queryObj->args['user']) ) {
-        $user_id = CCUser::IDForName($queryObj->args['user']);
-        $followers =<<<EOF
-            OR action_actor IN (SELECT follow_follows FROM cc_tbl_follow WHERE follow_user = {$user_id})
-EOF;
-    }
+    $user_id = empty($queryObj->args['user']) ? '0' : CCUser::IDFromName($queryObj->args['user']);
 
-    CCDatabase::Query('SELECT @FEED_REASON_FOLLOW := 5, @FEED_TYPE_UPLOAD := 1, @FEED_TYPE_REVIEW := 2, @FEED_TYPE_FORUM_POST := 3;');
+
+    CCDatabase::Query("SELECT @USER_ID := {$user_id}, @FEED_REASON_FOLLOW := 5, @FEED_TYPE_UPLOAD := 1, @FEED_TYPE_REVIEW := 2, @FEED_TYPE_FORUM_POST := 3;");
 
     $sql =<<<EOF
     SELECT action_verb        as verb, 
@@ -82,7 +50,7 @@ EOF;
 
                 topic_id, topic_thread, topic_user,
                 CASE feed_user
-                    WHEN {$user_id} THEN feed_reason
+                    WHEN @USER_ID THEN feed_reason
                     ELSE @FEED_REASON_FOLLOW
                 END as reason,
                 IF( action_object_type = @FEED_TYPE_FORUM_POST, topic_name, '') as topic_name,
@@ -96,7 +64,8 @@ EOF;
             LEFT JOIN cc_tbl_feed    ON action_id=feed_action
             LEFT JOIN cc_tbl_topics  ON action_object=topic_id   AND 
                                          action_object_type IN (@FEED_TYPE_REVIEW,@FEED_TYPE_FORUM_POST)
-            %where% ${followers}
+            %joins%                                         
+            %where%
             ORDER BY action_date DESC
             %limit%
 
@@ -110,7 +79,8 @@ EOF;
     SELECT COUNT(*) 
         FROM cc_tbl_feed_action
             LEFT JOIN cc_tbl_feed ON action_id=feed_action
-        %where% ${followers}
+            %joins%
+        %where%
 EOF;
 
     return array( 'sql' => $sql,
