@@ -15,6 +15,7 @@ define('FEED_VERB_RECOMMEND',       4);
 define('FEED_VERB_TOPIC_REPLY',     5);
 define('FEED_VERB_FORUM_POST',      6);
 define('FEED_VERB_EDPICK',          7);
+define('FEED_VERB_FOLLOW',          8);
 
 define('FEED_TYPE_UPLOAD',     1);
 define('FEED_TYPE_REVIEW',     2);
