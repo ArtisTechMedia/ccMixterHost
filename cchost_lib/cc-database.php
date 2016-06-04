@@ -69,6 +69,12 @@ class CCDatabase
         
         @mysql_select_db( $config['db-name'], $link ) or die( mysql_error() );
 
+        $qr = mysql_query('SELECT @@version');
+        $r = mysql_fetch_row($qr);
+        if( preg_match('/^5\.7\./', $r[0]) ) {
+            $set = "set sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'";
+            mysql_query($set);
+        }
         return( $link );
     }
 

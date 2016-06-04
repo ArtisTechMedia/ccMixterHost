@@ -1,12 +1,8 @@
 <?
 
 /*
-SELECT user_id FROM cc_tbl_user where user_name IN (
-select concat("'",replace(user_favorites,",","','" ),"'") as str 
-  from cc_tbl_user 
-  where user_id = 9);
 
-
+  One time install of random events into feed
 
 */
 function UserFeedPrePopulate($lib) {
@@ -17,8 +13,11 @@ function UserFeedPrePopulate($lib) {
   CCDatabase::Query('TRUNCATE TABLE cc_tbl_feed');
   CCDatabase::Query('TRUNCATE TABLE cc_tbl_feed_action');
 
+  /*
+    Convert user_favorites to cc_tbl_follow
+  */
   $sql =<<<EOF
-    SELECT user_id, CONCAT("'",replace(user_favorites,',',"','"),"'") as str FROM cc_tbl_user WHERE user_favorites > '';
+    SELECT user_id, CONCAT("'",REPLACE(user_favorites,',',"','"),"'") AS str FROM cc_tbl_user WHERE user_favorites > '';
 EOF;
   $rows = CCDatabase::QueryRows($sql);
   foreach ($rows as $row) {
@@ -31,9 +30,25 @@ EOF;
     CCDatabase::Query($sql);
   }
 
-  $sql =<<<EOF
-    SELECT * FROM cc_tbl_topics WHERE topic_type = 'reply' ORDER BY topic_date DESC LIMIT 100;
-EOF;
+  /*
+    Add 'user follows other-user'
+  */
+  $sql = "SELECT DISTINCT follow_user FROM cc_tbl_follow LIMIT 30";
+  $follows = implode(',', CCDatabase::QueryItems($sql) );
+  $sql = "SELECT follow_user,follow_follows FROM cc_tbl_follow WHERE follow_user IN ({$follows}) GROUP BY follow_user";
+  $follows = CCDatabase::QueryRows($sql);
+  $count = 3;
+  foreach ($follows as $F) {
+    $d = strtotime("-${count} days");
+    $date = date( 'Y-m-d H:i:s', $d );
+    $lib->AddFollowing($F['follow_user'], $F['follow_follows'],$date);
+    ++$count;
+  }
+
+  /*
+    add topic replies
+  */
+  $sql = "SELECT * FROM cc_tbl_topics WHERE topic_type = 'reply' ORDER BY topic_date DESC LIMIT 100";
   $topics = CCDatabase::QueryRows($sql);
   require_once('cchost_lib/ccextras/cc-topics.inc');
   $topix =& CCTopics::GetTable();
@@ -43,26 +58,39 @@ EOF;
     $lib->AddTopicReply($parent,$topic);
   }
 
-
-  $sql =<<<EOF
-    SELECT upload_id FROM cc_tbl_uploads WHERE upload_tags LIKE '%,editorial_pick,%' ORDER BY upload_date LIMIT 10;
-EOF;
+  /*
+    editorial picks
+  */
+  $sql = "SELECT upload_id FROM cc_tbl_uploads WHERE upload_tags LIKE '%,editorial_pick,%' ORDER BY upload_date DESC LIMIT 10";
   $upload_ids = CCDatabase::QueryItems($sql);
   foreach ($upload_ids as $upload_id) {
     $lib->AddEdPick($upload_id);
   }
 
+  /*
+    admin announcements
+  */
   $sql =<<<EOF
-    SELECT * FROM cc_tbl_topics WHERE topic_forum = 1 AND 
-      topic_name NOT LIKE '%(Reply)%'  ORDER BY topic_date DESC LIMIT 10;
+    SELECT * FROM cc_tbl_topics 
+      WHERE topic_forum = 1 AND topic_name NOT LIKE '%(Reply)%'  
+      ORDER BY topic_date DESC 
+      LIMIT 4;
 EOF;
   $topics = CCDatabase::QueryRows($sql);
   foreach ($topics as $topic) {
     $lib->AddAdminMessage($topic);
   }
 
+  /*
+    uploads (including remixes)
+  */
+  $d = strtotime("-60 days");
+  $upload_date = date( 'Y-m-d H:i:s', $d );
   $sql =<<<EOF
-    SELECT upload_id FROM cc_tbl_uploads ORDER BY upload_date DESC LIMIT 50;
+    SELECT upload_id 
+      FROM cc_tbl_uploads 
+      WHERE upload_published > 0 AND upload_banned < 1 AND upload_date > '{$upload_date}'
+      ORDER BY upload_date DESC 
 EOF;
   $upload_ids = CCDatabase::QueryItems($sql);
   foreach ($upload_ids as $upload_id) {
@@ -76,23 +104,36 @@ EOF;
     $lib->AddUpload($upload_id,CC_UF_NEW_UPLOAD,$parents);
   }
 
+  /*
+    ratings
+  */
   $sql =<<<EOF
-    SELECT ratings_user,ratings_upload,upload_user 
+    SELECT ratings_user,ratings_upload,upload_user,upload_date 
       FROM cc_tbl_ratings 
       JOIN cc_tbl_uploads ON ratings_upload=upload_id
-      ORDER BY ratings_id DESC LIMIT 200;
+      WHERE upload_date > '{$upload_date}'
+      ORDER BY ratings_id DESC 
+
 EOF;
   $ratings = CCDatabase::QueryRows($sql);
+  $count = 1;
   foreach ($ratings as $rating) {
-    $lib->AddRecommends($rating,$rating);
+    $d = strtotime("-${count} days");
+    $upload = strtotime($rating['upload_date']);
+    $date = date( 'Y-m-d H:i:s', max($d,$upload) );
+    $lib->AddRecommends($rating,$rating,$date);
+    $count++;
   }
   
+  /*
+    reviews
+  */
   $sql =<<<EOF
-    select topic_user,topic_id,upload_user 
-      from cc_tbl_topics 
-      join cc_tbl_uploads on topic_upload=upload_id
-      where topic_upload > 0 and topic_name not like '%(Reply)%' order by topic_date desc limit 200;
-
+    SELECT topic_user,topic_id,topic_date,upload_user 
+      FROM cc_tbl_topics 
+      JOIN cc_tbl_uploads on topic_upload=upload_id
+      WHERE topic_upload > 0 and topic_name NOT LIKE '%(Reply)%' AND upload_date > '{$upload_date}'
+      ORDER BY topic_date desc 
 EOF;
   $reviews = CCDatabase::QueryRows($sql);
   foreach ($reviews as $review) {

@@ -20,13 +20,15 @@ define('FEED_VERB_FOLLOW',          8);
 define('FEED_TYPE_UPLOAD',     1);
 define('FEED_TYPE_REVIEW',     2);
 define('FEED_TYPE_FORUM_POST', 3);
+define('FEED_TYPE_USER',       4);
 
 define('FEED_REASON_REMIXED',     1);
 define('FEED_REASON_REVIEWED',    2);
 define('FEED_REASON_REPLIED',     3);
 define('FEED_REASON_EDPICKED',    4);
-define('FEED_REASON_FOLLOW',      5);
+define('FEED_REASON_FOLLOW',      5); // because you follow this person
 define('FEED_REASON_RECOMMENDED', 6);
+define('FEED_REASON_FOLLOWED',    7); // because your are being followed by this person
 
 
 define('ADMIN_ID',    2);

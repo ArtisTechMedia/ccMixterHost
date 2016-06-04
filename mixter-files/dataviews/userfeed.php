@@ -10,18 +10,10 @@ function userfeed_dataview($queryObj)
 {
     global $CC_SQL_DATE;        
 
-    require_once('mixter-lib/lib/feed-types.inc');
+    // see 'mixter-lib/lib/feed-types.inc'
 
-    /*
-    $actor_avatar = cc_get_user_avatar_sql('actor', 'actor_avatar_url');
-    $artist_avatar = cc_get_user_avatar_sql('artist', 'artist_avatar_url');
-    $poster_avatar = cc_get_user_avatar_sql('poster', 'poster_avatar_url');
-    */
-
-    $user_id = empty($queryObj->args['user']) ? '0' : CCUser::IDFromName($queryObj->args['user']);
-
-
-    CCDatabase::Query("SELECT @USER_ID := {$user_id}, @FEED_REASON_FOLLOW := 5, @FEED_TYPE_UPLOAD := 1, @FEED_TYPE_REVIEW := 2, @FEED_TYPE_FORUM_POST := 3;");
+    $vars = "SELECT @FEED_TYPE_UPLOAD := 1, @FEED_TYPE_REVIEW := 2, @FEED_TYPE_FORUM_POST := 3, @FEED_TYPE_USER := 4";
+    CCDatabase::Query($vars);
 
     $sql =<<<EOF
     SELECT action_verb        as verb, 
@@ -35,7 +27,10 @@ function userfeed_dataview($queryObj)
                 ELSE ''
             END as name,
             topic_id, topic_thread, _d_.upload_id,
-            DATE_FORMAT(action_date, '%W, %M %e, %Y @ %l:%i %p') as date_format,
+            action_date,
+
+            feeder.user_name      as feeder_user_name,
+            feeder.user_real_name as feeder_real_name,
 
             actor.user_name      as actor_user_name,
             actor.user_real_name as actor_real_name,
@@ -46,33 +41,33 @@ function userfeed_dataview($queryObj)
         FROM (
 
          SELECT action_actor, action_verb, action_object_type, 
-                action_sticky,  action_date,
+                action_sticky,  action_date, action_object,
 
                 topic_id, topic_thread, topic_user,
-                CASE feed_user
-                    WHEN @USER_ID THEN feed_reason
-                    ELSE @FEED_REASON_FOLLOW
-                END as reason,
+                feed_reason as reason,
                 IF( action_object_type = @FEED_TYPE_FORUM_POST, topic_name, '') as topic_name,
                 CASE action_object_type
                     WHEN @FEED_TYPE_REVIEW  THEN topic_upload
                     WHEN @FEED_TYPE_UPLOAD  THEN action_object
                     ELSE 0
-                END as upload_id
+                END as upload_id,
+
+                feed_user
 
             FROM cc_tbl_feed_action
-            LEFT JOIN cc_tbl_feed    ON action_id=feed_action
-            LEFT JOIN cc_tbl_topics  ON action_object=topic_id   AND 
-                                         action_object_type IN (@FEED_TYPE_REVIEW,@FEED_TYPE_FORUM_POST)
+            LEFT OUTER JOIN cc_tbl_feed   ON action_id=feed_action
+            LEFT       JOIN cc_tbl_topics ON action_object=topic_id   AND 
+                                               action_object_type IN (@FEED_TYPE_REVIEW,@FEED_TYPE_FORUM_POST)
             %joins%                                         
             %where%
             ORDER BY action_date DESC
             %limit%
 
         ) as _d_
-             JOIN cc_tbl_user    actor    ON action_actor    = actor.user_id
-        LEFT JOIN cc_tbl_uploads upl      ON _d_.upload_id   = upl.upload_id 
-        LEFT JOIN cc_tbl_user    artist   ON upl.upload_user = artist.user_id
+                   JOIN cc_tbl_user    actor    ON action_actor    = actor.user_id
+        LEFT OUTER JOIN cc_tbl_user    feeder   ON _d_.feed_user   = feeder.user_id
+        LEFT OUTER JOIN cc_tbl_uploads upl      ON _d_.upload_id   = upl.upload_id 
+        LEFT OUTER JOIN cc_tbl_user    artist   ON artist.user_id = IF( action_object_type = @FEED_TYPE_USER, _d_.action_object, upl.upload_user)
 EOF;
 
     $sql_count =<<<EOF

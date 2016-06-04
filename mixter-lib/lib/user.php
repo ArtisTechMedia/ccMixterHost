@@ -28,69 +28,73 @@
 if( !defined('IN_CC_HOST') )
    die('Welcome to CC Host');
 
+require_once( 'mixter-lib/lib/events.php' );
 require_once( 'mixter-lib/lib/status.inc' );
+require_once( 'mixter-lib/lib/follow-table.php');
 
 class CCLibUser
 {
-    function CurrentUser() {
-        $name = CCUser::CurrentUserName();
-        return empty($name) ? _make_status(USER_NOT_LOGGED_IN) : _make_ok_status($name);
-    }
+  function CurrentUser() {
+    $name = CCUser::CurrentUserName();
+    return empty($name) ? _make_status(USER_NOT_LOGGED_IN) : _make_ok_status($name);
+  }
 
-    function Login($username='',$password='',$remember=true) {
-        $status = null;
-        if( empty($password) ) {
-            $status = _make_err_status(USER_MISSING_PASSWORD); 
-        } else if( empty($username) ) {
-            $status = _make_err_status(USER_MISSING_NAME); 
+  function Login($username='',$password='',$remember=true) {
+    $status = null;
+    if( empty($password) ) {
+      $status = _make_err_status(USER_MISSING_PASSWORD); 
+    } else if( empty($username) ) {
+      $status = _make_err_status(USER_MISSING_NAME); 
+    } else {
+      $password = md5( $password );
+      $sql = "SELECT user_id, user_password FROM cc_tbl_user WHERE user_name = '{$username}'";
+      $row = CCDatabase::QueryRow($sql);
+      if( empty($row) ) {
+        $status = _make_err_status(USER_UNKNOWN_USER); 
+      } else {
+        if( $row['user_password'] != $password ) {
+          $status = _make_err_status(USER_INVALID_PASSWORD); 
         } else {
-            $password = md5( $password );
-            $sql = "SELECT user_id, user_password FROM cc_tbl_user WHERE user_name = '{$username}'";
-            $row = CCDatabase::QueryRow($sql);
-            if( empty($row) ) {
-                $status = _make_err_status(USER_UNKNOWN_USER); 
-            } else {
-                if( $row['user_password'] != $password ) {
-                    $status = _make_err_status(USER_INVALID_PASSWORD); 
-                } else {
-                    $status = _make_ok_status($username);
-                }
-            }
+          $status = _make_ok_status($username);
         }
-        if( $status->ok() ) {
-            $this->CreateLoginCookie($username,$password,$remember);
-        }
-        return $status;
+      }
     }
-
-    function Logout() {
-        cc_setcookie(CC_USER_COOKIE,'',time());
-        unset($_COOKIE[CC_USER_COOKIE]);        
-        return _make_ok_status();
+    if( $status->ok() ) {
+      $this->CreateLoginCookie($username,$password,$remember);
     }
+    return $status;
+  }
 
-    function CreateLoginCookie($username,$password,$remember) {
-        if( $remember )
-            $time = time()+60*60*24*30;
-        else
-            $time = null;
-        $val = serialize(array($username,$password));
-        cc_setcookie(CC_USER_COOKIE,$val,$time);
-        return _make_ok_status();
+  function Logout() {
+    cc_setcookie(CC_USER_COOKIE,'',time());
+    unset($_COOKIE[CC_USER_COOKIE]);    
+    return _make_ok_status();
+  }
+
+  function CreateLoginCookie($username,$password,$remember) {
+    if( $remember )
+      $time = time()+60*60*24*30;
+    else
+      $time = null;
+    $val = serialize(array($username,$password));
+    cc_setcookie(CC_USER_COOKIE,$val,$time);
+    return _make_ok_status();
+  }
+
+  function Follow($follow,$user,$following) {
+    $table =& CCFollowTable::GetTable();
+    $isFollowing = $table->IsFollowing($user,$following);
+    if( $follow ) {
+      if( !$isFollowing ) {
+        $table->Follow($user,$following);
+        CCEvents::Invoke( CC_EVENT_START_FOLLOWING, array( $user, $following ) );
+      }
+    } else {
+      if( $isFollowing ) {
+        $table->UnFollow($user,$following);
+      }
     }
-
-    function Followers($useridOrName='') {
-        if( empty($useridOrName) ) {
-            $username = CCUser::CurrentUserName();
-        } else {
-            $username = CCUser::NameForID($useridOrName);
-        }
-        if( empty($username) ) {
-            return _make_err_status(USER_UNKNOWN_USER);
-        }
-        $followers = CCDatabase::QueryItems( "SELECT user_name FROM cc_tbl_user WHERE LOWER(CONCAT(',',user_favorites,',')) LIKE LOWER('%,{$username},%')" );
-        return _make_ok_status($followers);
-    }
-
+    return _make_ok_status();
+  }
 }
 ?>

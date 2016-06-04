@@ -35,50 +35,30 @@ class CCUser
         return( !empty($CC_GLOBALS['user_name']) );
     }
 
-    public static function IsSuper($name='')
-    {
+    static function _isSomething($name,$key) {
         if( !CCUtil::IsHTTP() )
             return true;
 
         global $CC_GLOBALS;
 
-        if( empty($CC_GLOBALS['supers']) )
+        if( empty($CC_GLOBALS[$key]) )
             return false; // err...
 
         if( empty($name) )
             $name = CCUser::CurrentUserName();
-        $ok = !empty($name) && (preg_match( "/(^|\W|,)$name(\W|,|$)/i",$CC_GLOBALS['supers']) > 0);
+        $ok = !empty($name) && (preg_match( "/(^|\W|,)$name(\W|,|$)/i",$CC_GLOBALS[$key]) > 0);
 
         return $ok;
+
+    }
+    public static function IsSuper($name='')
+    {
+        return CCUser::_isSomething($name,'supers');
     }
 
     public static function IsAdmin($name='')
     {
-        static $checked;
-
-        if( empty($name) && isset($checked) )
-        {
-            return $checked;
-        }
-        else
-        {
-            if( empty($name) && (!CCUtil::IsHTTP() || CCUser::IsSuper($name)) )
-            {
-                $checked = true;
-                return true;
-            }
-
-            $configs =& CCConfigs::GetTable();
-            $settings = $configs->GetConfig('settings');
-            $_admins = $settings['admins'];
-
-            if( empty($name) )
-                $name = CCUser::CurrentUserName();
-
-            $checked = !empty($name) && (preg_match( "/(^|\W|,)$name(\W|,|$)/i",$_admins) > 0);
-
-            return $checked;
-        }
+        return CCUser::_isSomething($name,'admins');
     }
 
     public static function CurrentUser()
@@ -128,7 +108,7 @@ class CCUser
     // numeric (and I'm too afraid to change this behavoir at this point)
     public static function IDForName($username_or_id)
     {        
-        if( (int)$username_or_id > 0 ) {
+        if( is_numeric($username_or_id) > 0 ) {
             return $username_or_id;
         }
         return CCDatabase::QueryItem(
@@ -141,7 +121,7 @@ class CCUser
         if( empty($username_or_id) ) {
             return null;
         }
-        if( (int)$username_or_id > 0 ) {
+        if( is_numeric($username_or_id) ) {
             $sql = 'SELECT user_name FROM cc_tbl_user WHERE user_id = ' . $username_or_id;
         } else {
             $sql = 'SELECT user_name FROM cc_tbl_user WHERE LOWER(user_name) = \'' .

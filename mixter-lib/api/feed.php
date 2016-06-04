@@ -1,5 +1,6 @@
 <?
 
+require_once( 'mixter-lib/lib/events.php' );
 require_once('mixter-lib/lib/feed.php');
 
 CCEvents::AddHandler(CC_EVENT_MAP_URLS,        array( 'CCEventsFeed', 'OnMapUrls'));
@@ -9,6 +10,7 @@ CCEvents::AddHandler(CC_EVENT_RATED,           array( 'CCEventsFeed', 'OnRated')
 CCEvents::AddHandler(CC_EVENT_REVIEW,          array( 'CCEventsFeed', 'OnReview'));
 CCEvents::AddHandler(CC_EVENT_FORUM_POST,      array( 'CCEventsFeed', 'OnForumPost'));
 CCEvents::AddHandler(CC_EVENT_TOPIC_REPLY,     array( 'CCEventsFeed', 'OnTopicReply'));
+CCEvents::AddHandler(CC_EVENT_START_FOLLOWING, array( 'CCEventsFeed', 'OnStartFollowing'));
 
 define('USER_FIELD_FEED_SEEN','feedseen');
 
@@ -34,7 +36,7 @@ class CCEventsFeed
     {
         if( !empty($args['datasource']) && $args['datasource'] === 'feed')
         {
-            if( 0 ) {
+            if( !empty($args['install']) && CCUser::IsAdmin() ) {
                 $lib = new CCLibFeed();
                 $lib->PrePopulate();
                 $x = array(
@@ -104,6 +106,12 @@ class CCEventsFeed
     {
         $lib = new CCLibFeed();
         $lib->AddUpload($upload_id,$op,$parents);
+    }
+
+    function OnStartFollowing($user,$following)
+    {
+        $lib = new CCLibFeed();
+        $lib->AddFollowing($user,$following);
     }
 }
 

@@ -11,16 +11,24 @@ class CCLibFeed
 {
 
   function AddEdPick($upload_id) {
+
+    $uploads =& CCUploads::GetTable();
+    $edpicks = $uploads->GetExtraField($upload_id, 'edpicks');
+    foreach ($edpicks as $pick ) {
+      $date = $pick['edited'];
+      break;
+    }
+
     $actions =& CCFeedActionTable::GetTable(); 
     $where = array(
         'action_actor' => ADMIN_ID,
         'action_verb'  => FEED_VERB_EDPICK,
         'action_object' => $upload_id,
         'action_object_type' => FEED_TYPE_UPLOAD,
+        'action_date' => $date
       );    
     $action = $actions->AddAction($where);
 
-    $uploads =& CCUploads::GetTable();
     $uploader = $uploads->QUeryItemFromKey('upload_user',$upload_id);
 
     $feed =& CCFeedTable::GetTable();
@@ -34,7 +42,7 @@ class CCLibFeed
     return _make_ok_status();
   }
 
-  function AddRecommends($upload,$ratings) {
+  function AddRecommends($upload,$ratings,$date='') {
 
     $actions =& CCFeedActionTable::GetTable(); 
     $where = array(
@@ -42,6 +50,7 @@ class CCLibFeed
         'action_verb'  => FEED_VERB_RECOMMEND,
         'action_object' => $ratings['ratings_upload'],
         'action_object_type' => FEED_TYPE_UPLOAD,
+        'action_date' => $date
       );    
     $action = $actions->AddAction($where);
 
@@ -64,6 +73,7 @@ class CCLibFeed
         'action_verb'  => FEED_VERB_REVIEW,
         'action_object' => $topic['topic_id'],
         'action_object_type' => FEED_TYPE_REVIEW,
+        'action_date' => $topic['topic_date']
       );    
     $action = $actions->AddAction($where);
 
@@ -86,12 +96,37 @@ class CCLibFeed
         'action_verb'  => FEED_VERB_FORUM_POST,
         'action_object' => $topic['topic_id'],
         'action_object_type' => FEED_TYPE_FORUM_POST,
-        'action_sticky' => 1
+        'action_sticky' => 1,
+        'action_date' => $topic['topic_date']
       );    
     $action = $actions->AddAction($where);
     return _make_ok_status();    
   }
 
+  function AddFollowing($user,$following,$date='') {
+    $actions =& CCFeedActionTable::GetTable(); 
+    $user = CCUser::IDFromName($user);
+    $following = CCUser::IDFromName($following);
+    $where = array(
+        'action_actor' => $user,
+        'action_verb'  => FEED_VERB_FOLLOW,
+        'action_object' => $following,
+        'action_object_type' => FEED_TYPE_USER,
+        'action_date' => $date
+      );    
+    $action = $actions->AddAction($where);
+
+    $feed =& CCFeedTable::GetTable();
+    $where = array(
+        'feed_action' => $action,
+        'feed_user'   => $following,
+        'feed_reason' => FEED_REASON_FOLLOWED
+      );
+    $feed->AddItem($where);
+    
+    return _make_ok_status();    
+
+  }
   function AddTopicReply($original,$topic) {
 
     require_once('cchost_lib/ccextras/cc-topics.inc');
@@ -120,6 +155,7 @@ class CCLibFeed
         'action_verb'  => FEED_VERB_TOPIC_REPLY,
         'action_object' => $topic['topic_id'],
         'action_object_type' => $top['topic_type'] == 'review' ? FEED_TYPE_REVIEW : FEED_TYPE_FORUM_POST,
+        'action_date' => $topic['topic_date']
       );    
     $action = $actions->AddAction($where);
 
@@ -165,20 +201,22 @@ class CCLibFeed
 
     $feed =& CCFeedTable::GetTable();
 
-    // Notify people who have been remixed
-    $parent_owners = empty($parents)
-                    ? array()
-                    : array_unique(array_map(function($u) { return $u['upload_user']; }, $parents));
+    if( empty($parents) ) {
+      $action();
+    } else {
+      // Notify people who have been remixed
+      $parent_owners = array_unique(array_map(function($u) { return $u['upload_user']; }, $parents));
 
-    foreach ($parent_owners as $remixee ) {
-        $where = array(
-            'feed_action' => $action(),
-            'feed_user'   => $remixee,
-            'feed_reason' => FEED_REASON_REMIXED
-          );
-        $feed->AddItem($where);
+      foreach ($parent_owners as $remixee ) {
+          $where = array(
+              'feed_action' => $action(),
+              'feed_user'   => $remixee,
+              'feed_reason' => FEED_REASON_REMIXED
+            );
+          $feed->AddItem($where);
+      }
     }
-    
+        
     return _make_ok_status();
   }
 

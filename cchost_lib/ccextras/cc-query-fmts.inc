@@ -86,8 +86,7 @@ class CCQueryFormats
             case 'jsex':
             {
                 $mime = 'text/javascript';
-                // JSON_PARTIAL_OUTPUT_ON_ERROR not defined on php 5.4
-                $json = json_encode( $records, JSON_UNESCAPED_SLASHES|1024 );
+                $json = CCUtil::JSONEncode( $records );
                 $results = array( $json, $mime );
                 break;
             }
