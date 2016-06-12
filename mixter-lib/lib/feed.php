@@ -220,6 +220,49 @@ class CCLibFeed
     return _make_ok_status();
   }
 
+  function RemoveUpload($upload_id) {
+    // Nuke all the reviews and replies
+    require_once('cchost_lib/ccextras/cc-reviews-table.inc');
+    $reviews =& CCReviews::GetTable();
+    $w['topic_upload'] = $upload_id;
+    $topics = $reviews->QueryKeys($w);
+    foreach ($topics as $topic) {
+      $this->RemoveTopic($topic,true);
+    }
+    return $this->_remove_object($upload_id,@FEED_TYPE_UPLOAD);
+  }
+
+  function RemoveTopic($topic_id,$remove_children=true) {
+    $types = array(@FEED_TYPE_FORUM_POST,@FEED_TYPE_REVIEW);
+    if( $remove_children ) {
+      require_once('cchost_lib/ccextras/cc-topics.inc');
+      $topics =& CCTopics::GetTable();
+      $ids = $topics->IDsForBranch($topic_id);
+      foreach ($ids as $id) {
+        $status = $this->_remove_object($id,$types);
+        if( !$status->ok() ) {
+          return $status;
+        }
+      }
+      return $status;
+    } else {
+      return $this->_remove_object($topic_id,$types);
+    }
+  }
+
+  function _remove_object($object_id,$types) {
+    $actions =& CCFeedActionTable::GetTable(); 
+    $ids = $actions->IDsForObject($object_id,$types);
+    if( !empty($ids) ) {
+      $actions->DeleteKeys($ids);
+      $ids = implode(',', $ids);
+      $feed =& CCFeedTable::GetTable();
+      $feed->DeleteWhere( "feed_action IN ({$ids})");
+    }
+    return _make_ok_status();     
+  }
+
+
   function PrePopulate() {
     require_once('mixter-lib/lib/feed-install.inc');
     UserFeedPrePopulate($this);

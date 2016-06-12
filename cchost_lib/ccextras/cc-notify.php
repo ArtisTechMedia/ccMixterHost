@@ -68,7 +68,7 @@ class CCNotify
         $notify_api->OnRated($rating_rec,$rating,$record);
     }
 
-    function OnReview(&$review)
+    function OnReview(&$review,&$upload)
     {
         if( !$this->_is_notify_on() )
             return;

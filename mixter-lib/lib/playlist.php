@@ -187,7 +187,11 @@ EOF;
         if( empty($name) )
             $name = $this->GenerateNameForNewPlaylist($user_id,$user_name);
 
-        $record =& $this->CreatePlaylist('',$name, $desc);
+        $status = $this->CreatePlaylist('',$name, $desc);
+        if( !$status->ok() ) {
+            return $status;
+        }
+        $record = $status->data;
         $playlist_id = $record['cart_id'];
 
         if( !empty($upload_id) )

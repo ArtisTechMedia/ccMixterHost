@@ -433,6 +433,23 @@ define('CC_EVENT_CONFIG_CHAGNED', 'cfgchanged');
 */
 define('CC_EVENT_DELETE_UPLOAD',       'delete' );
 
+
+/**
+* Notification Event: Pre-Deletion notification
+*
+* This is sent before CC_EVENT_DELETE_UPLOAD to
+* allow modules that rely on ancillary upload
+* records (like review, recommendations) being
+* present before the deletion actually happens
+*
+* Event call back (handler) prototype:
+*<code>
+* function OnUploadDelete( &$record );
+*</code>
+* @see CCEvents::AddHandler()
+*/
+define('CC_EVENT_DELETING_UPLOAD',     'deleting' );
+
 /**
 * Notification Event: Physical file is about to be deleted
 *

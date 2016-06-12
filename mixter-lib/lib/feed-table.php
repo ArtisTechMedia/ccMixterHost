@@ -92,7 +92,7 @@ class CCFeedActionTable extends CCTable
 {
     function CCFeedActionTable() {
         global $CC_SQL_DATE;        
-        $this->CCTable('cc_tbl_feed_action','feed_id');
+        $this->CCTable('cc_tbl_feed_action','action_id');
     }
 
     public static function & GetTable() {
@@ -109,6 +109,15 @@ class CCFeedActionTable extends CCTable
         $where['action_id'] = $this->NextID();
         $this->Insert($where);
         return $where['action_id'];
+    }
+
+    function IDsForObject($object_id,$object_types) {
+        if( !is_array($object_types) ) {
+            $object_types = array( $object_types );
+        }
+        $types = implode(',', $object_types);
+        $where = "action_object = {$object_id} AND action_object_type IN ({$types})";
+        return $this->QueryItems('action_id',$where);
     }
 }
 

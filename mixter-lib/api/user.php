@@ -1,32 +1,4 @@
 <?
-/*
-* Creative Commons has made the contents of this file
-* available under a CC-GNU-GPL license:
-*
-* http://creativecommons.org/licenses/GPL/2.0/
-*
-* A copy of the full license can be found as part of this
-* distribution in the file LICENSE.TXT.
-* 
-* You may use the ccHost software in accordance with the
-* terms of that license. You agree that you are solely 
-* responsible for your use of the ccHost software and you
-* represent and warrant to Creative Commons that your use
-* of the ccHost software will comply with the CC-GNU-GPL.
-*
-* $Id: cc-user-hook.php 12466 2009-04-29 05:08:38Z fourstones $
-*
-*/
-
-/**
-* Module for handling remote user queries
-*
-* @package cchost
-* @subpackage user
-*/
-
-if( !defined('IN_CC_HOST') )
-   die('Welcome to CC Host');
 
 require_once( 'mixter-lib/lib/status.inc' );
 require_once( 'mixter-lib/lib/user.php' );
@@ -56,6 +28,8 @@ class CCEventsUser
             CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '', _('Perform logout'), CC_AG_USER);
         CCEvents::MapUrl( ccp('api','user','follow'), array('CCAPIUser','Follow'),
             CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '', _('Perform logout'), CC_AG_USER);
+        CCEvents::MapUrl( ccp('api','user','thumbnail'), array('CCAPIUser','Thumbnail'),
+            CC_DONT_CARE_LOGGED_IN, ccs(__FILE__), '', _('get a user thumbnail'), CC_AG_USER);
     }
 
     function OnFilterUserInfo(&$rows)
@@ -127,6 +101,25 @@ class CCAPIUser
             $status = $lib->Follow($type === 'follow', $follower, $followee);
         }
         CCUtil::ReturnAjaxObj($status);        
+    }
+
+    function Thumbnail($username) {
+        $checkid = CCUser::IDFromName($username);
+        if( !empty($checkid) ) {
+            $lib = new CCLibUser();
+            $name = $lib->Thumbnail($username);
+            $info = pathinfo($name);
+            if( file_exists($name) ) {
+                $fp = @fopen($name, 'rb');
+                if( $fp !== FALSE ) {
+                    header("Content-Type: image/" . $info['extension']);
+                    header("Content-Length: " . filesize($name));
+                    fpassthru($fp);
+                    exit;
+                }
+            }
+        }
+        CCUtil::Send404();
     }
 }
 ?>

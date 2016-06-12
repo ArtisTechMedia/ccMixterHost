@@ -38,9 +38,11 @@ CCEvents::AddHandler(CC_EVENT_USER_PROFILE_TABS,  array( 'CCReviewsHV',  'OnUser
 CCEvents::AddHandler(CC_EVENT_MAP_URLS,           array( 'CCReview',  'OnMapUrls')         , 'cchost_lib/ccextras/cc-reviews.inc' );
 CCEvents::AddHandler(CC_EVENT_GET_CONFIG_FIELDS,  array( 'CCReview' , 'OnGetConfigFields') , 'cchost_lib/ccextras/cc-reviews.inc' );
 CCEvents::AddHandler(CC_EVENT_DELETE_UPLOAD,      array( 'CCReview',  'OnUploadDelete')    , 'cchost_lib/ccextras/cc-reviews.inc' );
-CCEvents::AddHandler(CC_EVENT_TOPIC_DELETE,       array( 'CCReview' , 'OnTopicDelete')     , 'cchost_lib/ccextras/cc-reviews.inc' );
-CCEvents::AddHandler(CC_EVENT_SEARCH_META,          array( 'CCReviewsHV',  'OnSearchMeta'));
 
+CCEvents::AddHandler(CC_EVENT_REVIEW,             array( 'CCReview',  'OnReview')    , 'cchost_lib/ccextras/cc-reviews.inc' );
+CCEvents::AddHandler(CC_EVENT_TOPIC_DELETE,       array( 'CCReview' , 'OnTopicDelete')     , 'cchost_lib/ccextras/cc-reviews.inc' );
+
+CCEvents::AddHandler(CC_EVENT_SEARCH_META,              array( 'CCReviewsHV',  'OnSearchMeta'));
 CCEvents::AddHandler(CC_EVENT_FILTER_MACROS,            array( 'CCReviewsHV',  'OnFilterMacros') );
 CCEvents::AddHandler(CC_EVENT_FITLER_REVIEWERS_UNIQUE,  array( 'CCReviewsHV',  'OnFilterReviewersUnique') );
 

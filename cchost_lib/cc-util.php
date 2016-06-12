@@ -265,11 +265,12 @@ class CCUtil
         exit;
     }
 
-    public static function JSONEncode($value)
+    public static function JSONEncode($value,$pretty=true)
     {
+        $pp = $pretty ? JSON_PRETTY_PRINT : 0;
         // JSON_PARTIAL_OUTPUT_ON_ERROR not defined on php 5.4
         if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
-            $encoded = json_encode($value, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|1024);
+            $encoded = json_encode($value, $pp|JSON_UNESCAPED_SLASHES|1024);
         } else {
             $encoded = json_encode($value,JSON_UNESCAPED_SLASHES|1024);
         }
@@ -296,8 +297,7 @@ class CCUtil
     // depreicated because, er, returns invalid JSON ;)
     public static function ReturnAjaxData($obj,$inHeader=true)
     {
-        require_once('cchost_lib/zend/json-encoder.php');
-        $text = CCZend_Json_Encoder::encode($obj);
+        $text = CCUtil::JSONEncode($obj,!$inHeader);
         if( $inHeader )
             header( "X-JSON: $text");
         header( 'Content-type: text/plain');
@@ -307,8 +307,7 @@ class CCUtil
 
     public static function ReturnAjaxObj($obj,$inHeader=true)
     {
-        require_once('cchost_lib/zend/json-encoder.php');
-        $text = CCZend_Json_Encoder::encode($obj);
+        $text = trim(CCUtil::JSONEncode($obj,!$inHeader));
         if( $inHeader )
             header( "X-JSON: $text");
         header( 'Content-type: text/plain');

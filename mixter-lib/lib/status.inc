@@ -14,8 +14,12 @@ require_once('cchost_lib/ccextras/cc-cart-table.inc');
 class CCStatus {
   function CCStatus($status=CC_STATUS_OK,$errmsg='',$data=null) {
     $this->status = $status;
-    $this->errmsg = $errmsg;
-    $this->data   = $data;
+    if( !empty($errmsg) ) {
+      $this->errmsg = $errmsg;
+    }
+    if( !empty($data) ) {
+      $this->data = $data;
+    }
     //$this->cookie = $_COOKIE;
   }
 

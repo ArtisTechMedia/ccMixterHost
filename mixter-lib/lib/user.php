@@ -96,5 +96,39 @@ class CCLibUser
     }
     return _make_ok_status();
   }
+
+  function Thumbnail($username) {
+
+    global $CC_GLOBALS;
+
+    $users = CCUsers::GetTable();
+    $img_name = $users->QueryItem('user_image',array('user_name' => $username));
+    
+    if( !empty($img_name) ) {
+      $dir = "{$CC_GLOBALS['user-upload-root']}/{$username}";
+      if( file_exists("{$dir}/{$img_name}") ) {
+        $info = pathinfo($img_name);
+        $newname = "{$info['filename']}20x20.{$info['extension']}";
+        $newpath = "{$dir}/{$newname}";
+      } else { // we're on a test machine
+        $img_name = null;
+      }
+    }
+
+    if( empty($img_name) ) {
+      $img_path = $CC_GLOBALS['default_user_image'];
+      $info = pathinfo($img_path);
+      $newname = "{$info['filename']}20x20.{$info['extension']}";
+      $newpath = "{$info['dirname']}/{$newname}";
+    }
+    
+    if( !file_exists($newpath) ) {
+      // ask me why this is in CCForm. Go ahead. Ask.
+      require_once('cchost_lib/cc-form.php');
+      $newname = CCForm::ResizeAvatar(20,20,$img_name,$dir,false);
+      $newpath = "{$dir}/{$newname}";
+    }
+    return $newpath;
+  }
 }
 ?>

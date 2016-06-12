@@ -7,6 +7,42 @@
 */
 function UserFeedPrePopulate($lib) {
 
+  $sql = array();
+  $sql[] =<<<EOF
+CREATE TABLE IF NOT EXISTS cc_tbl_feed_action (
+    action_id           int(11) NOT NULL auto_increment,
+    action_actor        int(11) NOT NULL default '0',
+    action_verb         int(3) NOT NULL default 0,
+    action_object       int(11) NOT NULL default '0',
+    action_object_type  int(3) NOT NULL default 0,
+    action_date         datetime default NULL,
+    action_sticky       int(1) NOT NULL default 0,
+    PRIMARY KEY  (action_id)
+  ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+EOF;
+  
+  $sql[] =<<<EOF
+
+  CREATE TABLE IF NOT EXISTS cc_tbl_feed (
+    feed_id           int(11) NOT NULL auto_increment,
+    feed_user         int(11) NOT NULL default '0',
+    feed_action       int(11) NOT NULL default '0',
+    feed_reason       int(11) NOT NULL default '0',
+    PRIMARY KEY  (feed_id)
+  ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+
+EOF;
+  
+  $sql[] =<<<EOF
+CREATE TABLE IF NOT EXISTS cc_tbl_follow (     
+    follow_user         int(11) NOT NULL default '0',     
+    follow_follows      int(11) NOT NULL default '0',     
+    INDEX(follow_user)   
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;  
+EOF;
+
+  CCDatabase::Query($sql);
+
   CCDatabase::Query('LOCK TABLES cc_tbl_follow WRITE, cc_tbl_feed WRITE, cc_tbl_feed_action WRITE, cc_tbl_user READ, cc_tbl_uploads READ, cc_tbl_ratings READ, cc_tbl_tree READ, cc_tbl_topics READ');
 
   CCDatabase::Query('TRUNCATE TABLE cc_tbl_follow');

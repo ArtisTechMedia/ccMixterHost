@@ -828,7 +828,11 @@ EOF;
     {
         if( $this->args['datasource'] == 'cart' && !empty($this->args['dynamic']) && !array_key_exists('minitems', $this->args) ) 
         {
-            $this->where[] = 'LENGTH(cart_dynamic) > 0';
+            if( $this->args['dynamic'] == -1 ) {
+                $this->where[] = 'LENGTH(cart_dynamic) = 0';
+            } else {
+                $this->where[] = 'LENGTH(cart_dynamic) > 0';
+            }
         }
     }
 

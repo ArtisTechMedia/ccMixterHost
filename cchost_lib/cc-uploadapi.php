@@ -103,6 +103,7 @@ EOF;
         $record['tree_ids'] = CCDatabase::QueryRows($sql);
         $recs = array( &$record );
 
+        CCEvents::Invoke(CC_EVENT_DELETING_UPLOAD, $recs);
         CCEvents::Invoke(CC_EVENT_DELETE_UPLOAD, $recs );
 
         $relative_dir = $record['upload_extra']['relative_dir'];

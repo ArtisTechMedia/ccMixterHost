@@ -232,6 +232,11 @@ class CCReview
         return CCReviewsHV::_can_review($row_or_id);
     }
 
+    function OnReview(&$topic,&$upload_rec)
+    {
+        CCReview::Sync($topic['topic_upload'],$topic['topic_user']);
+    }
+    
     public static function Sync($upload_id,$reviewer,$add=0)
     {
         $count = CCDatabase::QueryItem("SELECT COUNT(*) FROM cc_tbl_topics WHERE topic_type='review' AND topic_upload=$upload_id");

@@ -918,6 +918,12 @@ class CCTable
         $this->DeleteWhere($this->_key_field . "= '$key'");
     }
 
+    function DeleteKeys($keys)
+    {
+        $keys = implode(',', $keys);
+        $this->DeleteWhere($this->_key_field . " IN ({$keys})");
+    }
+
     /**
     * Delete records based on a $where filter
     *

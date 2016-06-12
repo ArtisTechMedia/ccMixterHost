@@ -2174,7 +2174,7 @@ END;
         return( $ok );
     }
     
-    public static function ResizeAvatar($maxwidth, $maxheight, $clean_name, $imagedir)
+    public static function ResizeAvatar($maxwidth, $maxheight, $clean_name, $imagedir, $deleteoid=true)
     {
         global $CC_GLOBALS;
         
@@ -2196,12 +2196,20 @@ END;
                     " \"" . $oldrealpath . "\" " . 
                     "-resize " . $sizestr . 
                     " \"" . $realpath . "\"";
-        $result = exec($cmd);
-        $ok = $result != 0;
-        $arr = array( 'cmd' => $cmd,
-                      'result' => $result );
-        unlink($oldrealpath);                                      
-        chmod($realpath,cc_default_file_perms());
+        $result = exec($cmd,$output,$ret_val);
+
+        // 2>&1         
+        // $arr = array( 'cmd' => $cmd,
+        //               'result' => $result,
+        //               'output' => $output,
+        //               'ret_val' => $ret_val );
+        
+        // CCDebug::PrintV($arr);
+        if( $deleteoid ) {
+            unlink($oldrealpath);
+        }
+        if( file_exists($realpath) )
+            chmod($realpath,cc_default_file_perms());
         return $clean_name;
     }
 

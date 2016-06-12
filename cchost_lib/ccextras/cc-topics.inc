@@ -175,6 +175,17 @@ class CCTopics extends CCTable
         $this->Unlock();
     }
 
+    function IDsForBranch($topic_id)
+    {
+        list( $left, $right ) = CCDatabase::QueryRow('SELECT topic_left,topic_right FROM cc_tbl_topics WHERE topic_id='.$topic_id,false);
+        if( empty($left) || empty($right) ) // orphaned
+        {
+            return array($topic_id);
+        }
+        $where = "topic_left BETWEEN $left AND $right";
+        return $this->QueryKeys($where);
+    }
+
     /**
      *  Create a new top level topic from an existing branch (reply)
      *
@@ -241,6 +252,8 @@ class CCTopics extends CCTable
     
     function InsertNewTopic(&$values,$parent_id)
     {
+        $values['topic_edited'] = $values['topic_date'];
+        
         // we do a variation of the nested set model discussed here
         // see: http://en.wikipedia.org/wiki/Nested_set_model
         //

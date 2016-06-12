@@ -26,7 +26,6 @@
 if( !defined('IN_CC_HOST') )
    die('Welcome to CC Host');
 
-
 /**
 * CCSync - class for keeping cached upload counts in sync with the rest of the system.
 *
@@ -331,6 +330,13 @@ END;
         }
     }
 
+    public function OnRated($ratingsrec,$score,&$upload) {
+        if( !empty($upload['trigger_sync'])) {
+            require_once('cchost_lib/cc-ratings.php');
+            $ratings =& CCRatings::GetTable();
+            CCSync::Ratings($upload,$ratings);
+        }
+    }
     /**
     * Method to call after a record has been rated.
     *

@@ -81,9 +81,9 @@ class CCReviewFormAPI
 
         $upload_row = CCDatabase::QueryRow(
             'SELECT user_real_name, upload_name, user_name, upload_user FROM cc_tbl_uploads JOIN cc_tbl_user ON upload_user=user_id WHERE upload_id='
-            . $upload_id, false);
-
-        list( $user_real_name, $upload_name, $user_name, $upload_user ) = $upload_row;
+            . $upload_id);
+        
+        extract($upload_row);
 
         if( empty($_POST['review']) || !$form->ValidateFields() )
         {

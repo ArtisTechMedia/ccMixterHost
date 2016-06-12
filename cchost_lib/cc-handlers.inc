@@ -167,6 +167,9 @@ CCEvents::AddHandler(CC_EVENT_MAIN_MENU,    array( 'CCSubmit',  'OnBuildMenu'), 
 CCEvents::AddHandler(CC_EVENT_MAP_URLS,     array( 'CCSubmit',  'OnMapUrls'), 'cchost_lib/cc-submit.php' );
 CCEvents::AddHandler(CC_EVENT_ADMIN_MENU,   array( 'CCSubmit', 'OnAdminMenu'), 'cchost_lib/cc-submit.php' );
 
+CCEvents::AddHandler(CC_EVENT_RATED,  array( 'CCSync', 'OnRated'), 'cchost_lib/cc-sync.php');
+
+
 CCEvents::AddHandler(CC_EVENT_MAIN_MENU,        array( 'CCTagEvents', 'OnBuildMenu'), 'cchost_lib/cc-tags.inc' );
 CCEvents::AddHandler(CC_EVENT_MAP_URLS,         array( 'CCTagEvents', 'OnMapUrls'), 'cchost_lib/cc-tags.inc' );
 CCEvents::AddHandler(CC_EVENT_ADMIN_MENU,       array( 'CCTagEvents', 'OnAdminMenu'), 'cchost_lib/cc-tags.inc' );

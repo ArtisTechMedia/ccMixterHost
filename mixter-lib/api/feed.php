@@ -11,6 +11,9 @@ CCEvents::AddHandler(CC_EVENT_REVIEW,          array( 'CCEventsFeed', 'OnReview'
 CCEvents::AddHandler(CC_EVENT_FORUM_POST,      array( 'CCEventsFeed', 'OnForumPost'));
 CCEvents::AddHandler(CC_EVENT_TOPIC_REPLY,     array( 'CCEventsFeed', 'OnTopicReply'));
 CCEvents::AddHandler(CC_EVENT_START_FOLLOWING, array( 'CCEventsFeed', 'OnStartFollowing'));
+CCEvents::AddHandler(CC_EVENT_UPLOAD_MODERATED,array( 'CCEventsFeed', 'OnUploadModerated'));
+CCEvents::AddHandler(CC_EVENT_DELETING_UPLOAD ,array( 'CCEventsFeed', 'OnDeletingUpload'));
+CCEvents::AddHandler(CC_EVENT_TOPIC_DELETE,    array( 'CCEventsFeed', 'OnTopicDelete'));
 
 define('USER_FIELD_FEED_SEEN','feedseen');
 
@@ -79,7 +82,7 @@ class CCEventsFeed
     function OnRated($ratingRec, $score, &$uploadRecord )
     {
         $lib = new CCLibFeed();
-        $lib->AddRecommend($uploadRecord,$ratingRec);
+        $lib->AddRecommends($uploadRecord,$ratingRec);
     }
 
     function OnReview(&$topic,&$upload_rec)
@@ -112,6 +115,26 @@ class CCEventsFeed
     {
         $lib = new CCLibFeed();
         $lib->AddFollowing($user,$following);
+    }
+
+    function OnUploadModerated(&$row)
+    {
+        if( !empty($row['upload_banned']) ) {
+            $lib = new CCLibFeed();
+            $lib->RemoveUpload($row['upload_id']);
+        }
+    }
+
+    function OnDeletingUpload(&$row)
+    {
+        $lib = new CCLibFeed();
+        $lib->RemoveUpload($row['upload_id']);        
+    }
+
+    function OnTopicDelete($deep_flag,$topic_id)
+    {
+        $lib = new CCLibFeed();
+        $lib->RemoveTopic($topic_id,true);        
     }
 }
 
