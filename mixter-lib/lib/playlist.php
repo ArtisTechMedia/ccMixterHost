@@ -187,7 +187,7 @@ EOF;
         if( empty($name) )
             $name = $this->GenerateNameForNewPlaylist($user_id,$user_name);
 
-        $status = $this->CreatePlaylist('',$name, $desc);
+        $status = $this->CreatePlaylist('',$name, $desc,$user_id);
         if( !$status->ok() ) {
             return $status;
         }
@@ -196,11 +196,11 @@ EOF;
 
         if( !empty($upload_id) )
         {
-            if( !$this->_verifyPlaylist($user_id,$upload_id,$playlist_id,PLAYLIST_TEST_ALL) ) {
+            if( !$this->_verifyPlaylist($user_id,$upload_id,0,PLAYLIST_TEST_UPLOAD) ) {
                 return _make_err_status(PLAYLIST_NOT_FOUND);
             }
 
-            $status = $this->AddTrackToPlaylist($upload_id,$playlist_id);
+            $status = $this->AddTrackToPlaylist($user_id,$upload_id,$playlist_id);
             if( !$status->ok() ) {
                 return $status;
             }
@@ -305,7 +305,7 @@ EOF;
 
     function AddTrackToPlaylist($user_id, $upload_id, $playlist_id)
     {
-        if( !$this->_verifyPlaylist( $user_id, 0, $playlist_id, PLAYLIST_TEST_PLAYLIST | PLAYLIST_TEST_OWNER ) ) {
+        if( !$this->_verifyPlaylist( $user_id, $upload_id, $playlist_id, PLAYLIST_TEST_ALL ) ) {
             return _return_status(PLAYLIST_NOT_FOUND);
         }
 

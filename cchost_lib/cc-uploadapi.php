@@ -442,6 +442,9 @@ EOF;
                                      $relative_dir) 
     {
 
+// $x = array( $upload_args, $old_record, $relative_dir );
+// CCDebug::PrintV($x);
+
         // ---------
         // N.B. The following code assumes JOINed information
         // (user, license, contest, etc.) did NOT change for

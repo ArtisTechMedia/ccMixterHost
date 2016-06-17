@@ -1418,6 +1418,27 @@ EOF;
         {
             $this->where[] = "cart_subtype = '{$this->args['type']}'";
         }
+        elseif( $this->args['datasource'] == 'tags' ) 
+        {
+            $type = $this->args['type'];
+            if( $type == 'system:assignable' ) {
+                $type = 'system';
+                /*
+                $reserved = implode('|', get_super_reseved_tag());
+                //                    tags_tag NOT REGEXP '^({$reserved})$' AND 
+
+                $this->where[] =<<<EOF
+                    tag_category IS NULL OR tag_category NOT IN('Style','Format','License','Vanity','Genre','tempo','misc','Submission Type')
+EOF;
+                */
+            }
+            $map = array(
+                'system' => CCTT_SYSTEM,
+                'admin'  => CCTT_ADMIN,
+                'user'   => CCTT_USER
+                );
+            $this->where[] = "tags_type = {$map[$type]}";
+        }
     }
 
     function _gen_upload()
@@ -1832,5 +1853,59 @@ function CCQuery_QueryURLs()
     exit;
 }
 
+function get_super_reseved_tag() {
+    // TODO: put these in config
+    return array(
+    '0kbps',
+    '[0-9]+kbps',
+    '[0-9]+k',
+    'acapella',
+    'acappella',
+    'archive',
+    'attribution',
+    'au',
+    'audio',
+    'a_capella',
+    'a_cappella',
+    'bpm_.*', 
+    'cbr',
+    'ccplus.*',
+    'cczero',
+    'contest.*',
+    'copyrightcriminals',
+    'crammed',
+    'creative_commons',
+    'flac',
+    'fortminor',
+    'freestylemix',
+    'fukushima_debris',
+    'how_i_did_it',
+    'in_.*',
+    'magnatune',
+    'media',
+    'mid',
+    'mono',
+    'mp3',
+    'nc_sampling_plus',
+    'non_commercial.*',
+    'non_commercial_share_alike',
+    'ogg',
+    'pop',
+    'remix',
+    'sample',
+    'samples',
+    'sampling_plus',
+    'secret_mixter',
+    'share_alike',
+    'stateshirt',
+    'stereo',
+    'to',
+    'trackback',
+    'vbr',
+    'wma',
+    'zip'
+  );
+
+}
 
 ?>

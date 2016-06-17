@@ -24,6 +24,8 @@ class CCEventsUpload
       CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '', _('Rate/recommend an upload'), CC_AG_UPLOAD);
     CCEvents::MapUrl( ccp('api','upload','review'), array('CCAPIUpload','Review'),
       CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '', _('Rate/recommend an upload'), CC_AG_UPLOAD);
+    CCEvents::MapUrl( ccp('api','upload','properties'), array('CCAPIUpload','PutProperties'),
+      CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '', _('Update properties in an upload'), CC_AG_UPLOAD);
   }
 
 }
@@ -67,6 +69,34 @@ class CCAPIUpload
       $status = $lib->Review($upload_id,$user_name,$text);
     }
     CCUtil::ReturnAjaxObj($status);        
+  }
+
+  function PutProperties($upload_id) {
+    if( !$this->_validate_upload_id($upload_id) ) {
+      $status = _make_err_status(INVALID_UPLOAD_ID);
+    } else {
+      $req_props = CCUtil::Strip($_REQUEST);
+      $props = array();
+
+      if( !empty($req_props['bpm']) ) {
+        $bpm = abs((int)CCUtil::CleanNumber($req_props['bpm']));
+        if( !empty($bpm) ) {
+          $props['bpm'] = $bpm;
+        }
+      }
+
+      if( !empty($req_props['tags'] ) ) {
+        $props['upload_tags'] = $req_props['tags'];
+      }
+      
+      if( !empty($props) ) {
+        $lib = new CCLibUpload();
+        $status = $lib->PutProperties($upload_id,$props);  
+      } else {
+        $status = _make_ok_status();
+      }
+    }
+    CCUtil::ReturnAjaxObj($status);            
   }
 
   function _validate_upload_id($upload_id)
