@@ -20,16 +20,19 @@ class CCEventsUser
     */
     function OnMapUrls()
     {
+        // CC_DONT_CARE_LOGGED_IN
         CCEvents::MapUrl( ccp('api','user','current'), array('CCAPIUser','CurrentUser'),
             CC_DONT_CARE_LOGGED_IN, ccs(__FILE__), '', _('Ajax callback for currently logged in user'), CC_AG_USER);
         CCEvents::MapUrl( ccp('api','user','login'), array('CCAPIUser','Login'),
             CC_DONT_CARE_LOGGED_IN, ccs(__FILE__), '', _('Perform login'), CC_AG_USER);
+        CCEvents::MapUrl( ccp('api','user','thumbnail'), array('CCAPIUser','Thumbnail'),
+            CC_DONT_CARE_LOGGED_IN, ccs(__FILE__), '', _('get a user thumbnail'), CC_AG_USER);
+
+        // CC_MUST_BE_LOGGED_IN
         CCEvents::MapUrl( ccp('api','user','logout'), array('CCAPIUser','Logout'),
             CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '', _('Perform logout'), CC_AG_USER);
         CCEvents::MapUrl( ccp('api','user','follow'), array('CCAPIUser','Follow'),
             CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '', _('Perform logout'), CC_AG_USER);
-        CCEvents::MapUrl( ccp('api','user','thumbnail'), array('CCAPIUser','Thumbnail'),
-            CC_DONT_CARE_LOGGED_IN, ccs(__FILE__), '', _('get a user thumbnail'), CC_AG_USER);
     }
 
     function OnFilterUserInfo(&$rows)

@@ -19,7 +19,7 @@ class CCEventsUpload
   function OnMapUrls()
   {
     CCEvents::MapUrl( ccp('api','upload','permissions'), array('CCAPIUpload','Permissions'),
-      CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '', _('Return various permissions on upload per user'), CC_AG_UPLOAD);
+      CC_DONT_CARE_LOGGED_IN, ccs(__FILE__), '', _('Return various permissions on upload per user'), CC_AG_UPLOAD);
     CCEvents::MapUrl( ccp('api','upload','rate'), array('CCAPIUpload','Rate'),
       CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '', _('Rate/recommend an upload'), CC_AG_UPLOAD);
     CCEvents::MapUrl( ccp('api','upload','review'), array('CCAPIUpload','Review'),
@@ -34,7 +34,6 @@ class CCAPIUpload
 {
   function Permissions($upload_id,$user_name)
   {
-
     if( !$this->_validate_upload_id($upload_id) ) {
       $status = _make_err_status(INVALID_UPLOAD_ID);
     } else if( !$this->_get_user_id($user_name) ) {

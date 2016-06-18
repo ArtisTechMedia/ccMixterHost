@@ -28,16 +28,16 @@ class CCStatus {
   }
 }
 
-function _make_status($status, $errmsg='',$data=null) {
+function __dont_use_make_status($status, $errmsg='',$data=null) {
     return new CCStatus($status,$errmsg,$data);
 }
 
 function _make_ok_status($data='') {
-  return _make_status(CC_STATUS_OK,'',$data);
+  return __dont_use_make_status(CC_STATUS_OK,'',$data);
 }
 
 function _make_err_status($msg) {
-  return _make_status(CC_STATUS_ERROR,$msg);
+  return __dont_use_make_status(CC_STATUS_ERROR,$msg);
 }
 
 

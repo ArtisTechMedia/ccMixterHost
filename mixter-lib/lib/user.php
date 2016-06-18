@@ -36,7 +36,7 @@ class CCLibUser
 {
   function CurrentUser() {
     $name = CCUser::CurrentUserName();
-    return empty($name) ? _make_status(USER_NOT_LOGGED_IN) : _make_ok_status($name);
+    return empty($name) ? _make_err_status(USER_NOT_LOGGED_IN) : _make_ok_status($name);
   }
 
   function Login($username='',$password='',$remember=true) {
