@@ -100,10 +100,10 @@ EOF;
             $values['cart_name'] = substr($name,0,60);
         }
         if( !empty($tags) ) {
-            $values['cart_tags'] = $tags;
+            $values['cart_tags'] = $tags == '-' ? '' : $tags;
         }
         if( !empty($desc) ) {
-            $values['cart_desc'] = $desc;
+            $values['cart_desc'] = $desc == '-' ? '' : $desc;
         }
 
         $carts->Update($values);

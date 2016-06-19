@@ -270,8 +270,13 @@ class CCAPIPlaylist
         $lib->UpdateProperties(   CCUser::CurrentUser(),
                                   $playlist_id,
                                   empty($_REQUEST['name']) ? '' : $_REQUEST['name'],
-                                  empty($_REQUEST['tags']) ? '' : $_REQUEST['tags'],
-                                  empty($_REQUEST['description']) ? '' : $_REQUEST['description'] );
+                                  array_key_exists('tags',$_REQUEST) 
+                                    ? (empty($_REQUEST['tags']) ? '-' : $_REQUEST['tags'])
+                                    : '',
+                                  array_key_exists('description',$_REQUEST) 
+                                    ? (empty($_REQUEST['description']) ? '-' : $_REQUEST['description'])
+                                    : ''
+                                );;
 
         require_once('cchost_lib/cc-query.php');
         $query = new CCQuery();
