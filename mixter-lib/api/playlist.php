@@ -263,32 +263,33 @@ class CCAPIPlaylist
 
     function APIUpdate($playlist_id)
     {
-        $playlist_id = CCUtil::CleanNumber($playlist_id);
+        $playlist_id = CCUtil::CleanNumber($playlist_id);        
         CCUtil::Strip($_REQUEST);
         $lib = new CCLibPlaylists();
-        $stat =
-        $lib->UpdateProperties(   CCUser::CurrentUser(),
+        $status = $lib->UpdateProperties(   
+                                  CCUser::CurrentUser(),
                                   $playlist_id,
-                                  empty($_REQUEST['name']) ? '' : $_REQUEST['name'],
+                                  empty($_REQUEST['name']) ? null : $_REQUEST['name'],
                                   array_key_exists('tags',$_REQUEST) 
-                                    ? (empty($_REQUEST['tags']) ? '-' : $_REQUEST['tags'])
+                                    ? (empty($_REQUEST['tags']) ? null : $_REQUEST['tags'])
                                     : '',
                                   array_key_exists('description',$_REQUEST) 
-                                    ? (empty($_REQUEST['description']) ? '-' : $_REQUEST['description'])
-                                    : ''
-                                );;
-
-        require_once('cchost_lib/cc-query.php');
-        $query = new CCQuery();
-        $args = $query->ProcessAdminArgs('f=php&dataview=playlist_head&ids='.$playlist_id);
-        list( $value, $mime ) = $query->Query($args);
-        $status = _make_ok_status($value);
+                                    ? (empty($_REQUEST['description']) ? null : $_REQUEST['description'])
+                                    : '',
+                                  empty($_REQUEST['featured']) ? null : $_REQUEST['featured'] == 'true'
+                                );
         CCUtil::ReturnAjaxObj($status);        
     }
 
     function APIFeature($playlist_id) 
     {
         $playlist_id = CCUtil::CleanNumber($playlist_id);
+        $status = $this->_doFeature($playlist_id);
+        CCUtil::ReturnAjaxObj($status);        
+    }
+
+    function _doFeature($playlist_id) 
+    {
         $status = array();
         $status['status'] = 'invalid user';
         if( CCUser::IsAdmin() )
@@ -299,7 +300,7 @@ class CCAPIPlaylist
                 $status->$status = $status[PLAYLIST_ERROR];
             }
         }
-        CCUtil::ReturnAjaxObj($status);        
+        return $status;        
     }
 
     function APIDelete($playlist_id)

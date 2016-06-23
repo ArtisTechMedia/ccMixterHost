@@ -18,6 +18,7 @@ define('PLAYLIST_TEST_ALL',       PLAYLIST_TEST_UPLOAD | PLAYLIST_TEST_PLAYLIST 
 
 define('PLAYLIST_NOT_FOUND',    'playlist not found');
 define('PLAYLIST_EMPTY_QUERY',  'empty query string');
+define('PLAYLIST_NOT_ALLOWED',  'wrong permissions');
 
 require_once('cchost_lib/ccextras/cc-cart-table.inc');
 
@@ -86,7 +87,7 @@ EOF;
         return $status;
     }
 
-    function UpdateProperties($user_id,$playlist_id,$name,$tags,$desc)
+    function UpdateProperties($user_id,$playlist_id,$name,$tags,$desc,$featured)
     {
         if( !$this->_verifyPlaylist($user_id,0,$playlist_id, PLAYLIST_TEST_PLAYLIST | PLAYLIST_TEST_OWNER) ) {
             return _make_err_status(PLAYLIST_NOT_FOUND);
@@ -96,14 +97,20 @@ EOF;
 
         $values = array( 'cart_id' => $playlist_id );      
 
-        if( !empty($name) ) {
+        if( !is_null($name) ) {
             $values['cart_name'] = substr($name,0,60);
         }
-        if( !empty($tags) ) {
-            $values['cart_tags'] = $tags == '-' ? '' : $tags;
+        if( !is_null($tags) ) {
+            $values['cart_tags'] = $tags;
         }
-        if( !empty($desc) ) {
-            $values['cart_desc'] = $desc == '-' ? '' : $desc;
+        if( !is_null($desc) ) {
+            $values['cart_desc'] = $desc;
+        }
+        if( !is_null($featured) ) {
+            if( !CCUser::IsAdmin() ) {
+                return _make_err_status(PLAYLIST_NOT_ALLOWED);
+            }
+            $values['cart_subtype'] = $featured ? 'featured' : '';
         }
 
         $carts->Update($values);
