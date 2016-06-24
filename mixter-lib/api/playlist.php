@@ -58,9 +58,6 @@ class CCEventsPlaylists
             array( 'CCAPIPlaylist', 'APIRemove'),  CC_MUST_BE_LOGGED_IN,   ccs(__FILE__),
              '{upload_id},{playlist_id}', _('Remove upload from playlist'), CC_AG_PLAYLIST );
     
-        CCEvents::MapUrl( ccp('api','playlist','feature'),
-            array( 'CCAPIPlaylist', 'APIFeature'),  CC_ADMIN_ONLY,   ccs(__FILE__),
-             '{playlist_id}', _('toggle feature status of playlist'), CC_AG_PLAYLIST );
     }
 
     function OnApiQuerySetup( &$args, &$queryObj, $requiresValidation )
@@ -265,42 +262,27 @@ class CCAPIPlaylist
     {
         $playlist_id = CCUtil::CleanNumber($playlist_id);        
         CCUtil::Strip($_REQUEST);
+        
         $lib = new CCLibPlaylists();
-        $status = $lib->UpdateProperties(   
-                                  CCUser::CurrentUser(),
-                                  $playlist_id,
-                                  empty($_REQUEST['name']) ? null : $_REQUEST['name'],
-                                  array_key_exists('tags',$_REQUEST) 
-                                    ? (empty($_REQUEST['tags']) ? null : $_REQUEST['tags'])
-                                    : '',
-                                  array_key_exists('description',$_REQUEST) 
-                                    ? (empty($_REQUEST['description']) ? null : $_REQUEST['description'])
-                                    : '',
-                                  empty($_REQUEST['featured']) ? null : $_REQUEST['featured'] == 'true'
-                                );
-        CCUtil::ReturnAjaxObj($status);        
-    }
 
-    function APIFeature($playlist_id) 
-    {
-        $playlist_id = CCUtil::CleanNumber($playlist_id);
-        $status = $this->_doFeature($playlist_id);
-        CCUtil::ReturnAjaxObj($status);        
-    }
-
-    function _doFeature($playlist_id) 
-    {
-        $status = array();
-        $status['status'] = 'invalid user';
-        if( CCUser::IsAdmin() )
-        {
-            $lib = new CCLibPlaylists();
-            $status = $lib->Feature($playlist_id);
-            if( $status->$status !== CC_STATUS_OK ) {
-                $status->$status = $status[PLAYLIST_ERROR];
-            }
+        $props = array();
+        if( !empty($_REQUEST['name']) ) {
+            $props['name'] = $_REQUEST['name'];
         }
-        return $status;        
+        if( array_key_exists('tags',$_REQUEST) ) {
+            $props['tags'] = $_REQUEST['tags'];
+        }
+        if( array_key_exists('description',$_REQUEST) ) {
+            $props['description'] = $_REQUEST['description'];
+        }
+        if( !empty($_REQUEST['isFeatured']) ) {
+            $props['featured'] = $_REQUEST['isFeatured'] == 'true';
+        }
+
+        $status = $lib->UpdateProperties(CCUser::CurrentUser(),$playlist_id,$props);
+
+        CCUtil::ReturnAjaxObj($status);        
+
     }
 
     function APIDelete($playlist_id)

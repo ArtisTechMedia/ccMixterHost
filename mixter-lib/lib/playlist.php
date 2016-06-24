@@ -87,7 +87,7 @@ EOF;
         return $status;
     }
 
-    function UpdateProperties($user_id,$playlist_id,$name,$tags,$desc,$featured)
+    function UpdateProperties($user_id,$playlist_id,$props)
     {
         if( !$this->_verifyPlaylist($user_id,0,$playlist_id, PLAYLIST_TEST_PLAYLIST | PLAYLIST_TEST_OWNER) ) {
             return _make_err_status(PLAYLIST_NOT_FOUND);
@@ -97,42 +97,29 @@ EOF;
 
         $values = array( 'cart_id' => $playlist_id );      
 
-        if( !is_null($name) ) {
-            $values['cart_name'] = substr($name,0,60);
-        }
-        if( !is_null($tags) ) {
-            $values['cart_tags'] = $tags;
-        }
-        if( !is_null($desc) ) {
-            $values['cart_desc'] = $desc;
-        }
-        if( !is_null($featured) ) {
-            if( !CCUser::IsAdmin() ) {
-                return _make_err_status(PLAYLIST_NOT_ALLOWED);
+        foreach ($props as $key => $value) {
+            switch ($key) {
+                case 'name':
+                    $values['cart_name'] = $value;
+                    break;
+                case 'tags':
+                    $values['cart_tags'] = $value;
+                    break;
+                case 'description':
+                    $values['cart_desc'] = $value;
+                    break;
+                case 'featured':
+                    if( !CCUser::IsAdmin() ) {
+                        return _make_err_status(PLAYLIST_NOT_ALLOWED);
+                    }
+                    $values['cart_subtype'] = $value ? 'featured' : '';
+                    break;                
             }
-            $values['cart_subtype'] = $featured ? 'featured' : '';
         }
 
         $carts->Update($values);
 
         return _make_ok_status();
-    }
-
-    function Feature($playlist_id) 
-    {
-        if( $this->_verifyPlaylist(0,0,$playlist_id,PLAYLIST_TEST_PLAYLIST) ) {
-            $carts =& CCPlaylist::GetTable();
-            $sub_type = $carts->QueryItemFromKey('cart_subtype', $playlist_id); 
-            $w['cart_id'] = $playlist_id;
-            if( $sub_type == 'featured') {
-                $w['cart_subtype'] = '';
-            } else {
-                $w['cart_subtype'] = 'featured';
-            }
-            $carts->Update($w);
-            return _make_ok_status();
-        }
-        return _make_err_status(PLAYLIST_NOT_FOUND);
     }
 
     function DeletePlaylist($user_id,$playlist_id)
