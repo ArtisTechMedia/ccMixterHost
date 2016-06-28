@@ -203,7 +203,7 @@ class CCPlaylistManage
 
     function Edit($playlist_id='')
     {
-        $url = 'http://playlists.ccmixter.org/playlist/browse/' . $playlist_id;
+        $url = 'http://beta.ccmixter.org/playlist/browse/' . $playlist_id;
         CCUtil::SendBrowserTo($url);
         /*
 

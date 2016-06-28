@@ -40,7 +40,7 @@ class CCPlaylistBrowse
     */
     function User($user)
     {
-        CCUtil::SendBrowserTo('http://playlists.ccmixter.org/people/' . $user . '/playlists');
+        CCUtil::SendBrowserTo('http://beta.ccmixter.org/people/' . $user . '/playlists');
         /*
         require_once('cchost_lib/cc-page.php');
         $page =& CCPage::GetPage();
@@ -216,7 +216,7 @@ class CCPlaylistBrowse
         $query->_arg_alias_ref($args);
 
         if( !empty($args['user']) ) {
-            CCUtil::SendBrowserTo('http://playlists.ccmixter.org/people/' . $args['user']);
+            CCUtil::SendBrowserTo('http://beta.ccmixter.org/people/' . $args['user']);
         }
 
         if( !empty($playlist_id) )
@@ -290,7 +290,7 @@ EOF;
         }
         else
         {
-            $url = 'http://playlists.ccmixter.org/playlist/browse/' . $playlist_id;
+            $url = 'http://beta.ccmixter.org/playlist/browse/' . $playlist_id;
             CCUtil::SendBrowserTo($url);
 
             /*
