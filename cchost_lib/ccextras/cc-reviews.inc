@@ -252,13 +252,17 @@ class CCReview
         $users =& CCUsers::GetTable();
         $arg1['user_id'] = $reviewer;
         $count = $users->QueryItemFromKey('user_num_reviews',$reviewer) + $add;
-        $arg1['user_num_reviews'] = $count;
-        $users->Update($arg1);
+        if( $count >= 0 ) {
+            $arg1['user_num_reviews'] = $count;
+            $users->Update($arg1);
+        }
 
         $arg2['user_id'] = $reviewee;
         $count = $users->QueryItemFromKey('user_num_reviewed',$reviewee) + $add;
-        $arg2['user_num_reviewed'] = $count;
-        $users->Update($arg2);
+        if( $count >= 0 ) {
+            $arg2['user_num_reviewed'] = $count;
+            $users->Update($arg2);
+        }
     }
 
     /**

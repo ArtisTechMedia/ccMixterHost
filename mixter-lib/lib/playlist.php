@@ -122,6 +122,20 @@ EOF;
         return _make_ok_status();
     }
 
+    function RemovePlaylistsForUser($user_id)
+    {
+        $carts =& CCPlaylist::GetTable();
+        $where['cart_user'] = $user_id;
+        $keys = $carts->QueryKeys($where);
+        foreach ($keys as $key) {
+            $status = $this->DeletePlaylist($user_id,$key);
+            if( !$status->ok() ) {
+                return $status;
+            }
+        }
+        return _make_ok_status();
+    }
+
     function DeletePlaylist($user_id,$playlist_id)
     {
         if( !$this->_verifyPlaylist( $user_id, 0, $playlist_id, PLAYLIST_TEST_PLAYLIST | PLAYLIST_TEST_OWNER ) ) {

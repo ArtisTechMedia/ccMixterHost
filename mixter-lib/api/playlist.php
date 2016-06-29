@@ -209,6 +209,12 @@ class CCEventsPlaylists
         $lib->RemoveUploadFromAllPlaylists($record['upload_id']);
     }
 
+    function OnUserDelete($user_id)
+    {
+        $lib = new CCLibPlaylists();
+        $lib->RemovePlaylistsForUser($user_id);
+    }
+
 }
 
 class CCAPIPlaylist
