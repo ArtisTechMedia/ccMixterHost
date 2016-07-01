@@ -169,7 +169,7 @@ class CCBan
         // of language, not the users
 
         $row = CCDatabase::QueryRow(
-            'SELECT upload_banned, upload_name, user_name, user_email FROM cc_tbl_uploads JOIN cc_tbl_user ON upload_user=user_id WHERE upload_id='.$upload_id);
+            'SELECT upload_banned, upload_name, user_name, upload_id, user_email FROM cc_tbl_uploads JOIN cc_tbl_user ON upload_user=user_id WHERE upload_id='.$upload_id);
         $uploads =& CCUploads::GetTable();
         $new_ban_flag = $row['upload_banned'] ^= 1;
         $args['upload_id'] = $upload_id;

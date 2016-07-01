@@ -117,9 +117,9 @@ class CCEventsFeed
         $lib->AddFollowing($user,$following);
     }
 
-    function OnUploadModerated(&$row)
+    function OnUploadModerated(&$row,$value)
     {
-        if( !empty($row['upload_banned']) ) {
+        if( $value == 'banned' ) {
             $lib = new CCLibFeed();
             $lib->RemoveUpload($row['upload_id']);
         }
