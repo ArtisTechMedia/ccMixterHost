@@ -108,6 +108,7 @@ class CCFeedActionTable extends CCTable
         }
         $where['action_id'] = $this->NextID();
         $this->Insert($where);
+        CCEvents::Invoke(CC_EVENT_FEED_ACTION_ADDED, array(&$where));
         return $where['action_id'];
     }
 

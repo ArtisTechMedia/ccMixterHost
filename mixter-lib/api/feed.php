@@ -1,19 +1,21 @@
 <?
 
-require_once( 'mixter-lib/lib/events.php' );
+require_once('mixter-lib/lib/events.php' );
 require_once('mixter-lib/lib/feed.php');
+require_once('cchost_lib/cc-query.php');
 
-CCEvents::AddHandler(CC_EVENT_MAP_URLS,        array( 'CCEventsFeed', 'OnMapUrls'));
-CCEvents::AddHandler(CC_EVENT_API_QUERY_SETUP, array( 'CCEventsFeed', 'OnApiQuerySetup'));
-CCEvents::AddHandler(CC_EVENT_ED_PICK,         array( 'CCEventsFeed', 'OnEdPick'));
-CCEvents::AddHandler(CC_EVENT_RATED,           array( 'CCEventsFeed', 'OnRated'));
-CCEvents::AddHandler(CC_EVENT_REVIEW,          array( 'CCEventsFeed', 'OnReview'));
-CCEvents::AddHandler(CC_EVENT_FORUM_POST,      array( 'CCEventsFeed', 'OnForumPost'));
-CCEvents::AddHandler(CC_EVENT_TOPIC_REPLY,     array( 'CCEventsFeed', 'OnTopicReply'));
-CCEvents::AddHandler(CC_EVENT_START_FOLLOWING, array( 'CCEventsFeed', 'OnStartFollowing'));
-CCEvents::AddHandler(CC_EVENT_UPLOAD_MODERATED,array( 'CCEventsFeed', 'OnUploadModerated'));
-CCEvents::AddHandler(CC_EVENT_DELETING_UPLOAD ,array( 'CCEventsFeed', 'OnDeletingUpload'));
-CCEvents::AddHandler(CC_EVENT_TOPIC_DELETE,    array( 'CCEventsFeed', 'OnTopicDelete'));
+CCEvents::AddHandler(CC_EVENT_MAP_URLS,          array( 'CCEventsFeed', 'OnMapUrls'));
+CCEvents::AddHandler(CC_EVENT_API_QUERY_SETUP,   array( 'CCEventsFeed', 'OnApiQuerySetup'));
+CCEvents::AddHandler(CC_EVENT_ED_PICK,           array( 'CCEventsFeed', 'OnEdPick'));
+CCEvents::AddHandler(CC_EVENT_RATED,             array( 'CCEventsFeed', 'OnRated'));
+CCEvents::AddHandler(CC_EVENT_REVIEW,            array( 'CCEventsFeed', 'OnReview'));
+CCEvents::AddHandler(CC_EVENT_FORUM_POST,        array( 'CCEventsFeed', 'OnForumPost'));
+CCEvents::AddHandler(CC_EVENT_TOPIC_REPLY,       array( 'CCEventsFeed', 'OnTopicReply'));
+CCEvents::AddHandler(CC_EVENT_START_FOLLOWING,   array( 'CCEventsFeed', 'OnStartFollowing'));
+CCEvents::AddHandler(CC_EVENT_UPLOAD_MODERATED,  array( 'CCEventsFeed', 'OnUploadModerated'));
+CCEvents::AddHandler(CC_EVENT_DELETING_UPLOAD ,  array( 'CCEventsFeed', 'OnDeletingUpload'));
+CCEvents::AddHandler(CC_EVENT_TOPIC_DELETE,      array( 'CCEventsFeed', 'OnTopicDelete'));
+CCEvents::AddHandler(CC_EVENT_FEED_ACTION_ADDED, array( 'CCEventsFeed', 'OnFeedActionAdded'));
 
 define('USER_FIELD_FEED_SEEN','feedseen');
 
@@ -52,7 +54,9 @@ class CCEventsFeed
             $sticky = empty($args['sticky']) ? 0 : 1;
             $queryObj->where[] = "action_sticky = {$sticky}";
 
-            if( !empty($args['user']) ) {
+            if( empty($args['user']) ) {
+
+            } else {
                 $user_id = CCUser::IDForName($args['user']);
                 if( !$user_id ) {
                     $queryObj->dead = true;
@@ -135,6 +139,12 @@ class CCEventsFeed
     {
         $lib = new CCLibFeed();
         $lib->RemoveTopic($topic_id,true);        
+    }
+
+    function OnFeedActionAdded() 
+    {
+        $three_hours = /*60 * 60 * */ 3;
+        CCQuery::ClearCache('sitefeed', $three_hours );
     }
 }
 
