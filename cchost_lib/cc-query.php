@@ -669,12 +669,10 @@ class CCQuery
 
     }
 
-    static public function ClearCache($cache_name,$if_older_than_seconds) {
-        $cname = cc_temp_dir() . '/query_cache_' . $cache_name . '.txt';
-        if( file_exists($cname) ) {
-            $fileTime = filectime($cname);
-            $fileAge = time() - $fileTime; 
-            if ($fileAge > ($if_older_than_seconds * 60)) {
+    static public function ClearCache($cache_mask,$if_older_than_seconds) {
+        $cmask = cc_temp_dir() . '/query_cache_' . $cache_mask . '.txt';
+        foreach (glob($cmask) as $cname) {
+            if (time() - filectime($cname) > ($if_older_than_seconds * 60)) {
                 unlink($cname);
             }
         }

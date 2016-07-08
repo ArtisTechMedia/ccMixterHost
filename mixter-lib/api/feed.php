@@ -143,8 +143,8 @@ class CCEventsFeed
 
     function OnFeedActionAdded() 
     {
-        $three_hours = /*60 * 60 * */ 3;
-        CCQuery::ClearCache('sitefeed', $three_hours );
+        $three_hours = 60 * 60 * 3;
+        CCQuery::ClearCache('sitefeed*', $three_hours );
     }
 }
 
