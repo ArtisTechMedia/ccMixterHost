@@ -10,16 +10,18 @@ if( !defined('IN_CC_HOST') )
    die('Welcome to CC Host');
 
 define('CC_EVENT_FILTER_CART_NSFW','cartnsfw');
+define('CC_EVENT_FILTER_PLAYLIST_CLEAN','plycln');
 
 require_once('cchost_lib/ccextras/cc-cart-table.inc');
 require_once('mixter-lib/lib/playlist.php');
 
-CCEvents::AddHandler(CC_EVENT_MAP_URLS,           array( 'CCEventsPlaylists', 'OnMapUrls'));
-CCEvents::AddHandler(CC_EVENT_USER_DELETED,       array( 'CCEventsPlaylists', 'OnUserDelete'));
-CCEvents::AddHandler(CC_EVENT_API_QUERY_SETUP,    array( 'CCEventsPlaylists', 'OnApiQuerySetup')); 
-CCEvents::AddHandler(CC_EVENT_DELETE_UPLOAD,      array( 'CCEventsPlaylists', 'OnUploadDelete'));
-CCEvents::AddHandler(CC_EVENT_SEARCH_META,        array( 'CCEventsPlaylists', 'OnSearchMeta'));
-CCEvents::AddHandler(CC_EVENT_FILTER_MACROS,      array( 'CCEventsPlaylists', 'OnFilterMacros'));
+CCEvents::AddHandler(CC_EVENT_MAP_URLS,              array( 'CCEventsPlaylists', 'OnMapUrls'));
+CCEvents::AddHandler(CC_EVENT_USER_DELETED,          array( 'CCEventsPlaylists', 'OnUserDelete'));
+CCEvents::AddHandler(CC_EVENT_API_QUERY_SETUP,       array( 'CCEventsPlaylists', 'OnApiQuerySetup')); 
+CCEvents::AddHandler(CC_EVENT_DELETE_UPLOAD,         array( 'CCEventsPlaylists', 'OnUploadDelete'));
+CCEvents::AddHandler(CC_EVENT_SEARCH_META,           array( 'CCEventsPlaylists', 'OnSearchMeta'));
+CCEvents::AddHandler(CC_EVENT_FILTER_MACROS,         array( 'CCEventsPlaylists', 'OnFilterMacros'));
+CCEvents::AddHandler(CC_EVENT_FILTER_PLAYLIST_CLEAN, array( 'CCEventsPlaylists', 'OnFilterPlaylistClean'));
 
 class CCEventsPlaylists
 {
@@ -152,11 +154,25 @@ class CCEventsPlaylists
             );
     }
 
+    function OnFilterPlaylistClean(&$records) 
+    {
+        $R =& $records[0];
+        if( !count($R['cart_dynamic']) ) {
+            return;
+        }
+        parse_str($R['cart_dynamic'],$args);
+        $cargs = array();
+        foreach ($args as $key => $value) {
+            if( $key[0] !== '_' && $key !== 'lepsog3' ) {
+                $cargs[$key] = $args[$key];
+            }
+        }
+        $str = http_build_query($cargs);
+        $R['cart_dynamic'] = $str;
+    }
+
     function OnFilterMacros(&$records)
     {
-        if( !cc_playlist_enabled() )
-            return;
-
         $k = array_keys($records);
         $c = count($k);
 
@@ -251,7 +267,7 @@ class CCAPIPlaylist
         $name   = $_REQUEST['title'];
         $tags   = empty($_REQUEST['tags']) ? '' : $_REQUEST['tags'];
         $lib    = new CCLibPlaylists();
-        $status = $lib->CreatePlaylist('playlist',$name,'',CCUser::CurrentUser(),$_REQUEST,$tags);
+        $status = $lib->CreatePlaylist('playlist',$name,'',CCUser::CurrentUser(),$_GET,$tags);
         CCUtil::ReturnAjaxObj($status);
     }
 
