@@ -531,11 +531,12 @@ class CCQuery
         // $keys = array_keys($args);
         //
 
-        $badargs = array( 'qstring', 'ccm', 'format', 'template', 'dataview', 'datasource', '_', '_cache_buster' ); 
+        $badargs = array( 'qstring', 'ccm', 'format', 'template', 'dataview', 'datasource', 'lepsog3' ); 
 
         foreach( $keys as $K )
         {
-            if(  in_array( $K, $badargs ) || empty($args[$K]) || !is_string($args[$K]) ||
+            if(  in_array( $K, $badargs ) || empty($args[$K]) 
+                || !is_string($args[$K]) || $K[0] == '_' ||
                 ( array_key_exists($K,$default_args) && ($args[$K] == $default_args[$K]) ) )
             {
                 continue;

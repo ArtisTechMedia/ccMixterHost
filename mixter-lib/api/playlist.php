@@ -160,15 +160,12 @@ class CCEventsPlaylists
         if( !count($R['cart_dynamic']) ) {
             return;
         }
-        parse_str($R['cart_dynamic'],$args);
-        $cargs = array();
-        foreach ($args as $key => $value) {
-            if( $key[0] !== '_' && $key !== 'lepsog3' ) {
-                $cargs[$key] = $args[$key];
-            }
+        parse_str($R['cart_dynamic'],$queryArgs);
+        $lib = new CCLibPlaylists();
+        $status = $lib->SerializeQueryArgs($queryArgs);
+        if( $status->ok() ) {
+            $R['cart_dynamic'] = $status->data;
         }
-        $str = http_build_query($cargs);
-        $R['cart_dynamic'] = $str;
     }
 
     function OnFilterMacros(&$records)
