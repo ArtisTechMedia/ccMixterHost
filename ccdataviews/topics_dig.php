@@ -29,6 +29,7 @@ SELECT
         CONCAT( '$urlp', user_name ) as artist_page_url,
         DATE_FORMAT( topic.topic_date, '%a, %b %e, %Y @ %l:%i %p' ) as topic_date_format,
         topic_date
+        %columns%
 FROM cc_tbl_topics AS topic
 JOIN cc_tbl_user AS user ON (topic.topic_user = user_id) 
 %where% 

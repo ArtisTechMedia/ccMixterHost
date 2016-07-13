@@ -1420,9 +1420,25 @@ EOF;
         // 'type' for uploads (as applied to tags) are handled elsewhere (see 
         // call to MakeTagFilter in this file)
 
-        if( $this->args['datasource'] == 'topics' )
+        if( $this->args['datasource'] == 'topics' )            
         {
-            $this->where[] = "topic_type = '{$this->args['type']}'";
+            $ttype = $this->args['type'];
+            $sql = "SELECT topic_id FROM cc_tbl_topics WHERE topic_type = '{$ttype}' LIMIT 1";
+            $hit = CCDatabase::QueryItem($sql);
+            if( !$hit ) {
+                $page = CCPage::GetViewFile($ttype);
+                if( $page ) 
+                {
+                    require_once('cchost_lib/cc-file-props.php');
+                    $fp = new CCFileProps();
+                    $props = $fp->GetFileProps($page);
+                    $ttype = $props['topic_type'];
+                    $col = "'" . $props['content_page_textformat'] . "' as content_page_textformat";
+                    $this->sql_p['columns'] = $col;
+                }
+            }
+
+            $this->where[] = "topic_type = '{$ttype}'";
         }
         elseif( $this->args['datasource'] == 'cart' ) 
         {
