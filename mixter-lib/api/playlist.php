@@ -11,17 +11,19 @@ if( !defined('IN_CC_HOST') )
 
 define('CC_EVENT_FILTER_CART_NSFW','cartnsfw');
 define('CC_EVENT_FILTER_PLAYLIST_CLEAN','plycln');
+define('CC_EVENT_FILTER_PLAYLIST_PERMISSIONS','plyperms');
 
 require_once('cchost_lib/ccextras/cc-cart-table.inc');
 require_once('mixter-lib/lib/playlist.php');
 
-CCEvents::AddHandler(CC_EVENT_MAP_URLS,              array( 'CCEventsPlaylists', 'OnMapUrls'));
-CCEvents::AddHandler(CC_EVENT_USER_DELETED,          array( 'CCEventsPlaylists', 'OnUserDelete'));
-CCEvents::AddHandler(CC_EVENT_API_QUERY_SETUP,       array( 'CCEventsPlaylists', 'OnApiQuerySetup')); 
-CCEvents::AddHandler(CC_EVENT_DELETE_UPLOAD,         array( 'CCEventsPlaylists', 'OnUploadDelete'));
-CCEvents::AddHandler(CC_EVENT_SEARCH_META,           array( 'CCEventsPlaylists', 'OnSearchMeta'));
-CCEvents::AddHandler(CC_EVENT_FILTER_MACROS,         array( 'CCEventsPlaylists', 'OnFilterMacros'));
-CCEvents::AddHandler(CC_EVENT_FILTER_PLAYLIST_CLEAN, array( 'CCEventsPlaylists', 'OnFilterPlaylistClean'));
+CCEvents::AddHandler(CC_EVENT_MAP_URLS,                    array( 'CCEventsPlaylists', 'OnMapUrls'));
+CCEvents::AddHandler(CC_EVENT_USER_DELETED,                array( 'CCEventsPlaylists', 'OnUserDelete'));
+CCEvents::AddHandler(CC_EVENT_API_QUERY_SETUP,             array( 'CCEventsPlaylists', 'OnApiQuerySetup')); 
+CCEvents::AddHandler(CC_EVENT_DELETE_UPLOAD,               array( 'CCEventsPlaylists', 'OnUploadDelete'));
+CCEvents::AddHandler(CC_EVENT_SEARCH_META,                 array( 'CCEventsPlaylists', 'OnSearchMeta'));
+CCEvents::AddHandler(CC_EVENT_FILTER_MACROS,               array( 'CCEventsPlaylists', 'OnFilterMacros'));
+CCEvents::AddHandler(CC_EVENT_FILTER_PLAYLIST_CLEAN,       array( 'CCEventsPlaylists', 'OnFilterPlaylistClean'));
+CCEvents::AddHandler(CC_EVENT_FILTER_PLAYLIST_PERMISSIONS, array( 'CCEventsPlaylists', 'OnFilterPlaylistPermissions'));
 
 class CCEventsPlaylists
 {
@@ -165,6 +167,16 @@ class CCEventsPlaylists
         $status = $lib->SerializeQueryArgs($queryArgs);
         if( $status->ok() ) {
             $R['cart_dynamic'] = $status->data;
+        }
+    }
+
+    function OnFilterPlaylistPermissions(&$records) 
+    {
+        $R =& $records[0];
+        $lib = new CCLibPlaylists();
+        $status = $lib->GetPermissions( CCUser::CurrentUser(), $R );
+        if( $status->ok() ) {
+            $R['permissions'] = $status->data;
         }
     }
 

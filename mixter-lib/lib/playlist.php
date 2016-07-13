@@ -288,6 +288,14 @@ EOF;
         return sprintf( _("%s's Collection (%d) "),$user_name, $num + 1);
     }
 
+    function GetPermissions($user_id,$playlist)
+    {
+        $ok = $this->_verifyPlaylist($user_id,0,$playlist['cart_id'],PLAYLIST_TEST_OWNER);
+        return _make_ok_status(array('canEdit' => $ok, 
+                                     'canFeature' => $this->_isAdmin($user_id)
+                                     ));
+    }
+
     function _verifyPlaylist( $user_id, $upload_id, $playlist_id, $flags )
     {
         $ok = true;
@@ -305,10 +313,17 @@ EOF;
         }
         if( $ok && ($flags & PLAYLIST_TEST_OWNER) )
         {
-            $owner = CCDatabase::QueryItem('SELECT cart_user FROM cc_tbl_cart WHERE cart_id='.$playlist_id);
-            $ok = !empty($owner) && ($owner == $user_id);
+            if( !$this->_isAdmin($user_id) ) {
+                $owner = CCDatabase::QueryItem('SELECT cart_user FROM cc_tbl_cart WHERE cart_id='.$playlist_id);
+                $ok = !empty($owner) && ($owner == $user_id);
+            }
         }
         return $ok;
+    }
+
+    function _isAdmin($user_id) 
+    {
+        return CCUser::IsAdmin(CCUser::NameFromID($user_id));
     }
 
     function AddTrackToPlaylist($user_id, $upload_id, $playlist_id)

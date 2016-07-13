@@ -31,6 +31,7 @@ EOF;
                   'sql_count' => $sql_count,
                    'e'  => array( CC_EVENT_FILTER_FORMAT,
                                   CC_EVENT_FILTER_PLAYLIST_CLEAN,
+                                  CC_EVENT_FILTER_PLAYLIST_PERMISSIONS,
                                   CC_EVENT_FILTER_CART_NSFW ) 
                  );
 }
