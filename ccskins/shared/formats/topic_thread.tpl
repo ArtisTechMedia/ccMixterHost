@@ -23,6 +23,7 @@ SELECT  topic.topic_id, IF( COUNT(parent.topic_id) > 2, (COUNT(parent.topic_id) 
         CONCAT( '$turl', topic.topic_thread, '#', topic.topic_id ) as topic_url,
         CONCAT( '$urlp', user_name ) as artist_page_url,
         DATE_FORMAT( topic.topic_date, '%a, %b %e, %Y @ %l:%i %p' ) as topic_date_format,
+        topic.topic_date,
         {$user_avatar_col}
 FROM cc_tbl_topics AS topic, 
      cc_tbl_topics AS parent,
