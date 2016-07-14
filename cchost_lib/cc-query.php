@@ -1427,15 +1427,26 @@ EOF;
             $hit = CCDatabase::QueryItem($sql);
             if( !$hit ) {
                 $page = CCPage::GetViewFile($ttype);
+                $ttype = '';
                 if( $page ) 
                 {
                     require_once('cchost_lib/cc-file-props.php');
                     $fp = new CCFileProps();
                     $props = $fp->GetFileProps($page);
-                    $ttype = $props['topic_type'];
-                    $col = "'" . $props['content_page_textformat'] . "' as content_page_textformat";
-                    $this->sql_p['columns'] = $col;
+                    if( !empty($props) && 
+                        array_key_exists('topic_type', $props) && 
+                        array_key_exists('content_page_textformat', $props)) 
+                    {
+                            $ttype = $props['topic_type'];
+                            $col = "'" . $props['content_page_textformat'] . "' as content_page_textformat";
+                            $this->sql_p['columns'] = $col;
+                    }
                 }
+            }
+
+            if( empty($ttype) )
+            {
+                $ttype = '_unknown_type_';
             }
 
             $this->where[] = "topic_type = '{$ttype}'";
