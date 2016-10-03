@@ -288,6 +288,7 @@ class CCThrottle
         $configs    =& CCConfigs::GetTable();
         $rules      = $configs->GetConfig('throttle_rules');
         $throttle   = $configs->GetConfig('throttle');
+
         
         if( $this->_is_user_manual_throttled() ) {
             foreach( $type_keys as $type_key )
@@ -318,7 +319,7 @@ class CCThrottle
 
             $limit_by_type = $rule['limit_by_type'];
 
-            if( !array_key_exists($limit_by_type,$submit_types) )
+            if( $limit_by_type != 'all' && !array_key_exists($limit_by_type,$submit_types) )
             {
                 // this is a crufty upgrade, a rule exsists for a submit type that doesn't exist anymore
                 // todo: ???
