@@ -4,7 +4,7 @@ cd $HOME
 sh ccmixter-0$1-package.sh
 sh ccmixter-0$1-zip.sh
 mv ./injest/0$1/*.zip /var/www/ccmixter/injest
-mv ./injest/0$1/*.csv /var/www/ccmixter/injest
+mv ccmixter-0$1.csv /var/www/ccmixter/injest
 sh ccmixter-0$1-clean.sh
 echo -----------------------
 echo Posted ZIP and CSV for Batch $1 
