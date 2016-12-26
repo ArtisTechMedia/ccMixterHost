@@ -2,7 +2,7 @@
 php -f cc-mixter-batch.php $1 $2
 cd $HOME
 sh ccmixter-0$1-package.sh
-sh ccmixter-0$1-zip
+sh ccmixter-0$1-zip.sh
 mv ./injest/0$1/*.zip /var/www/ccmixter/injest
 mv ./injest/0$1/*.csv /var/www/ccmixter/injest
 sh ccmixter-0$1-clean.sh
