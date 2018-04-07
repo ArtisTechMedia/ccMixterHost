@@ -61,7 +61,7 @@ function inject_content_topics()
         $args['topic_date'] = $D[1];
         $args['topic_name'] = $D[2];
         $args['topic_text'] = $D[3];
-        $topics->Insert($args,0);
+        $topics->InsertNewTopic($args,0);
     }
 }
 
