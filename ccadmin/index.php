@@ -65,7 +65,7 @@ print('</body></html>');
 
 function step_1()
 {
-    $v = cc_split('\.',phpversion());
+    $v = explode('\.',phpversion());
     if( intval($v[0]) < 4 )
     {
         $vmsg = "<div class='err'>It doesn't look like you're running on PHP 4, you can't run ccHost until you upgrade.</span>";
