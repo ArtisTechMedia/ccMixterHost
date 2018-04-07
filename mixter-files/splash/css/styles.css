@@ -78,7 +78,7 @@ html a:hover {
 	float: right;
 	position: absolute;
 	top: 17px;
-	right: 170px;
+	right: 55px;
 }
 
 .signUp:hover, .signUpBasic:hover {
@@ -92,7 +92,7 @@ html a:hover {
 	float: right;
 	position: absolute;
 	top: 17px;
-	right: 170px;
+	right: 55px;
 	width: 100px;
 	height: 35px;
 }
@@ -110,18 +110,8 @@ html a:hover {
 	font-size: 16px;
 	font-weight: 400;
 }
-.signUp2 {
-	float: right;
-	position: absolute;
-	top: 17px;
-	right: 55px;
-	width: 130px;
-	height: 35px;
-	border-radius: 50px;
-	padding: 5px 0 5px 22px;
-}
-/* HERO */
 
+/* HERO */
 #heroImg {
 	background-image: url(/mixter-files/splash/images/hero_img.jpg);
 	width: 100%;
@@ -209,6 +199,7 @@ html a:hover {
 	background-image: linear-gradient(to top, #309200, #6dca00 74%, #b4ce02);
 	padding: 8px 60px 9px 60px;
 	border: none;
+	margin: 50px auto;
 }
 .signB:hover {
 	width: 270px;
@@ -620,32 +611,6 @@ form h3 {
 	background-image: -ms-linear-gradient(bottom, #0086f8, #0086f8);
 	background-image: linear-gradient(to top, #0086ff, #0086ff);
 
-}
-
-.signF {
-	margin: 0px auto;
-	width: 290px;
-	height: 55px;
-	-webkit-border-radius: 27px 28px 28px 27px/27px 27px 28px 28px;
-	-moz-border-radius: 27px 28px 28px 27px/27px 27px 28px 28px;
-	border-radius: 27px 28px 28px 27px/27px 27px 28px 28px;
-	background-color: #1f1f27;
-	-webkit-box-shadow: 0 2px #002c50;
-	-moz-box-shadow: 0 2px #002c50;
-	box-shadow: 0 2px #002c50;
-	border: solid 1px #00549f;
-	background-image: -webkit-linear-gradient(bottom, #004176, #0c72b5 74%, #0c72b5);
-	background-image: -moz-linear-gradient(bottom, #004176, #0c72b5 74%, #0c72b5);
-	background-image: -o-linear-gradient(bottom, #004176, #0c72b5 74%, #0c72b5);
-	background-image: -ms-linear-gradient(bottom, #004176, #0c72b5 74%, #0c72b5);
-	background-image: linear-gradient(to top, #004176, #0c72b5 74%, #0c72b5);
-}
-.signF:hover {
-	background-image: -webkit-linear-gradient(bottom, #004176, #004176);
-	background-image: -moz-linear-gradient(bottom, #004176, #004176 74%, #004176);
-	background-image: -o-linear-gradient(bottom, #004176, #004176 74%, #004176);
-	background-image: -ms-linear-gradient(bottom, #004176, #004176 74%, #004176);
-	background-image: linear-gradient(to top, #004176, #004176);
 }
 
 img#faceLogo {

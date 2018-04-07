@@ -28,7 +28,6 @@
 </script>
 
 <script type="text/javascript" src="ccskins/shared/js/prototype.js"></script>
-<script type="text/javascript" src="ccskins/shared/js/facebook.js" ></script>
 
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -40,24 +39,6 @@
 </head>
 
 <body data-spy="scroll" data-target=".navbar-collapse">
-<script>
-  window.fbAsyncInit = function() {
-  // facebook
-  FB.init({
-      appId    : '1550961735160190',
-      xfbml    : true,
-      version  : 'v2.2'
-      });
-    };
-
-  (function(d, s, id){
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) {return;}
-    js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-</script>
 
 <div class="myNav" id="myNav_div">
   <div class="container">
@@ -71,9 +52,6 @@
       </ul>
       <div class="signUp">
         <a onclick="myScrollTo('#universe',true)">Sign Up</a>
-      </div>
-      <div class="signUp2"> 
-        OR <fb:login-button scope="public_profile,email" onlogin="fb_check_login_state();"></fb:login-button>
       </div>
     </div><!-- .collapse navbar-collapse -->
   </div><!-- .container -->
@@ -157,10 +135,6 @@
         <div class="ready-to-upload">
           <h3>Ready to upload?</h3>
           <button class="signB" onclick="document.location = '/register';" ><a>Register...</a></button>
-          <span class="or"> &mdash; or &mdash; </span>
-          <div class="signF">  
-            <a href="#" onclick="fb_custom_fb_login()"><img id="faceLogo" src="mixter-files/splash/images/facebook-logo.png" /> <img id="faceDiv" src="mixter-files/splash/images/facebook-div.png" /> <span id="faceText">Sign in with Facebook</span> </a>
-          </div>
         </div>
       </div>
 
