@@ -1,0 +1,150 @@
+#mixup-player {
+    background-color: #FCFCFC;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 7px;
+    border: 1px solid #AAA;
+}
+
+#mixup-player-ui {
+    background-color: #EDEDED;
+    margin-bottom: 0;
+    text-align: center;
+    padding: 1rem;
+}
+
+#mixup-player-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    align-content: center;
+}
+
+#mixup-player-button-container {
+    text-align: center;
+}
+
+#mixup-player-volume-container {
+    min-width: 76px;
+    text-align: left;
+}
+
+#mixup-player-volume-container .flex {
+    display: flex;
+    align-items: center;
+}
+
+#mixup-player-volume-control-container, #mixup-player-volume-control {
+    height: 8px;
+}
+
+#mixup-player-volume-control-container {
+    position: relative;
+    display: inline-block;
+    background-color: #BBB;
+    width: 50px;
+    margin: 0 0.25rem 0 0;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+#mixup-player-volume-control {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #8EE6FD;
+    display: inline-block;
+}
+
+#mixup-player-time-display {
+    min-width: 76px;
+}
+
+#mixup_table #mixup-player #mixup-player-scrubber,
+#mixup_table #mixup-player #mixup-player-loaded,
+#mixup_table #mixup-player #mixup-player-position,
+#mixup_table #mixup-player #mixup-player-scrubber-clicker {
+    height: 8px;
+}
+
+#mixup_table #mixup-player #mixup-player-scrubber {
+    position: relative;
+    background-color: #DDD;
+    margin: 1rem -1rem -1rem -1rem;
+}
+
+#mixup_table #mixup-player #mixup-player-loaded,
+#mixup_table #mixup-player #mixup-player-position,
+#mixup_table #mixup-player #mixup-player-scrubber-clicker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+}
+
+#mixup_table #mixup-player #mixup-player-loaded {
+    background-color: #BBB;
+}
+
+#mixup_table #mixup-player #mixup-player-position {
+    background-color: #8EE6FD;
+}
+
+#mixup_table #mixup-player #mixup-player-scrubber-clicker {
+    background-color: transparent;
+    cursor: pointer;
+}
+
+#mixup-playlist {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#mixup-playlist td {
+    padding: .25rem .5rem;
+}
+
+#mixup-playlist tr:nth-child(even) td {
+    background-color: #F5F5F5;
+}
+
+#mixup-playlist .mixup-current-track td,
+#mixup-playlist tr.mixup-current-track:nth-child(even) td {
+    background-color: #EFFBFE;
+}
+
+a.mixup-button, a.mixup-track-button {
+    display: inline-block;
+    cursor: pointer;
+    color: #555;
+    font-size: 1rem;
+    line-height: 2rem;
+    vertical-align: top;
+}
+
+a.mixup-track-button {
+    line-height: auto;
+}
+
+a.mixup-button:hover, a.mixup-button:active,
+a.mixup-track-button:hover, a.mixup-track-button:active {
+    color: #000;
+}
+
+#mixup-player-playpause {
+    font-size: 2rem;
+    margin: 0 .25rem;
+}
+
+a.menuup_hook, a.info_button {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+.center {
+    text-align: center;
+}
