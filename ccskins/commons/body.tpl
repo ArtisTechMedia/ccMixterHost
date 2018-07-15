@@ -1,25 +1,4 @@
 <body>
-%if_not_empty(facebook-appid)%
-<script>
-    window.fbAsyncInit = function() {
-    // facebook
-    FB.init({
-            appId      : '%(facebook-appid)%',
-            xfbml      : true,
-            version    : 'v2.2'
-            });
-        };
-
-    (function(d, s, id){
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {return;}
-        js = d.createElement(s); js.id = id;
-        js.src = "//connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-</script>
-%end_if%
-
 %if_not_empty(site-disabled)%
     <div id="site_disabled_message" style="position:absolute">%text(str_site_disabled)%</div>
 %end_if%
@@ -49,10 +28,6 @@
         <a class="light_color" href="%(home-url)%login">%text(str_log_in)%</a>
         %if_not_empty(openid-type)%
             <a class="light_color" id="cc_openid_enabled" href="%(home-url)%login/openid"><div>%text(str_openid_enabled)%</div></a>
-        %end_if%    
-        %if_not_empty(facebook_allow_login)%    
-            %call('facebook.tpl/fb_login_script')%
-            <br />%call('facebook.tpl/facebook_login')%          
         %end_if%
     %end_if%
     </div>
