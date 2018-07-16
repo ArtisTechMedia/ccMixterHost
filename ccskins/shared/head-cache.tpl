@@ -96,12 +96,12 @@ var user_name = %if_not_null(logged_in_as)% '%(logged_in_as)%'; %else% null; %en
             if (fileResult.files.length > 0) {
               var DownloadURL = fileResult.files[0].download_url;
               var ReplaceURL = "_ep_" + DownloadID;
-              var ReplaceContent = "<audio preload='none' controls><source src='" +
+              var ReplaceContent = "<audio preload='none' controls class='track-audio'><source src='" +
                 DownloadURL + "' type='audio/mpeg'>Your browser does not support the audio element</audio>\r\n";
               $j("a[id='" + ReplaceURL + "']").parent().html(ReplaceContent);
 
               document.addEventListener('play', function(e) {
-                var audio = document.getElementsByTagName('audio');
+                var audio = document.getElementsByClassName('track-audio');
                 for(var i = 0, len = audio.length; i < len;i++) {
                   if(audio[i] != e.target) {
                     audio[i].pause();
