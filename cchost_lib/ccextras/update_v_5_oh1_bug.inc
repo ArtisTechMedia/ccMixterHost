@@ -35,7 +35,7 @@ class v_5_oh1_bug extends CCUpdate
         $cfg =& CCConfigs::GetTable();
         $cfg->SetValue('config', 'cc-host-version', CC_HOST_VERSION, CC_GLOBAL_SCOPE);
         $CC_GLOBALS['cc-host-version']  = CC_HOST_VERSION;
-        CCPage::Prompt( sprintf(_('%s Upgrade Complete'),CC_HOST_VERSION));
+        $page =& CCPage::GetPage(); $page->Prompt( sprintf(_('%s Upgrade Complete'),CC_HOST_VERSION));
 
     }
 }

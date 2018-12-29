@@ -243,6 +243,7 @@ class CCNavigatorAdmin
     function AdminTabs($page_name='',$cmd='')
     {
         require_once('cchost_lib/cc-page.php');
+        $mainPage =& CCPage::GetPage();
 
         $nav_api = new CCNavigator();
 
@@ -285,7 +286,7 @@ class CCNavigatorAdmin
                 {
                     require_once('cchost_lib/cc-page.php');
                     $title = _('Rename Navigator Tabs Set');
-                    CCPage::AddForm( $form->GenerateForm() );
+                    $mainPage->AddForm( $form->GenerateForm() );
                 }
                 else
                 {
@@ -345,8 +346,8 @@ class CCNavigatorAdmin
                               );
                 $main_crumb = true;
                 $title = _("Manage Navigator Tab Sets");
-                CCPage::PageArg('use_buttons',1);
-                CCPage::PageArg('client_menu',$MI,'print_client_menu');
+                $mainPage->PageArg('use_buttons',1);
+                $mainPage->PageArg('client_menu',$MI,'print_client_menu');
                 break;
             }
 
@@ -387,7 +388,7 @@ class CCNavigatorAdmin
 
                 $main_crumb = true;
                 $title = _("Manage Navigator Tab Sets");
-                CCPage::AddContent($html);
+                $mainPage->AddContent($html);
 
                 break;
             }
@@ -421,7 +422,7 @@ class CCNavigatorAdmin
                 $form = new CCEditTabsForm($page,$page_name);
                 if( empty($_POST['edittabs']) || !$form->ValidateFields() )
                 {
-                    CCPage::AddForm($form->GenerateForm());
+                    $mainPage->AddForm($form->GenerateForm());
                 }
                 else
                 {
@@ -562,7 +563,7 @@ class CCNavigatorAdmin
                 CCAdmin::BreadCrumbs(false,array('url'=>'','text'=>$title));
             else
                 CCAdmin::BreadCrumbs(false,array('url'=>ccl('admin','tabs'),'text'=>_('Manage Navigator Tab Sets')),array('url'=>'','text'=>$title));
-            CCPage::SetTitle($title);
+            $mainPage->SetTitle($title);
         }
     }
 

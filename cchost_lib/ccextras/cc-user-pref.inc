@@ -34,7 +34,8 @@ class CCUserPreferences
         global $CC_GLOBALS;
 
         require_once('cchost_lib/cc-form.php');
-        CCPage::SetTitle('str_pref_title');
+        $page =& CCPage::GetPage();
+        $page->SetTitle('str_pref_title');
         CCUser::AddUserBreadCrumbs('str_pref_title');
 
         $form = new CCGenericForm();
@@ -111,7 +112,7 @@ class CCUserPreferences
         
         if( empty($_POST['generic']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {

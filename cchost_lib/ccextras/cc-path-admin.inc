@@ -110,6 +110,30 @@ class CCPathAdminForm extends CCEditConfigForm
                        'formatter'  => 'textedit',
                        'flags'      => CCFF_POPULATE );
 
+        $fields['imagemagick-path'] =
+               array(  'label'      => _('Location of ImageMagick'),
+                       'form_tip'   => _("Full path to 'convert' utility (e.g. /usr/bin/convert)"),
+                       'slash'      => false,
+                       'value'      => '',
+                       'formatter'  => 'sysdir',
+                       'flags'      => CCFF_POPULATE );
+
+        $fields['lame-path']  =
+               array(  'label'      => _('Location of Lame'),
+                       'form_tip'   => _("Full path to 'lame' utility (e.g. /usr/bin/lame)"),
+                       'slash'      => false,
+                       'value'      => '',
+                       'formatter'  => 'sysdir',
+                       'flags'      => CCFF_POPULATE );
+
+        $fields['curl-path'] =
+               array(  'label'      => _('Location of curl'),
+                       'form_tip'   => _("Full path to 'curl' utility (e.g. /usr/bin/curl)"),
+                       'slash'      => false,
+                       'value'      => '',
+                       'formatter'  => 'sysdir',
+                       'flags'      => CCFF_POPULATE );
+
         $fields['error-txt'] =
                array( 'label'       => _('System Error Message'),
                        'form_tip'   => _('This file is displayed when the system encounters an error.'),
@@ -207,11 +231,12 @@ class CCPathAdmin
     function Admin()
     {
         $title = _('Paths and Files');
+        $page =& CCPage::GetPage();
         require_once('cchost_lib/cc-admin.php');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
         $form = new CCPathAdminForm();
-        CCPage::AddForm($form->GenerateForm());
+        $page->AddForm($form->GenerateForm());
     }
 
     /**

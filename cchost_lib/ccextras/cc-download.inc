@@ -117,22 +117,23 @@ class CCDownload
     function Admin()
     {
         global $CC_GLOBALS;
+        $page =& CCPage::GetPage();
 
         require_once('cchost_lib/cc-admin.php');
         $title = _('Configure Download Manager');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
 
         if( empty($CC_GLOBALS['pretty-urls']) )
         {
             $url = ccl('admin/setup');
             $link1 = "<a href=\"{$url}\">";
-            CCPage::Prompt( sprintf(_('Sorry, but "pretty urls" must be enabled in order to use this feature. Read more %shere%s'),$link1,'</a>'));
+            $page->Prompt( sprintf(_('Sorry, but "pretty urls" must be enabled in order to use this feature. Read more %shere%s'),$link1,'</a>'));
             return;
         }
         require_once('cchost_lib/ccextras/cc-download-form.inc');
         $form = new CCDownloadAdminForm();
-        CCPage::AddForm( $form->GenerateForm() );
+        $page->AddForm( $form->GenerateForm() );
     }
 }
 ?>

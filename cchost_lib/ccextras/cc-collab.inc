@@ -48,7 +48,7 @@ class CCCollabTopics extends CCTopics
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $table;
         if( !isset($table) )
@@ -223,12 +223,13 @@ class CCCollab
 
     function Create()
     {
+        $page =& CCPage::GetPage();
         require_once('cchost_lib/ccextras/cc-collab-forms.inc');
         $form =  new CCCollabForm();
         if( empty($_POST['collab']) || !$form->ValidateFields() )
         {
-            CCPage::SetTitle('str_collab_create');
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->SetTitle('str_collab_create');
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -254,6 +255,7 @@ class CCCollab
     function _delete_confirmed($collab_id)
     {
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         $topics =& CCCollabTopics::GetTable();
         $w['topic_upload'] = $collab_id;
         $w['topic_type'] = 'collab';
@@ -269,8 +271,8 @@ class CCCollab
         $users->DeleteKey($collab_id);
         $collabs =& CCCollabs::GetTable();
         $collabs->DeleteKey($collab_id);
-        CCPage::SetTitle('str_collab_remove');
-        CCPage::Prompt('str_collab_removed');
+        $page->SetTitle('str_collab_remove');
+        $page->Prompt('str_collab_removed');
     }
 
     function Edit($collab_id='')
@@ -283,6 +285,8 @@ class CCCollab
             $this->_delete_confirmed($collab_id);
             return;
         }
+        
+        $page =& CCPage::GetPage();
         require_once('cchost_lib/ccextras/cc-collab-forms.inc');
         $form =  new CCCollabForm();
         $fields = array( 
@@ -300,17 +304,17 @@ class CCCollab
         if( !$is_post || !$form->ValidateFields() )
         {
             $collab_row = $collabs->QueryKeyRow($collab_id);
-            CCPage::SetTitle( 'str_collab_project_s', $collab_row['collab_name'] );
+            $page->SetTitle( 'str_collab_project_s', $collab_row['collab_name'] );
             if( !$is_post )
                 $form->PopulateValues($collab_row);
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
             $form->GetFormValues($values);
             if( !empty($values['collab_delete']) )
             {
-                CCPage::SetTitle('str_collab_remove');
+                $page->SetTitle('str_collab_remove');
                 $row = $this->_collab_row($collab_id);
                 require_once('cchost_lib/cc-upload-forms.php');
                 $name = $row['collab_name'];
@@ -320,7 +324,7 @@ class CCCollab
                 $form->SetFormHelp($help);
                 $help = sprintf(_('%sThere is no UNDO%s'),'<span style="color:red">', '</span>');
                 $form->SetFormHelp($help);
-                CCPage::AddForm( $form->GenerateForm() );
+                $page->AddForm( $form->GenerateForm() );
             }
             else
             {
@@ -367,7 +371,8 @@ class CCCollab
 
         $collab_row = $this->_collab_row($collab_id);
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle( 'str_collab_project_s', $collab_row['collab_name'] );
+        $page =& CCPage::GetPage();
+        $page->SetTitle( 'str_collab_project_s', $collab_row['collab_name'] );
 
         require_once('cchost_lib/ccextras/cc-format.inc');
         $collab_row['collab_desc'] = _cc_format_format($collab_row['collab_desc']);
@@ -383,7 +388,7 @@ class CCCollab
                 'collab'    => $collab_row,
                 'lics'      => $lics,
                 );
-        CCPage::PageArg( 'collab', $args, 'collab_view' );
+        $page->PageArg( 'collab', $args, 'collab_view' );
         $this->_build_bread_crumb_trail($collab_row['collab_name'] );
     }
 
@@ -419,7 +424,8 @@ class CCCollab
         $trail[] = array( 'url' => '', 'text' => $collab_name );
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
     function _get_collab_users($collab_id)
@@ -772,6 +778,7 @@ EOF;
 
     function PostTopic($collab_id)
     {
+        $page =& CCPage::GetPage();
         global $CC_GLOBALS, $CC_CFG_ROOT;
 
         require_once('cchost_lib/ccextras/cc-collab-forms.inc');
@@ -780,8 +787,8 @@ EOF;
 
         if( empty($_POST['collabtopic']) || !$form->ValidateFields() )
         {
-            CCPage::SetTitle('str_collab_message');
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->SetTitle('str_collab_message');
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -793,7 +800,7 @@ EOF;
             $values['topic_user'] = CCUser::CurrentUser();
             $values['topic_type'] = 'collab';
             $values['topic_name'] = '';
-            $topics->Insert($values,0);
+            $topics->InsertNewTopic($values,0);
 
             $url = ccl( 'collab', $collab_id );
             $text = _('A new topic has been posted to your collaboration project') . "\n\n$url\n\n" . _('Thanks');

@@ -37,6 +37,8 @@ class CCArchive
     function Archive($type='',$arg1='',$tags='')
     {
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
+        
         $trail = array();
         $trail[] = array( 'url' => ccl(), 'text' => _('Home') );
         $trail[] = array( 'url' => ccl('archive'), 'text' => _('Archive') );
@@ -50,9 +52,9 @@ class CCArchive
                 $trail[] = array( 'url' => ccl('archive','month',$arg1), 'text' => $arg1 );
                 if( !empty($tags) )
                     $trail[] = array( 'url' => ccl('archive','month',$arg1,$tags), 'text' => $tags);
-                CCPage::AddBreadCrumbs($trail);
+                $page->AddBreadCrumbs($trail);
 
-                CCPage::SetTitle( 'str_archive_for_s', $tstr );
+                $page->SetTitle( 'str_archive_for_s', $tstr );
                 $month = $m[1];
                 require_once('cchost_lib/cc-query.php');
                 $query = new CCQuery();
@@ -63,7 +65,7 @@ class CCArchive
             }
         }
 
-        CCPage::AddBreadCrumbs($trail);
+        $page->AddBreadCrumbs($trail);
         $base_url = ccl('archive','month');
         $sql =<<<END
             SELECT DATE_FORMAT( upload_date, '%M %Y' ) as menu_text,
@@ -75,8 +77,8 @@ class CCArchive
             ORDER BY mo DESC 
 END;
         $args = CCDatabase::QueryRows($sql);
-        CCPage::SetTitle( 'str_archive_monthly' );
-        CCPage::PageArg('client_menu',$args,'print_client_menu');
+        $page->SetTitle( 'str_archive_monthly' );
+        $page->PageArg('client_menu',$args,'print_client_menu');
     }
 
 

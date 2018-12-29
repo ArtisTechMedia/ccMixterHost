@@ -54,13 +54,14 @@ class CCPoolUI
             $alpha = $alpha{0};
 
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         $pool = CCDatabase::QueryRow('SELECT pool_description,pool_name,pool_id,pool_site_url FROM cc_tbl_pools WHERE pool_id='.$pool_id);
-        CCPage::SetTitle( 'str_pool_name_s', $pool['pool_name'] );
-        CCPage::PageArg( 'pool_info', $pool );
+        $page->SetTitle( 'str_pool_name_s', $pool['pool_name'] );
+        $page->PageArg( 'pool_info', $pool );
         $this->_build_bread_crumb_trail($pool['pool_id'],$pool['pool_name']);
 
-        CCPage::PageArg('pool_id',$pool_id,'pool_alpha');
-        CCPage::PageArg('pool_alpha_char',$alpha);
+        $page->PageArg('pool_id',$pool_id,'pool_alpha');
+        $page->PageArg('pool_alpha_char',$alpha);
 
         $where =<<<END
             (pool_item_pool = $pool_id) AND 
@@ -80,8 +81,9 @@ END;
     function ShowPools()
     {
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         $this->_build_bread_crumb_trail();
-        CCPage::SetTitle('str_pools_link');
+        $page->SetTitle('str_pools_link');
         require_once('cchost_lib/cc-query.php');
         $query = new CCQuery();
         $args = $query->ProcessAdminArgs('t=pools_list&datasource=pools&sort=');
@@ -131,16 +133,19 @@ END;
         $query = new CCQuery();
         $args = $query->ProcessAdminArgs('t=pool_item&ids='.$pool_item_id);
         $query->Query($args);
-        CCPage::SetTitle( 'str_pool_item_page' );
+        $page =& CCPage::GetPage();
+        $page->SetTitle( 'str_pool_item_page' );
     }
 
     function Admin()
     {
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
+        
         require_once('cchost_lib/cc-admin.php');
         $title = _("Sample Pools Administration");
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
 
 
         $args =
@@ -164,7 +169,7 @@ END;
                        'menu_text' => _('Manage Trackbacks'),
                        'help' => _('Edit, delete and otherwise manage remote remixes') ),
                );
-        CCPage::PageArg('client_menu',$args,'print_client_menu');
+        $page->PageArg('client_menu',$args,'print_client_menu');
     }
 
     function _delete_trackback($pool_item_id)
@@ -199,7 +204,7 @@ END;
         }
     }
 
-    function ApproveTrackback($pool_item_id,$upload_id=0)
+    public static function ApproveTrackback($pool_item_id,$upload_id=0)
     {
         //
         // for approval the trackbacks are pool items with the pool_item_approved set to 0
@@ -223,7 +228,7 @@ END;
         if( empty($upload_id) )
         {
             if( !empty($ex['upload_id']) )
-                $need_tags = split(',',$ex['upload_id']);
+                $need_tags = cc_split(',',$ex['upload_id']);
         }
         else
         {
@@ -265,11 +270,13 @@ END;
     function Approve($submit='')
     {
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
+        
         require_once('cchost_lib/cc-admin.php');
         $title = _("Approve Pending Trackbacks");
         CCAdmin::BreadCrumbs(true,array('url'=> ccl('admin','pools'),'text'=>_("Sample Pools Administration")),
                                   array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
 
         if( !empty($_POST['action'])  )
         {
@@ -327,10 +334,10 @@ EOF;
             }
         }
 //d($records);
-        CCPage::PageArg('records',$records,'pool_approvals');
+        $page->PageArg('records',$records,'pool_approvals');
     }
 
-    function GetWebSamplePool()
+    public static function GetWebSamplePool()
     {
         $pool_id = CCDatabase::QueryItem('SELECT pool_id FROM cc_tbl_pools WHERE pool_short_name = \'_web\'');
         if( empty($pool_id) )
@@ -365,10 +372,11 @@ EOF;
             return;
         }
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         require_once('cchost_lib/cc-admin.php');
         $title = _("Manage Sample Pools");
         CCAdmin::BreadCrumbs(true,array('url'=> ccl('admin','pools'),'text'=>_("Sample Pools Administration")),array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
 
         $pools =& CCPools::GetTable();
         $rows = $pools->QueryRows('');
@@ -389,8 +397,8 @@ EOF;
                        'help' => $pool_row['pool_name'] 
                      );
         }
-        CCPage::PageArg('use_buttons', 1 );
-        CCPage::PageArg('client_menu',$args,'print_client_menu');
+        $page->PageArg('use_buttons', 1 );
+        $page->PageArg('client_menu',$args,'print_client_menu');
 
     }
 
@@ -399,10 +407,11 @@ EOF;
         require_once('cchost_lib/cc-feedreader.php');
         require_once('cchost_lib/cc-pools-forms.php');
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         require_once('cchost_lib/cc-admin.php');
         $title = _('Sample Pools Settings');
         CCAdmin::BreadCrumbs(true,array('url'=> ccl('admin','pools'),'text'=>_("Sample Pools Administration")),array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
 
 
         $form = new CCAdminPoolsForm();
@@ -425,7 +434,7 @@ EOF;
                 //CCDebug::PrintVar($xml);
                 if( $xml && ($xml->status['status'] == 'ok') )
                 {
-                    CCPage::Prompt(_('Registration with sample pool succeeded.'));
+                    $page->Prompt(_('Registration with sample pool succeeded.'));
                 }
             }
         }
@@ -458,7 +467,7 @@ EOF;
                 }
                 else
                 {
-                    CCPage::Prompt(_("That Sample Pool is already registered here."));
+                    $page->Prompt(_("That Sample Pool is already registered here."));
                 }
             }
         }
@@ -466,10 +475,10 @@ EOF;
         {
             $configs =& CCConfigs::GetTable();
             $configs->SaveConfig($this->_typename, $values);
-            CCPage::Prompt(_("Settings saved"));
+            $page->Prompt(_("Settings saved"));
         }
 
-        CCPage::AddForm( $form->GenerateForm() );
+        $page->AddForm( $form->GenerateForm() );
     }
 
     function ManageItems($pool_id)
@@ -492,9 +501,10 @@ EOF;
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
+        $page =& CCPage::GetPage();
         CCAdmin::BreadCrumbs(true,array('url'=> ccl('admin','pools'),'text'=>_("Sample Pools Administration")),
                                   array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
         require_once('cchost_lib/cc-query.php');
         $query = new CCQuery();
         $args = $query->ProcessAdminArgs('t=pool_item_admin&match='.$pool_short_name.'&title='.$title.'&sort=id&ord=desc');
@@ -505,17 +515,18 @@ EOF;
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
+        $page =& CCPage::GetPage();
         $title = _("Add Pool Wrapper");
         CCAdmin::BreadCrumbs(true,array('url'=> ccl('admin','pools'),'text'=>_("Sample Pools Administration")),
                                   array('url'=> ccl('admin','pools','manage'), 'text'=> _("Manage Sample Pools")),
                                   array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
 
         require_once('cchost_lib/cc-pools-forms.php');
         $form = new CCAddPoolWrapperForm();
         if( empty($_POST['addpoolwrapper']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -524,7 +535,7 @@ EOF;
             $api = new CCPool();
             $api->AddPoolWrapper($info);
             $name = $info['pool_name'] . ' (' . $info['pool_short_name'] . ')';
-            CCPage::Prompt(sprintf(_("New Pool Wrapper Added: %s"),$name));
+            $page->Prompt(sprintf(_("New Pool Wrapper Added: %s"),$name));
             $this->Manage();
         }
         
@@ -534,11 +545,12 @@ EOF;
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
+        $page =& CCPage::GetPage();
         $title = _("Edit Pool Information");
         CCAdmin::BreadCrumbs(true,array('url'=> ccl('admin','pools'), 'text'=>_("Sample Pools Administration")),
                                   array('url'=> ccl('admin','pools','manage'), 'text'=> _("Manage Sample Pools")),
                                   array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
 
         require_once('cchost_lib/cc-pools-forms.php');
 
@@ -558,7 +570,8 @@ EOF;
 
         if( $show )
         {
-            if( CCPool::IsPoolWrapper($row['pool_api_url']) )
+            $poolApi = new CCPool();
+            if( $poolApi->IsPoolWrapper($row['pool_api_url']) )
             {
                 $local_fields = array(
                         'manage' => 
@@ -574,14 +587,14 @@ EOF;
                     );
                 $form->AddFormFields( $local_fields );
             }
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
             $form->GetFormValues($values);
             $values['pool_id'] = $pool_id;
             $pools->Update($values);
-            CCPage::Prompt(_("Changes to pool saved"));
+            $page->Prompt(_("Changes to pool saved"));
             $this->Manage();
         }
     }
@@ -596,15 +609,16 @@ EOF;
         require_once('cchost_lib/cc-pools-forms.php');
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
+        $page =& CCPage::GetPage();
         $title = sprintf(_('Add Item To %s Wrapper'),$row['pool_name']);
         CCAdmin::BreadCrumbs(true,array('url'=> ccl('admin','pools'),'text'=>_("Sample Pools Administration")),
                                   array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
 
         $form = new CCAddPoolItemsForm();
         if( empty($_POST['addpoolitems']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -634,10 +648,11 @@ EOF;
         require_once('cchost_lib/cc-form.php');
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
+        $page =& CCPage::GetPage();
         $title = _('Edit Pool Item');
         CCAdmin::BreadCrumbs(true,array('url'=> ccl('admin','pools'),'text'=>_("Sample Pools Administration")),
                                   array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
 
         $form = new CCGenericForm();
         $fields = array();
@@ -677,7 +692,7 @@ EOF;
 
         if(  empty($_POST['generic']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -708,7 +723,8 @@ EOF;
         $pools->DeleteKey($pool_id);
         CCPage::Prompt("Pool deleted");
         */
-        CCPage::Prompt(_("This is not implemented."));
+        $page =& CCPage::GetPage();
+        $page->Prompt(_("This is not implemented."));
     }
 
     /**
@@ -748,7 +764,8 @@ EOF;
         }
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
 
@@ -813,13 +830,13 @@ EOF;
     * @param array &$items Menu items go here
     * @param string $scope One of: CC_GLOBAL_SCOPE or CC_LOCAL_SCOPE
     */
-    function OnAdminMenu($items,$scope)
+    function OnAdminMenu(&$items,$scope)
     {
         if( $scope == CC_LOCAL_SCOPE )
             return;
 
         global $CC_GLOBALS;
-
+        
         $enabled = empty($CC_GLOBALS['allow-pool-ui']) ? false : $CC_GLOBALS['allow-pool-ui'];
 
         if( $enabled )
@@ -833,6 +850,7 @@ EOF;
                                  'action' =>  ccl('admin','pools')
                                  ),
                     );
+                    
         }
     }
 

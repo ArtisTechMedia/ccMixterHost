@@ -1,5 +1,4 @@
 <body>
-
 %if_not_empty(site-disabled)%
     <div id="site_disabled_message" style="position:absolute">%text(str_site_disabled)%</div>
 %end_if%
@@ -29,7 +28,7 @@
         <a class="light_color" href="%(home-url)%login">%text(str_log_in)%</a>
         %if_not_empty(openid-type)%
             <a class="light_color" id="cc_openid_enabled" href="%(home-url)%login/openid"><div>%text(str_openid_enabled)%</div></a>
-        %end_if%        
+        %end_if%
     %end_if%
     </div>
 
@@ -38,7 +37,8 @@
     <span class="light_color">%text(str_findcontent)%</span></a></div>
 
     %if_not_empty(banner_message)%
-        <div id="beta_message">%(show_beta_message)%</div>
+        <div id="beta_message">%(show_beta_message)% 
+</div></div>
     %end_if%
 
     <h1 id="site_title"><a href="%(root-url)%" title="%(site-title)%">
@@ -73,7 +73,7 @@
 %end_if%
 
 %if_not_empty(page-title)%
-    <h1 class="title">%text(page-title)%</h1>
+    <h1 class="title">%text(page-title)% </h1>
 %end_if%
 <a name="content" ></a>
 <div id="inner_content">

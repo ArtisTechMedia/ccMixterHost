@@ -93,13 +93,41 @@ class CCTrackBack
         exit;
     }
 
+    function _getASnoopy() {
+        require_once('cchost_lib/snoopy/Snoopy.class.php');
+        $snoopy = new Snoopy();
+        global $CC_GLOBALS;
+        
+        if( !empty($CC_GLOBALS['curl-path']) )
+        {
+            $snoopy->curl_path = $CC_GLOBALS['curl-path'];
+        }
+        $snoopy->maxredirs = 8;
+        $snoopy->offsiteok = true;
+        return $snoopy;        
+    }
+
     function _get_item_name($name,$link)
     {
         if( !empty($name) )
             return $name;
-        require_once('cchost_lib/snoopy/Snoopy.class.php');
-        $snoopy = new Snoopy();
+        $snoopy = $this->_getASnoopy();
         @$snoopy->fetch($link);
+
+        if( $snoopy->status == "301" || ($snoopy->headers && preg_match('/302 Found/',$snoopy->headers[0])) )
+        {
+            if( preg_match('/Location: (.*)$/',$snoopy->headers[1],$m) ) {
+                $snoopy = $this->_getASnoopy();
+                $xxx = preg_replace('/\s/','',$m[1]);
+                @$snoopy->fetch($xxx);
+            }
+
+            if( $snoopy->_redirectaddr )
+            {
+               // return $this->_get_item_name($name,$snoopy->_redirectaddr);
+            }
+        }
+        
         if( !empty($snoopy->error) )
         {
             $text1 = _('There was an error trying to validate the web address. Test it in your %sbrowser%s to make sure.');
@@ -112,13 +140,14 @@ class CCTrackBack
 EOF;
             $this->_error_out($msg);
         }
+        
         if( preg_match( '/<meta name="title" content="([^"]+)">/U',$snoopy->results,$m ) )
             return $m[1];
         if( preg_match( '#<title>([^<]+)</title>#',$snoopy->results,$m) )
             return $m[1];
         if( preg_match( '#/([^/]+)$#',$link,$m) )
             return $m[1];
-        return substr( str_replace('http://','',$link), 0, 20 );
+        return substr( preg_replace('%https?:\/\/%','',$link), 0, 20 );
     }
 
     function _get_item_user($user,$link)
@@ -132,7 +161,9 @@ EOF;
 
     function _clean_url($text)
     {
-        if( substr($text,0,7) != 'http://' )
+        $text = trim($text);
+        $matches = array();
+        if( preg_match("/^https?:\/\//", $text, $matches) !== 1 )
             $text = 'http://' . $text;
         return trim($text);
     }

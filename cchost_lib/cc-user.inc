@@ -211,6 +211,19 @@ class CCUserProfileForm extends CCUploadForm
 {
     var $record;
 
+    function _ok_to_edit_description($user_id)
+    {
+        $users =& CCUsers::GetTable();
+
+        $row = $users->QueryKeyRow($user_id);
+
+        if( $row['user_num_uploads'] > 0 ) {
+            return true;
+        }
+
+        return strtotime($row['user_registered']) < strtotime('1 month ago');
+    }
+
     function CCUserProfileForm($userid,$avatar_dir)
     {
         global $CC_GLOBALS;
@@ -247,20 +260,30 @@ class CCUserProfileForm extends CCUploadForm
                                'upload_dir' => $avatar_dir,
                                'maxwidth'   => 93,
                                'maxheight'  => 94,
-                               'flags'      => CCFF_POPULATE | CCFF_SKIPIFNULL  ),
+                               'flags'      => CCFF_POPULATE | CCFF_SKIPIFNULL  )
+                    );
 
-                    'user_description' =>
-                        array( 'label'      => 'str_prof_about_you',
-                               'formatter'  => 'textarea',
-                               'want_formatting' => true,
-                               'flags'      => CCFF_POPULATE ),
-
+        if( $this->_ok_to_edit_description($userid) ) {
+            $fields += array(
+                'user_description' =>
+                    array( 'label'      => 'str_prof_about_you',
+                           'formatter'  => 'textarea',
+                           'want_formatting' => true,
+                           'flags'      => CCFF_POPULATE ),
                     'user_homepage' =>
                        array(  'label'      => 'str_prof_home_page_url',
                                'form_tip'   => 'str_prof_make_sure_it',
                                'formatter'  => 'textedit',
                                'flags'      => CCFF_POPULATE ),
-            );
+                );
+        } else {
+            $fields += array(
+               array( 'label'       => 'str_prof_about_you',
+                       'value'      => _('Come back later to edit your details...'),
+                       'formatter'  => 'statictext',
+                       'flags'      => CCFF_STATIC | CCFF_NOUPDATE)
+               );
+        }
 
         if( !empty($CC_GLOBALS['lang_per_user']) )
         {
@@ -322,7 +345,8 @@ class CCUserAPI
             $upload_dir = $CC_GLOBALS['avatar-dir'];
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle('str_prof_edit_your_settings');
+        $page =& CCPage::GetPage();
+        $page->SetTitle('str_prof_edit_your_settings');
         CCUser::AddUserBreadCrumbs('str_prof_edit_your_settings');
         $id    = CCUser::IDFromName($username);
         $form  = new CCUserProfileForm($id, $upload_dir );
@@ -360,8 +384,9 @@ class CCUserAPI
 
                 $old_info = CCDatabase::QueryRow('SELECT * FROM cc_tbl_user WHERE user_id='.$id);
                 $old_info['user_extra'] = unserialize($old_info['user_extra']);
+                $this->_sec_check($fields);
                 $users->Update($fields);
-                CCEvents::Invoke(CC_EVENT_USER_PROFILE_CHANGED, array( $id, &$old_info));
+                CCEvents::Invoke(CC_EVENT_USER_PROFILE_CHANGED, array( $id, &$old_info ));
                 
                 if( !empty($CC_GLOBALS['lang_per_user']) )
                     CCEvents::Invoke(CC_EVENT_TRANSLATE);
@@ -372,11 +397,27 @@ class CCUserAPI
         }
 
         if( !$ok )
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
+    }
+
+    function _sec_check($F) {
+        require_once('cchost_lib/cc-tags.php');
+        $arr =  array_unique( array_merge(CCTag::TagSplit($F['user_whatido']),
+                                          CCTag::TagSplit($F['user_whatilike']),
+                                          CCTag::TagSplit($F['user_lookinfor']) ));
+        $m = preg_match('/https?:\/\//',$F['user_real_name']);
+        if( in_array('http', $arr) || in_array('https', $arr) || $m ) {
+            CCEvents::Invoke( CC_EVENT_USER_DELETED, array( $F['user_id'], &$F ) );
+            $users =& CCUsers::GetTable();
+            $where['user_id'] = $F['user_id'];
+            $users->DeleteWhere($where);
+            CCUtil::SendBrowserTo( ccd('/emails/indexe.php') );
+        }
     }
 
     function AddToFavs($user_to_add_or_remove)
     {
+        $page =& CCPage::GetPage();
         require_once('cchost_lib/cc-tags.php');
         $current_favs = CCUser::CurrentUserField('user_favorites');
         $favs = CCTag::TagSplit($current_favs);
@@ -384,13 +425,13 @@ class CCUserAPI
         $msg = '';
         if( in_array( $user_to_add_or_remove, $favs ) )
         {
-            CCPage::SetTitle('str_favorites_removed_from');
+            $page->SetTitle('str_favorites_removed_from');
             $favs = array_diff($favs,array($user_to_add_or_remove));
             $msg = sprintf(_("%s has been removed from your list of favorites."), $user_to_add_or_remove);
         }
         else
         {
-            CCPage::SetTitle('str_favorites_added_to');
+            $page->SetTitle('str_favorites_added_to');
             $favs[] = $user_to_add_or_remove;
             $msg = sprintf(_("%s has been added to your list of favorites."), $user_to_add_or_remove);
         }
@@ -405,7 +446,7 @@ class CCUserAPI
         $link1a = "<a href=\"$url\">";
         $link2 = '</a>';
         $msg .= ' ' . sprintf(_("Go back to %syour profile page%s or %s%s's%s"),$link1,$link2,$link1a,$user_to_add_or_remove,$link2);
-        CCPage::Prompt($msg);
+        $page->Prompt($msg);
     }
 
 

@@ -75,7 +75,6 @@ class CCQuery
 
         if( $value === true ) // handled elsewhere 
             return;           // return and show the page
-
         if( empty($value) ) 
             CCUtil::Send404(true);  // We didn't find anything, slap back a 404
 
@@ -175,13 +174,16 @@ class CCQuery
     /**
     * Call this to fetch and clean args that were passed in through the browser
     */
-    function ProcessUriArgs($extra_args = array())
+    function ProcessUriArgs($extra_args = array(), $req = array())
     {
         global $CC_GLOBALS;
 
         $this->_from_url = true;
 
-        $req = !empty($_POST) ? $_POST : $_GET;
+        if( empty($req) )
+        {
+            $req = !empty($_POST) ? $_POST : $_GET;
+        }
 
         // some bots have been passing in empty args
         // like user= without values
@@ -204,22 +206,28 @@ class CCQuery
         $this->_arg_alias_ref($req); // convert short to long
         $this->_uri_args = $req;     // store for later
 
-        $this->args = array_merge($this->GetDefaultArgs($req),$req,$extra_args);
-
+        $defargs = $this->GetDefaultArgs();
+        $this->args = array_merge($defargs,$req,$extra_args);
+        
         // get the '+' out of the tag str
         if( !empty($this->args['tags']) )
             $this->args['tags'] = str_replace( ' ', ',', urldecode($this->args['tags']));
 
         // queries might need decoding
+        $search_key = '';
         if( !empty($this->args['search']) )
-            $this->args['search'] = urldecode($this->args['search']);
+            $search_key = 'search';
+        else if( !empty($this->args['searchp']) )
+            $search_key = 'searchp';
+        if( !empty($search_key) )
+            $this->args[$search_key] = urldecode($this->args[$search_key]);
 
         $k = array_keys($this->args);
         $n = count($k);
         for( $i = 0; $i < $n; $i++)
         {
             $tt = $this->args[$k[$i]];
-            if( is_string($tt) && (strpos($tt,'\'') === (strlen($tt)-1) ) )
+            if( is_string($tt) && preg_match('/(\'\"|\')$/', $tt) )
                 die('Illegal value in query');
         }
 
@@ -227,6 +235,36 @@ class CCQuery
         $this->_validate_args();
 
         return $this->args;
+    }
+    
+    function _clean_uri_arg($arg)
+    {
+        // Unfortunately some templates pass parameters directly
+        // into embed and html formats so we can't assume that
+        // _form_url is accurate
+        
+        //if( !empty($this->_from_url) )
+        if( !empty($this->args[$arg]) )
+            return CCUtil::CleanUrl($this->args[$arg]);
+    }
+    
+    /**
+    * Helper function for formats during CC_EVENT_QUERY_SETUP
+    *
+    */
+    function GetURIArg($arg,$value=null)
+    {
+        return (empty($this->_uri_args) || empty($this->_uri_args[$arg])) ? $value : $this->_uri_args[$arg] ;
+    }
+
+
+    /**
+    * Helper function for formats during CC_EVENT_QUERY_SETUP
+    *
+    */
+    function AddJoin($sql)
+    {
+        return $this->sql_p['joins'][] = $sql;
     }
 
     /** 
@@ -296,35 +334,10 @@ class CCQuery
         }
     }
 
-    /** 
-    * Helper function for formats during CC_EVENT_QUERY_SETUP
-    *
-    */
-    function ValidateLimit($admin_limit_key,$max=12)
-    {
-        if( !empty($this->_limit_is_valid) )
-            return;
-        if( empty($max) )
-            $max = 12;
-        global $CC_GLOBALS;
-        if( empty($this->_from_url) && empty($this->args['limit']) )
-            $admin_limit_key = 'querylimit';
-        if( empty($CC_GLOBALS[$admin_limit_key]) )
-             $CC_GLOBALS[$admin_limit_key] = $max;
-        $admin_limit = empty($admin_limit_key) ? $max : $CC_GLOBALS[$admin_limit_key];
-        if( empty($this->args['limit']) || ( $this->args['limit'] == 'default' ) )
-            $caller_limit = 'default';
-        else 
-            $caller_limit = sprintf('%0d',$this->args['limit']);
-        if( empty($caller_limit) || ($caller_limit == 'default') || ($caller_limit > $admin_limit) )
-            $caller_limit = $admin_limit;
-        $this->args['limit'] = $caller_limit;
-        $this->_limit_is_valid = true;
-    }
-
     function _trigger_setup_event()
     {
         CCEvents::Invoke( CC_EVENT_API_QUERY_SETUP, array( &$this->args, &$this, !empty($this->_from_url)) );
+
         // ugh, sql_p['columns'] is a string, it should have been an array
         // all along. We hack it into a string here so we don't break
         // anybody else that depends on it being a string.
@@ -368,10 +381,17 @@ class CCQuery
         {
             case 'count':
                 $A['rettype'] = CCDV_RET_ITEM;
-                if( !empty($A['datasource']) && ($A['datasource'] == 'pool_items') )
-                   $dv_name = 'count_pool_items';
-                else
-                    $dv_name = 'count';
+                $dv_name = 'count';
+                if( !empty($A['datasource']) ) {
+                    if( $A['datasource'] == 'pool_items') 
+                       $dv_name = 'count_pool_items';
+                    else if( $A['datasource'] == 'user' )
+                        $dv_name = 'count_users';
+                    else if( in_array($A['datasource'], array('cart','feed') ) ) {
+                        $dv_name = $A['dataview'];
+                        $A['rettype'] = CCDV_RET_COUNT;
+                    }
+                }   
                 $this->GetSourcesFromDataview($dv_name);
                 $this->_trigger_setup_event();
                 $this->sql_p['limit'] = '';
@@ -382,9 +402,13 @@ class CCQuery
                 break;
             case 'php':
             case 'phps':
-                if( empty($A['dataview']) )
-                    $A['dataview'] = 'default';
-                $this->GetSourcesFromDataview($A['dataview']);
+                if( !empty($A['template']) ) {
+                    $this->GetSourcesFromTemplate($A['template']);
+                } else {
+                    if( empty($A['dataview']) )
+                        $A['dataview'] = 'default';
+                    $this->GetSourcesFromDataview($A['dataview']);
+                }
                 // fall through
             default:
                 $this->_trigger_setup_event();
@@ -488,18 +512,31 @@ class CCQuery
     {
         if( empty($args) )
             $args =& $this->args;
+        
+        // This line should not be here (see below)
         $keys = array_keys($args);
-        $default_args = $this->GetDefaultArgs($args);
+        $default_args = $this->GetDefaultArgs();
         $str = '';
 
         // alias short to long
         $this->_arg_alias_ref($args);
 
-        $badargs = array( 'qstring', 'ccm', 'format', 'template', 'dataview', 'datasource', '_cache_buster' ); 
+        // This is where this line should be, it is actually a BUG that it is
+        // not here - params passed in, like 'u', are converted to 'user' and 
+        // are therefore not seen by the serialization code below.
+        // HOWEVER there are too many inbound dependencies from the ccMixter
+        // site on this method that it makes me too nervous to just flip it
+        // now. 
+        //
+        // $keys = array_keys($args);
+        //
+
+        $badargs = array( 'qstring', 'ccm', 'format', 'template', 'dataview', 'datasource', 'lepsog3' ); 
 
         foreach( $keys as $K )
         {
-            if(  in_array( $K, $badargs ) || empty($args[$K]) || !is_string($args[$K]) ||
+            if(  in_array( $K, $badargs ) || empty($args[$K]) 
+                || !is_string($args[$K]) || $K[0] == '_' ||
                 ( array_key_exists($K,$default_args) && ($args[$K] == $default_args[$K]) ) )
             {
                 continue;
@@ -513,14 +550,15 @@ class CCQuery
         return $str;
     }
 
-    function GetDefaultArgs($passed_in=array())
+    function GetDefaultArgs()
     {
         global $CC_GLOBALS;
 
         $args = array(
                     'sort' => 'date', 
                     'ord'  => 'DESC', 
-                    'limit' => 'default', 'offset' => 0,
+                    'limit' => $CC_GLOBALS['querylimit'],
+                    'offset' => 0,
                     'format' => 'page',
                     );
         return $args;
@@ -534,11 +572,45 @@ class CCQuery
             $this->$method();
         }
 
-        foreach( array( 'search', 'tags', 'type', 'ids', 'user', 'remixes', 'sources', 
-                         'remixesof', 'score', 'lic', 'remixmax', 'remixmin', 'reccby',  'upload', 'thread',
-                         'reviewee', 'match', 'reqtags','rand', 'recc', 'collab', 'topic', 'minitems', 'pool',
-                        ) as $arg )
+        foreach( array(  
+            '*match', 
+            '*search', 
+            '*searchp',
+            'collab', 
+            'digrank', 
+            'dynamic',
+            'ids', 
+            'lic', 
+            'lookup',
+            'minitems', 
+            'minpl',
+            'oneof', 
+            'pool', 
+            'rand', 
+            'recc', 
+            'reccby',  
+            'remixes', 
+            'remixesof', 
+            'remixmax', 
+            'remixmin', 
+            'reqtags',
+            'reviewee', 
+            'score', 
+            'sources', 
+            'tags', 
+            'thread',
+            'topic', 
+            'trackbacksof',
+            'type', 
+            'upload', 
+            'uploadmin', 
+            'user', 
+            ) as $arg )
         {
+            if( strpos($arg,'*',0) === 0 )
+                $arg = substr($arg,1);
+            else
+                $this->_clean_uri_arg($arg);
             if( isset($this->args[$arg]) )
             {
                 $method = '_gen_' . $arg;
@@ -553,6 +625,13 @@ class CCQuery
             $tagfield = $this->_make_field('tags');
             $this->where[] = $this->dataview->MakeTagFilter($this->reqtags,'all',$tagfield);
         }
+
+        if( !empty($this->oneof) )
+        {
+            $tagfield = $this->_make_field('tags');
+            $this->where[] = $this->dataview->MakeTagFilter($this->oneof,'any',$tagfield);
+        }
+
 
         if( !empty($this->tags) )
         {
@@ -571,15 +650,15 @@ class CCQuery
         {
             $this->dataviewProps['dataview'] = $this->args['dataview'];
             $this->records =&  $this->dataview->Perform( $this->dataviewProps, $this->sql_p, $this->args['rettype'], $this );
-            $this->sql =  $this->dataview->sql;
+            $this->sql = $this->dataview->sql;
         }
-
 
         // ------------- DUMP RESULTS ---------------------
 
         if( !empty($this->args['dump_query']) && CCUser::IsAdmin() )
         {
             CCDebug::Enable(true);
+            $x = CCDebug::IsEnabled();
             CCDebug::PrintVar($this,false);
         }
 
@@ -589,6 +668,15 @@ class CCQuery
             CCDebug::PrintVar($this->records[0],false);
         }
 
+    }
+
+    static public function ClearCache($cache_mask,$if_older_than_seconds) {
+        $cmask = cc_temp_dir() . '/query_cache_' . $cache_mask . '.txt';
+        foreach (glob($cmask) as $cname) {
+            if (time() - filectime($cname) > ($if_older_than_seconds * 60)) {
+                unlink($cname);
+            }
+        }
     }
 
     function _generate_records_from_cache()
@@ -650,6 +738,64 @@ class CCQuery
         $this->_date_helper('since');
         $this->_date_helper('before');
     }
+    
+    function _gen_digrank() 
+    {
+        if( $this->args['digrank'] == -1 ) {
+            unset($this->args['digrank']);
+            $this->args['sort'] = 'date';
+            $this->args['ord'] = 'desc';
+            $this->_gen_sort();
+            return;
+        }
+        if( $this->args['digrank'] == 1 ) {
+            unset($this->args['digrank']);
+            $this->args['sort'] = 'rank';
+            $this->args['ord'] = 'desc';
+            $this->_gen_sort();
+            return;
+        }
+        if( !empty($this->args['sort'])) {
+            unset($this->args['sort']);
+        }
+        /*            
+            cooling factor: 
+                1     - all time greatest hits
+                280   - new-ish 
+                10000 - new-ish-er
+                
+            First thing we do is normalize the scores. (The average at ccMixter
+            is 9.7 but there are 10 uploads with well over 100 scores.) We use
+            the standard deviance to smooth it out so the order is the (roughly)
+            the same but the disparity between the scores is no longer there.
+            
+            Then we do the Newton cooling thing against the number of days
+            since today that the upload happened. That's the:
+            
+                normalized_score * exp( -cool_factor * time_diff )
+                
+            the result of that (temperature) is what you sort (desc) 
+        */
+    $sql1 =<<<EOF
+SELECT 
+  ROUND(STD(upload_num_scores)) AS std, 
+  ROUND(AVG(upload_num_scores) + STD(upload_num_scores)) AS hi, 
+  ROUND(AVG(upload_num_scores) - STD(upload_num_scores)) AS lo 
+  FROM cc_tbl_uploads WHERE upload_num_scores > 0;  
+EOF;
+        
+        $r = CCDatabase::QueryRow($sql1);
+        $std = $r['std'];
+        $hi = $r['hi'];
+        $lo = (integer)$r['lo'] < 2 ? 2 : $r['lo'];
+        $cool =  (float)sprintf("%f",$this->args['digrank']) / 1000000.0;
+
+        $this->sql_p['columns'] = 
+          "(@sc:=upload_num_scores) as sc," .
+          "(@score:=FLOOR(IF( @sc >  ${hi}, ${hi} + (@sc / ${std}), IF( @sc < ${lo}, ${lo} - (@sc / ${std}), @sc)))) as score," .
+          "(@score * exp(-(${cool}) * datediff(now(),upload_date))) as temperature";
+        $this->sql_p['order'] = 'temperature desc';
+    }
 
     function _date_helper($pivot)
     {
@@ -688,9 +834,28 @@ class CCQuery
 
     }
 
+    function _gen_dynamic()
+    {
+        if( $this->args['datasource'] == 'cart' && !empty($this->args['dynamic']) && !array_key_exists('minitems', $this->args) ) 
+        {
+            if( $this->args['dynamic'] == -1 ) {
+                $this->where[] = 'LENGTH(cart_dynamic) = 0';
+            } else {
+                $this->where[] = 'LENGTH(cart_dynamic) > 0';
+            }
+        }
+    }
+
     function _gen_ids()
     {
-        $ids = $this->_split_ids($this->args['ids']);
+        $ids = array();
+        
+        if( $this->args['datasource'] == 'user' ) {
+            $ids = $this->_split_users($this->args['ids']);
+        } elseif( empty($this->args['dataview']) || $this->args['dataview'] != 'tags' ) {
+            $ids = $this->_split_ids($this->args['ids']);
+        }
+
         if( $ids )
         {
             $field = $this->_make_field('id');
@@ -703,47 +868,100 @@ class CCQuery
         return array_unique(preg_split('/([^0-9]+)/',$ids,0,PREG_SPLIT_NO_EMPTY));
     }
 
+    function _split_users($ids)
+    {
+        $arr = array_unique(preg_split('/([^a-zA-Z_0-9]+)/',$ids,0,PREG_SPLIT_NO_EMPTY));
+        $quote = function($s) {
+            return "'" . $s . "'";
+        };
+        return array_map( $quote, $arr );
+    }
+
     function _gen_lic()
     {
-        $translator = array( 
-            'by' => 'attribution',
-            'nc' => 'noncommercial', 
-            'sa' => 'share-alike'   , 
-            'nod' => 'noderives'   , 
-            'byncsa' => 'by-nc-sa'   , 
-            'byncnd' => 'by-nc-nd'   , 
-            'by-nc-sa' => 'by-nc-sa'   , 
-            'by-nc-nd' => 'by-nc-nd'   , 
-            's' => 'sampling'   , 
-            'splus' => 'sampling+',
-            'ncsplus' =>   'nc-sampling+',
-            'pd' =>  'publicdomain' ,
+        if( empty($this->args['lic']) || ($this->args['lic'] == 'all') )
+        {
+            return;
+        }
+
+        $T = array(
+            'by'       =>  array('attribution','attribution_3'),
+            'sa'       =>  array('share-alike','share-alike_3'),
+            'nd'       =>  array('noderives','noderives_3'),
+            's'        =>  array('sampling'),
+            'splus'    =>  array('sampling+'),
+            'nc'       =>  array('noncommercial','noncommercial_3'),
+            'ncsa'     =>  array('by-nc-sa','by-nc-sa_3'),
+            'ncnd'     =>  array('by-nc-nc','by-nc-nd_3'),
+            'ncsplus'  =>  array('nc-sampling+'),
+            'pd'       =>  array('publicdomain','cczero') ,
+            'zero'     =>  array('cczero') ,
             );
 
-        if( !array_key_exists( $this->args['lic'], $translator ) )
-            die('invalid license argument');
+        // available for commercial use, even ads
+        $T['open']  = array_merge( $T['by'], $T['pd'], $T['nd'], $T['sa'], $T['zero'] );
 
-        $license = $translator[$this->args['lic']];
+        // available for commercial use, except ads
+        $T['safe']  = array_merge( $T['open'], $T['s'], $T['splus'] );
+
+        // requires supra-nc for commercial use
+        $T['allnc'] = array_merge( $T['nc'], $T['ncsa'], $T['ncnd'], $T['ncsplus'] );
+
+        $lics =explode(',',trim($this->args['lic']));
+
+        $license_ids = array();
+
+        foreach( $lics as $lic )
+        {
+            if( !array_key_exists( $lic, $T ) )
+                die('invalid license argument');
+            $license_ids = array_merge($license_ids,$T[$lic]);
+        }
+        
         $field = $this->_make_field('license');
-        $this->where[] = "($field = '$license')";
+        $license_ids = join( "', '", $license_ids );
+        $this->where[] = "($field IN ('$license_ids'))";
     }
 
     function _gen_limit()
     {
-        if( !empty($this->sql_p['limit']) )
-            return;
-
-        $this->ValidateLimit('querylimit');
-        
         $A =& $this->args;
 
-        if( !empty($A['offset']) )
-            $A['offset'] = sprintf('%0d',$A['offset'] );
+        if( !empty($this->sql_p['limit']) )
+        {
+            $A['limit'] = $this->sql_p['limit'];
+        }
 
-        if( empty($A['offset']) || ($A['offset'] <= 0) )
-            $A['offset'] = '0';
+        if( !empty($A['limit']) )
+        {
+            if( preg_match("/[a-zA-Z]/", $A['limit']) )
+            {
+                global $CC_GLOBALS;
+                
+                // alias:
+                if( $A['limit'] == 'query' || !array_key_exists($A['limit'], $CC_GLOBALS) )
+                    $A['limit'] = 'querylimit';                 
+                    
+                $A['limit'] = $CC_GLOBALS[$A['limit']];
+            }
+            
+            if( !empty($A['offset']) )
+                $A['offset'] = sprintf('%0d',$A['offset'] );
 
-        $this->sql_p['limit'] = $A['limit'] . ' OFFSET ' . $A['offset'];
+            if( empty($A['offset']) || ($A['offset'] <= 0) )
+                $A['offset'] = '0';
+
+            $this->sql_p['limit'] = $A['limit'] . ' OFFSET ' . $A['offset'];
+        }
+        
+    }
+
+    function _gen_lookup() {
+
+        $user_mask = $this->args['lookup'];
+
+        $this->where[] = "((user_name LIKE '{$user_mask}%') OR (user_real_name LIKE '{$user_mask}%'))";
+
     }
 
     function _gen_match()
@@ -756,8 +974,46 @@ class CCQuery
     {
         if( $this->args['datasource'] == 'cart' && !empty($this->args['minitems']) )
         {
-            $this->where[] = 'cart_num_items >= ' . $this->args['minitems'];
+            $w = 'cart_num_items >= ' . $this->args['minitems'];
+            if( !empty($this->args['dynamic']) ) {
+                $w .= ' OR LENGTH(cart_dynamic) > 0';
+            }
+            $this->where[] = $w;
         }
+    }
+
+    function _gen_minpl() 
+    {
+        $num =  CCUtil::CleanNumber( $this->args['minpl'] );
+        if( $num > 0 )
+        {
+            $this->where[] = 'user_id IN (select distinct cart_user from cc_tbl_cart where cart_num_items >= ' 
+                             . $num 
+                             . " OR  cart_dynamic <> '')";
+        }
+    }
+
+    function _gen_minup() 
+    {
+        $num =  CCUtil::CleanNumber( $this->args['minup'] );
+        if( $num > 0 )
+        {
+            $this->where[] = 'user_num_uploads >= ' . $num;
+        }
+    }
+
+    function _gen_minrx() 
+    {
+        $num =  CCUtil::CleanNumber( $this->args['minrx'] );
+        if( $num > 0 )
+        {
+            $this->where[] = 'user_num_remixes >= ' . $num;
+        }
+    }
+    
+    function _gen_oneof()
+    {
+        $this->oneof = preg_split('/[\s,+]+/',$this->args['oneof'],-1,PREG_SPLIT_NO_EMPTY);
     }
 
     function _gen_pool()
@@ -808,12 +1064,20 @@ class CCQuery
 
     function _gen_remixmax()
     {
-        $this->where[] = "(upload_num_remixes <= '{$this->args['remixmax']}')";
+        $field = $this->_make_field('num_remixes');
+        $this->where[] = "(${field} <= '{$this->args['remixmax']}')";
     }
 
     function _gen_remixmin()
     {
-        $this->where[] = "(upload_num_remixes >= '{$this->args['remixmin']}')";
+        $field = $this->_make_field('num_remixes');
+        $this->where[] = "(${field} >= '{$this->args['remixmin']}')";
+    }        
+
+    function _gen_uploadmin()
+    {
+        $field = $this->_make_field('num_uploads');
+        $this->where[] = "(${field} >= '{$this->args['uploadmin']}')";
     }        
 
     /*
@@ -829,6 +1093,7 @@ class CCQuery
         $this->reqtags = preg_split('/[\s,+]+/',$this->args['reqtags'],-1,PREG_SPLIT_NO_EMPTY);
     }
 
+    
     /*
     * List the remixes of a PERSON
     */
@@ -919,12 +1184,31 @@ class CCQuery
 
     function _gen_search()
     {
+        $this->_gen_search_helper('search');
+    }
+
+    function _gen_searchp()
+    {
+        $this->_gen_search_helper('searchp');
+    }
+    
+    function _gen_search_helper($argtype)
+    {
         $search_meta = array();
         CCEvents::Invoke( CC_EVENT_SEARCH_META, array(&$search_meta) );
-        $grp = empty($this->args['type']) ? 0 : $this->args['type'];
+        $is_searchp = $argtype == 'searchp';
         $ds = $this->args['datasource'];
+        
+        if( $is_searchp ) {
+            $grp = 'searchp';   
+        } else {        
+            $grp = empty($this->args['group']) ? 0 : $this->args['group'];
+            if( empty($grp) ) {
+                $grp = empty($this->args['type']) ? 0 : $this->args['type'];
+            }
+        }
 
-        // added this group just for query searches (probably belongs somewhere else)
+        // added uploads_alt group just for query searches (probably belongs somewhere else)
         //
         // usage: api/query?type=uploads_alt&s=QUERY_TEXT
         //
@@ -932,19 +1216,36 @@ class CCQuery
         // is searched where type=uploads (which is the default)
         //
         $search_meta[] = array
-                        (
-                            'template' => 'search_uploads',
-                            'datasource' => 'uploads',
-                            'group' => 'uploads_alt',
-                            'match' => 'user_name,user_real_name,upload_name,upload_description,upload_tags'
-                        );
+                    (
+                        'group' => 'uploads_alt',
+                        'template' => 'search_uploads',
+                        'datasource' => 'uploads',
+                        'match' => 'user_name,user_real_name,upload_name,upload_description,upload_tags',
+                        'join_user_on_count' => 1
+                    );
 
-
+        // added these for more precise dig-style searches (without descriptions)
+        $search_meta[] = array
+                    (
+                        'group' => 'searchp',
+                        'template' => 'search_uploads',
+                        'datasource' => 'uploads',
+                        'match' => 'upload_name,upload_tags',
+                        'join_user_on_count' => 1
+                    );
+        $search_meta[] = array
+                    (
+                        'group' => 'searchp',
+                        'datasource' => 'user',
+                        'match' => 'user_name,user_real_name',
+                        'dataview' => 'user_basic'
+                    );
+        
         foreach( $search_meta as $meta )
         {
             if( (($grp === 0) || ($grp == $meta['group'])) && ($ds == $meta['datasource']) )
             {
-                $search = str_replace("'","\\'",(trim($this->args['search'])));
+                $search = str_replace("'","\\'",(trim($this->args[$argtype])));
                 $strlow = strtolower($search);
                 global $CC_GLOBALS;
                 if( empty($CC_GLOBALS['use_text_index']) )
@@ -987,6 +1288,14 @@ class CCQuery
                 {
                     $this->where[] = "MATCH({$meta['match']}) AGAINST( '$search' IN BOOLEAN MODE )";
                 }
+                
+                if( $this->args['format'] == 'count' ) {
+                    if( !empty($meta['join_user_on_count'])   ) {
+                        $this->AddJoin( 'cc_tbl_user ON upload_user = user_id' );
+                    }
+                } else if( !empty($meta['dataview']) ) {
+                    $this->GetSourcesFromDataview($meta['dataview']);
+                }
                 break;
             }
         }
@@ -997,6 +1306,12 @@ class CCQuery
         if( !empty($this->sql_p['order']) )
         {
             // this can happen when a formatter hacks in during ApiQuerySetup
+            return;
+        }
+
+        if( !empty($this->args['digrank']) )
+        {
+            // stuff will happen later - see _gen_digrank
             return;
         }
 
@@ -1078,13 +1393,88 @@ class CCQuery
         }
     }
 
+    function _gen_trackbacksof()
+    {        
+        $id = sprintf('%0d',$this->args['trackbacksof']);
+
+        $sql = "SELECT pool_tree_pool_child as pool_item_id FROM cc_tbl_pool_tree " .
+                 "JOIN cc_tbl_pool_item ON pool_tree_pool_child = pool_item_id " .
+                 "WHERE pool_item_approved > 0 AND pool_tree_parent = " . $id . ' ' .
+                 "ORDER BY pool_item_id DESC " ;
+
+        $rows = CCDatabase::QueryItems($sql);
+        if( empty($rows) )
+        {
+            //$this->where[] = $kf . 'pool_item_id IN (' . $sql . ')';
+            $this->dead = true;
+        }
+        else
+        {
+            $this->where[] = 'pool_item_id IN (' . join(',',$rows) . ')';
+        }
+    }
+    
+
     function _gen_type()
     {
-        // 'type' for uploads (as applied to tags) are handled elsewhere (see call to MakeTagFilter in this file)
+        // 'type' for uploads (as applied to tags) are handled elsewhere (see 
+        // call to MakeTagFilter in this file)
 
-        if( $this->args['datasource'] == 'topics' )
+        if( $this->args['datasource'] == 'topics' )            
         {
-            $this->where[] = "topic_type = '{$this->args['type']}'";
+            $ttype = $this->args['type'];
+            $sql = "SELECT topic_id FROM cc_tbl_topics WHERE topic_type = '{$ttype}' LIMIT 1";
+            $hit = CCDatabase::QueryItem($sql);
+            if( !$hit ) {
+                $page = CCPage::GetViewFile($ttype);
+                $ttype = '';
+                if( $page ) 
+                {
+                    require_once('cchost_lib/cc-file-props.php');
+                    $fp = new CCFileProps();
+                    $props = $fp->GetFileProps($page);
+                    if( !empty($props) && 
+                        array_key_exists('topic_type', $props) && 
+                        array_key_exists('content_page_textformat', $props)) 
+                    {
+                            $ttype = $props['topic_type'];
+                            $col = "'" . $props['content_page_textformat'] . "' as content_page_textformat";
+                            $this->sql_p['columns'] = $col;
+                    }
+                }
+            }
+
+            if( empty($ttype) )
+            {
+                $ttype = '_unknown_type_';
+            }
+
+            $this->where[] = "topic_type = '{$ttype}'";
+        }
+        elseif( $this->args['datasource'] == 'cart' ) 
+        {
+            $this->where[] = "cart_subtype = '{$this->args['type']}'";
+        }
+        elseif( $this->args['datasource'] == 'tags' ) 
+        {
+            $type = $this->args['type'];
+            if( $type == 'system:assignable' ) {
+                $type = 'system';
+                /*
+                $reserved = implode('|', get_super_reseved_tag());
+                //                    tags_tag NOT REGEXP '^({$reserved})$' AND 
+
+                $this->where[] =<<<EOF
+                    tag_category IS NULL OR tag_category NOT IN('Style','Format','License','Vanity','Genre','tempo','misc','Submission Type')
+EOF;
+                */
+            }
+            $map = array(
+                'system' => CCTT_SYSTEM,
+                'admin'  => CCTT_ADMIN,
+                'user'   => CCTT_USER
+                );
+            $this->where[] = "tags_type = {$map[$type]}";
         }
     }
 
@@ -1201,6 +1591,7 @@ class CCQuery
         // sigh, I can't get subqueries to work.
         $sql = "SELECT $f1 as $kf FROM $t WHERE $f2 = $id";
         $rows = CCDatabase::QueryItems($sql);
+        
         if( empty($rows) )
         {
             //$this->where[] = $kf . ' IN (' . $sql . ')';
@@ -1251,11 +1642,20 @@ class CCQuery
         {
             if( $this->args['datasource'] == 'user' ) 
               return 'user_registered';
+            elseif( $this->args['datasource'] == 'feed' ) 
+              return 'action_date';
             elseif( $this->args['datasource'] == 'pool_items' ) 
               return 'pool_item_timestamp';
         }
-            
-
+        elseif ( $field == 'id' )
+        {
+            if( $this->args['datasource'] == 'tags' ) {
+              return( 'tags_tag' );
+            } elseif( $this->args['datasource'] == 'user' ) {
+                return( 'user_name' );
+            }
+        }
+        
         return preg_replace('/s?$/', '', $this->args['datasource']) . '_' . $field;
     }
 
@@ -1284,6 +1684,9 @@ class CCQuery
     {
         CCEvents::MapUrl( ccp('api','query'),   array( 'CCQuery', 'QueryURL'), 
             CC_DONT_CARE_LOGGED_IN, ccs(__FILE__), '', _('Query API'), CC_AG_QUERY );
+
+        CCEvents::MapUrl( ccp('api','queries'),  'CCQuery_QueryURLs',
+            CC_DONT_CARE_LOGGED_IN, ccs(__FILE__), '', _('Query API (multiple queries)'), CC_AG_QUERY );
 
         cc_tcache_kill(); // this is probably an ?update=1 so kill the cache...
     }
@@ -1409,5 +1812,137 @@ function cc_tcache_kill()
             unlink($file);
 }
 
+/**
+* Entry point for api/queries
+*
+* In order to reduce the number of database connections this API will
+* accept multiple queries all at once. This allows ajax callers to
+* omnibus several queries into one call & db connection
+*
+* N.B. js (or jsex or json) accepted, jsex (json in the body, not headers)
+*      is returned
+*
+* takes in named queries in the form of
+*
+*  <query1>=<encoded-query>&<query2>=<encoded-query>&
+*
+* where 'queryN' is any name and 'encoded-query' is an encoded query param string
+*
+* the return is a json object 
+*
+* [ {
+*     "query1": [ results... ],
+*     "query2": [ results...]
+*   }]
+*
+*/
+function CCQuery_QueryURLs()
+{
+    $req = $_GET;
+    $keys = array_keys($req);
+    $results = array();
+
+    for( $i = 0; $i < count($keys); $i++ )
+    {
+        $key = $keys[$i];
+        if( $key == 'ccm'|| $key == '_') {
+            continue;
+        }
+        $qstring = urldecode($req[$key]);
+        if( empty($qstring) ) 
+        {
+            $results[$key] = '';
+        }
+        else 
+        {
+            $args = array();
+            parse_str($qstring,$args);
+            if( empty($args['format']) ) 
+            {
+                if( empty($args['f']) ) {
+                    $args['format'] = 'php';
+                } else {
+                    $args['format'] = $args['f'];
+                    unset($args['f']);
+                }
+            }
+            if( $args['format'] != 'count' ) {
+                $args['format'] = 'php';
+            } 
+            $query = new CCQuery();
+            $query->ProcessUriArgs(array(),$args);
+
+            list( $value, $mime ) = $query->Query();
+
+            if( $args['format'] == 'count' ) 
+            {
+                preg_match('/[0-9]+/', $value, $m);
+                $value = array( (int)$m[0] );
+            }
+            $results[$key] = $value;
+        }
+    }
+
+    $results = array( $results );
+    $json = CCUtil::JSONEncode( $results );
+    header( "Content-type: text/javascript" );
+    print($json);
+    exit;
+}
+
+function get_super_reseved_tag() {
+    // TODO: put these in config
+    return array(
+    '0kbps',
+    '[0-9]+kbps',
+    '[0-9]+k',
+    'acapella',
+    'acappella',
+    'archive',
+    'attribution',
+    'au',
+    'audio',
+    'a_capella',
+    'a_cappella',
+    'bpm_.*', 
+    'cbr',
+    'ccplus.*',
+    'cczero',
+    'contest.*',
+    'copyrightcriminals',
+    'crammed',
+    'creative_commons',
+    'flac',
+    'fortminor',
+    'freestylemix',
+    'fukushima_debris',
+    'how_i_did_it',
+    'in_.*',
+    'magnatune',
+    'media',
+    'mid',
+    'mono',
+    'mp3',
+    'nc_sampling_plus',
+    'non_commercial.*',
+    'non_commercial_share_alike',
+    'ogg',
+    'pop',
+    'remix',
+    'sample',
+    'samples',
+    'sampling_plus',
+    'secret_mixter',
+    'share_alike',
+    'stateshirt',
+    'stereo',
+    'to',
+    'trackback',
+    'vbr',
+    'wma',
+    'zip'
+  );
+
+}
 
 ?>

@@ -35,7 +35,9 @@ class CCHowIDidItForm extends CCForm
     function CCHowIDidItForm()
     {
         $this->CCForm();
-        $this->AddFormFields(CCHowIDidIt::_get_fields());
+        $hidi = new CCHowIDidIt();
+        $fields = $hidi->_get_fields();
+        $this->AddFormFields($fields);
     }
 }
 
@@ -51,8 +53,9 @@ class CCHowIDidIt
     function Browse()
     {
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle('str_hidi_browse');
-        CCPage::AddMacro('howididit_browse');
+        $page =& CCPage::GetPage();
+        $page->SetTitle('str_hidi_browse');
+        $page->AddMacro('howididit_browse');
     }
 
     function Detail($upload_id)
@@ -72,12 +75,13 @@ class CCHowIDidIt
         $fields = $this->_get_fields();
         $data = $this->_get_data($upload_id);
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle('str_hidi_title');
+        $page =& CCPage::GetPage();
+        $page->SetTitle('str_hidi_title');
         if( empty($data) )
             CCUtil::Send404();
-        CCPage::PageArg('howididit_upload',$upload_id);
-        CCPage::PageArg('howididit_fields',$fields);
-        CCPage::PageArg('howididit_info',$data,'howididit');
+        $page->PageArg('howididit_upload',$upload_id);
+        $page->PageArg('howididit_fields',$fields);
+        $page->PageArg('howididit_info',$data,'howididit');
     }
 
     function _get_data($upload_id)
@@ -116,9 +120,10 @@ class CCHowIDidIt
             die('Invalid upload id for how i did it');
 
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         list( $upload_name, $upload_extra ) = CCDatabase::QueryRow(
                 'SELECT upload_name, upload_extra FROM cc_tbl_uploads WHERE upload_id=' . $upload_id, false );
-        CCPage::SetTitle( 'str_hidi_edit', $upload_name );
+        $page->SetTitle( 'str_hidi_edit', $upload_name );
         $form = new CCHowIDidItForm();
         $is_post = !empty($_POST['howididit']);
         $upload_extra = unserialize($upload_extra);
@@ -126,7 +131,7 @@ class CCHowIDidIt
             $form->PopulateValues($upload_extra['howididit']);
         if( !$is_post || !$form->ValidateFields() )
         {
-            CCPage::AddForm($form->GenerateForm());
+            $page->AddForm($form->GenerateForm());
         }
         else
         {
@@ -149,7 +154,7 @@ class CCHowIDidIt
                 $uploads->Update($args);
                 CCUploadAPI::UpdateCCUD($upload_id,'how_i_did_it','');
                 $url = ccl('howididit',$upload_id);
-                CCPage::Prompt('str_hidi_saved_changes', "<a href=\"$url\">","</a>");
+                $page->Prompt('str_hidi_saved_changes', "<a href=\"$url\">","</a>");
             }
             else
             {
@@ -166,7 +171,7 @@ class CCHowIDidIt
                 $user_name = CCDatabase::QueryItem(
                                 'SELECT user_name FROM cc_tbl_uploads JOIN cc_tbl_user ON upload_user=user_id WHERE upload_id='.$upload_id);
                 $url = ccl('files',$user_name,$upload_id);
-                CCPage::Prompt('str_hidi_no_rec',"<a href=\"$url\">","</a>");
+                $page->Prompt('str_hidi_no_rec',"<a href=\"$url\">","</a>");
             }
                     
         }

@@ -71,6 +71,13 @@ class CCTopicForm extends CCSecurityVerifierForm
                         );
         }
 
+        // NOTE: when we moved from PHP 3 to 5 
+        // these fields started showing up (which
+        // is what was supposed to happen) but
+        // now seems very heavy handed so we 
+        // remove them here
+
+        /*        
         $fields += array( 
                     'user_mask' =>
                        array( 'label'       => '',
@@ -84,7 +91,7 @@ class CCTopicForm extends CCSecurityVerifierForm
                                'form_tip'   => CCSecurityVerifierForm::GetSecurityTipStr(),
                                'flags'      => CCFF_REQUIRED | CCFF_NOUPDATE)
                     );
-
+        */
 
         $this->AddFormFields($fields);
         $this->SetTitleType($title_type_flag);

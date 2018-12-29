@@ -36,12 +36,13 @@ class CCPublicize
         global $CC_GLOBALS;
 
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         
         if( empty($user) )
         {
             if( !($user = CCUser::CurrentUserName()) )
             {
-                CCPage::Prompt('str_share_no_user');
+                $page->Prompt('str_share_no_user');
                 return;
             }
         }
@@ -49,7 +50,7 @@ class CCPublicize
         $itsme  = $user == CCUser::CurrentUserName();
         if( !$this->_pub_wizard_allowd($itsme) )
         {
-            CCPage::Prompt('str_share_no_feature');
+            $page->Prompt('str_share_no_feature');
             return;
         }
 
@@ -59,10 +60,11 @@ class CCPublicize
     function Share($id)
     {
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         $uploads =& CCUploads::GetTable();
         if( !$uploads->KeyExists($id) )
         {
-            CCPage::Prompt('str_share_no_upload');
+            $page->Prompt('str_share_no_upload');
             return;
         }
         $record = CCDatabase::QueryRow('SELECT upload_id, user_name, upload_name, user_real_name FROM cc_tbl_uploads JOIN ' .
@@ -98,7 +100,7 @@ class CCPublicize
             $record = CCDatabase::QueryRow($sql);
             if( empty($record) )
             {
-                CCPage::Prompt('str_share_no_user');
+                $page->Prompt('str_share_no_user');
                 return;
             }
             $record['artist_page_url'] = ccl('people',$record['user_name']);
@@ -314,15 +316,16 @@ EOF;
         $args['htmlwarn'] = 'str_share_html_warn';
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle( $title );
-        CCPage::PageArg('publicize', 'publicize.php/publicize');
-        CCPage::PageArg('PUB', $args );
+        $page =& CCPage::GetPage();
+        $page->SetTitle( $title );
+        $page->PageArg('publicize', 'publicize.php/publicize');
+        $page->PageArg('PUB', $args );
         if( $do_share_popup )
         {
-            CCPage::PageArg('share', 'share.php/share_popup' );
-            CCPage::AddMacro('share');
+            $page->PageArg('share', 'share.php/share_popup' );
+            $page->AddMacro('share');
         }
-        CCPage::AddMacro('publicize');
+        $page->AddMacro('publicize');
 
         if( !empty($record) )
         {
@@ -351,7 +354,8 @@ EOF;
 
         $trail[] = array( 'url' => '', 'text' => 'str_share_text' );
 
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
     /**
@@ -387,7 +391,8 @@ EOF;
 
         $trail[] = array( 'url' => '', 'text' => 'str_share_text' );
 
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
     function _find_fmt_template($name)
@@ -408,7 +413,8 @@ EOF;
     function Email($type='',$arg1='')
     {
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle(_('Share This Link'));
+        $page =& CCPage::GetPage();
+        $page->SetTitle(_('Share This Link'));
 
         $type = CCUtil::Strip($type);
         $arg1 = CCUtil::Strip($arg1);
@@ -474,7 +480,7 @@ EOF;
 
         if( empty($_POST['sharelink']) || !$form->ValidateFields())
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -503,7 +509,7 @@ EOF;
             CCDebug::Enable(true);
             CCDebug::Log("Email share from {$fields['mail_from']} to {$fields['mail_to']} re: {$regarding}");
 
-            CCPage::Prompt( _('Mail sent') );
+            $page->Prompt( _('Mail sent') );
         }
     }
 

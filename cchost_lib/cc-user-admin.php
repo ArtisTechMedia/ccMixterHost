@@ -118,7 +118,7 @@ class CCDeleteUserFilesForm extends CCUserForm
                                'formatter'  => 'statictext',
                                'value'   => $username,
                                'flags'      => CCFF_NOUPDATE | CCFF_STATIC ),
-
+/*
                     'user_mask' =>
                        array( 'label'       => '',
                                'formatter'  => 'securitykey',
@@ -130,6 +130,7 @@ class CCDeleteUserFilesForm extends CCUserForm
                                'class'      => 'cc_form_input_short',
                                'form_tip'   => CCSecurityVerifierForm::GetSecurityTipStr(),
                                'flags'      => CCFF_REQUIRED | CCFF_NOUPDATE),
+*/                               
                         );
 
         $this->AddFormFields( $fields );
@@ -137,6 +138,7 @@ class CCDeleteUserFilesForm extends CCUserForm
     }
 
 }
+
 class CCIPManageForm extends CCGridForm
 {
     /**
@@ -174,16 +176,17 @@ class CCIPManageForm extends CCGridForm
 }
 
 class CCUserAdmin
-{
+{    
     function DefaultAvatar()
     {
         global $CC_GLOBALS;
+        $page =& CCPage::GetPage();
 
         $upload_dir = $CC_GLOBALS['image-upload-dir'];
         $title = _("Set Default User Avatar");
         require_once('cchost_lib/cc-admin.php');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
         $form  = new CCDefaultAvatarForm( $upload_dir );
 
         if( !empty($_POST['defaultavatar']) && $form->ValidateFields() )
@@ -196,24 +199,25 @@ class CCUserAdmin
                 $args['default_user_image'] = 0;
             $configs =& CCConfigs::GetTable();
             $configs->SaveConfig('config',$args);
-            CCPage::Prompt(_('Default avatar set'));
+            $page->Prompt(_('Default avatar set'));
         }
         else
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
     }
 
     function ChangePassword($user_id ='')
     {
-        CCPage::SetTitle(_("Change a User's Password/E-mail"));
+        $page =& CCPage::GetPage();
+        $page->SetTitle(_("Change a User's Password/E-mail"));
 
         $users =& CCUsers::GetTable();
         $form = new CCChangePasswordForm($user_id);
 
         if( empty($_POST['changepassword']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -325,9 +329,9 @@ EOF;
         if( $ip )        
             $activity_ip = url_args( ccl('activity'), 'ip=' . $ip );
 
-
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle(sprintf(_("Manage User Account for %s"), $username ));
+        $page =& CCPage::GetPage();
+        $page->SetTitle(sprintf(_("Manage User Account for %s"), $username ));
 
         switch( $cmd )
         {
@@ -363,7 +367,7 @@ EOF;
         }
 
         if( !empty($msg) )
-            CCPage::Prompt($msg);
+            $page->Prompt($msg);
 
         $spanR = '<span style="color:red">';
         $spanC = '</span>';
@@ -428,7 +432,9 @@ EOF;
                          'menu_text' => sprintf(_("Activity for %s"), $uq ),
                          'help'      => _('See Activity Log for this user.') );
 
-        CCPage::PageArg('client_menu',$args,'print_client_menu');
+        CCEvents::Invoke( CC_EVENT_USER_ADMIN_MENU, array( $user_id, &$args) );
+        
+        $page->PageArg('client_menu',$args,'print_client_menu');
 
     }
 
@@ -457,9 +463,10 @@ EOF;
         $username = $record['user_name'];
         $prompt = "Delete all files for '$username'";
         $form = new CCDeleteUserFilesForm($username,$prompt);
+        $page =& CCPage::GetPage();
         if( empty($_POST['deleteuserfiles']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
             return( false );
         }
         else
@@ -478,12 +485,13 @@ EOF;
 
     function _del_user(&$record)
     {
+        $page =& CCPage::GetPage();
         $username = $record['user_name'];
         $prompt = sprintf(_("Delete Account for user, %s"), $username);
         $form = new CCDeleteUserFilesForm($username,$prompt);
         if( empty($_POST['deleteuserfiles']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -492,7 +500,7 @@ EOF;
             $users =& CCUsers::GetTable();
             $where['user_id'] = $record['user_id'];
             $users->DeleteWhere($where);
-            CCPage::Prompt(sprintf(_("User account for user, %s, has been deleted."), $record['user_name']));
+            $page->Prompt(sprintf(_("User account for user, %s, has been deleted."), $record['user_name']));
         }
     }
 
@@ -510,11 +518,13 @@ EOF;
             array_unshift( $cc_banned_ips, $new_ip );
         }
 
+
         $form = new CCIPManageForm($cc_banned_ips);
 
         if( empty($_POST['ipmanage']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page =& CCPage::GetPage();
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -541,13 +551,18 @@ if( !defined('IN_CC_HOST') ) exit;
 \$cc_banned_ips = array (
 $new_masks
 );
-if( @preg_match('/' . implode('|',\$cc_banned_ips) . '/',\$_SERVER['REMOTE_ADDR']) ) exit;
+if( !empty(\$cc_banned_ips) && @preg_match('/' . implode('|',\$cc_banned_ips) . '/',\$_SERVER['REMOTE_ADDR']) ) exit;
 $ephp
+
 END;
-        $f = fopen('.cc-ban.txt','w');
+        $filename = '.cc-ban.txt';
+        if( file_exists($filename) )
+            unlink($filename);
+        $f = fopen($filename,'w');
         fwrite($f,$text);
         fclose($f);
-        chmod('.cc-ban.txt',cc_default_file_perms());
+        $perms = cc_default_file_perms();
+        chmod('.cc-ban.txt', $perms);
 
     }
 

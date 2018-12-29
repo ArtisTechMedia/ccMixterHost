@@ -86,7 +86,7 @@ class CCFileVerify
     * @param array &$types Outbound parameter to put the valid format types
     * @returns bool $havetypes true if there is at least one type
     */
-    function GetValidFileTypes(&$types)
+    public static function GetValidFileTypes(&$types)
     {
         require_once('cchost_lib/cc-getid3.php');
         $configs =& CCConfigs::GetTable();
@@ -295,12 +295,13 @@ class CCFileVerify
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
+        $page =& CCPage::GetPage();
         $title = _("Edit Allowable File Formats");
         CCAdmin::BreadCrumbs(false,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
 
         $form = new CCAdminFileVerifyForm($this);
-        CCPage::AddForm( $form->GenerateForm() );
+        $page->AddForm( $form->GenerateForm() );
     }
 
     /**
@@ -312,7 +313,7 @@ class CCFileVerify
     {
         require_once('cchost_lib/cc-getid3.php');
         $formats =& CCGetID3::GetFormats();
-        list( $mediatype ) = split('-',$name);
+        list( $mediatype ) = cc_split('-',$name);
         $F['media-type']  = $mediatype;
         $F['format-name'] = $name;
         $F['default-ext'] = $formats[$name]['name'];

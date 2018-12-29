@@ -56,6 +56,12 @@ class CCAdminThrottleForm extends CCEditConfigForm
            'formatter'  => 'textedit',
            'flags'      => CCFF_POPULATE );
 
+        $fields['user-manual'] = array (
+           'label'      => _('Manual throttle'),
+           'form_tip'   => _('Comma separted list of user login names to throttle indefinitely.'),
+           'formatter'  => 'textedit',
+           'flags'      => CCFF_POPULATE );
+
         $msg = _("You are not authorized to submit this type of file.") . ' ' . 
                _('Please contact the site administrator for details.');
 
@@ -282,6 +288,16 @@ class CCThrottle
         $configs    =& CCConfigs::GetTable();
         $rules      = $configs->GetConfig('throttle_rules');
         $throttle   = $configs->GetConfig('throttle');
+
+        
+        if( $this->_is_user_manual_throttled() ) {
+            foreach( $type_keys as $type_key )
+            {
+                $submit_types[$type_key]['quota_reached'] = true;
+                $submit_types[$type_key]['quota_message'] = $throttle['quota-msg'];
+            }
+        }
+
         $user_id    = CCUser::CurrentUser();
         $dv         = new CCDataView();
 
@@ -303,7 +319,7 @@ class CCThrottle
 
             $limit_by_type = $rule['limit_by_type'];
 
-            if( !array_key_exists($limit_by_type,$submit_types) )
+            if( $limit_by_type != 'all' && !array_key_exists($limit_by_type,$submit_types) )
             {
                 // this is a crufty upgrade, a rule exsists for a submit type that doesn't exist anymore
                 // todo: ???
@@ -381,20 +397,46 @@ class CCThrottle
         return(true);
     }
 
+    function _is_user_manual_throttled() {
+
+        $configs    =& CCConfigs::GetTable();
+        $throttle = $configs->GetConfig('throttle');
+
+        $user_manual = $throttle['user-manual'];
+        $username = CCUser::CurrentUserName();
+
+        if( !empty($throttle['user-manual']) )
+        {
+            require_once('cchost_lib/cc-tags.php');
+
+            $manual = CCTag::TagSplit($throttle['user-manual']);
+            
+            if( in_array( $username, $manual ) )
+            {
+                return(true);
+            }
+        }
+        
+        return (false);
+    }
+
+
     function Admin()
     {
+        $page =& CCPage::GetPage();
         $this->_build_bread_crumb_trail(false);
-        CCPage::SetTitle(_("Administer Upload Throttle"));
+        $page->SetTitle(_("Administer Upload Throttle"));
         $form = new CCAdminThrottleForm();
-        CCPage::AddForm( $form->GenerateForm() );
+        $page->AddForm( $form->GenerateForm() );
     }
 
     function Rules()
     {
+        $page =& CCPage::GetPage();
         $this->_build_bread_crumb_trail(true);
 
         $configs =& CCConfigs::GetTable();
-        CCPage::SetTitle(_("Upload Throttle Rules"));
+        $page->SetTitle(_("Upload Throttle Rules"));
 
         if( !empty($_POST['addrule']) )
         {
@@ -409,7 +451,7 @@ class CCThrottle
 
             $form = new CCAdminThrottleRulesForm($rules);
             $tmpl = $form->GenerateForm();
-            CCPage::AddForm($tmpl );
+            $page->AddForm($tmpl );
         }
         elseif( empty($_POST['adminthrottlerules']) )
         {
@@ -427,7 +469,7 @@ class CCThrottle
             }
 
             $form = new CCAdminThrottleRulesForm($throttle_rules);
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -510,7 +552,8 @@ class CCThrottle
         }
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
 }

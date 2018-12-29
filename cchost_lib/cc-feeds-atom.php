@@ -37,14 +37,11 @@ class CCFeedsAtom
 {
     function OnApiQuerySetup( &$args, &$queryObj, $validate)
     {
-        $f = $args['format'];
-
-        if( ($f == 'atom') || ($args['limit'] == 'feed') )
-            $queryObj->ValidateLimit('max-feed');
-
-        if( $f != 'atom' )
+        CCFeed::CalculateFeedLimit($args,'atom');
+        
+        if( $args['format'] != 'atom' )
             return;
-
+            
         $args['template'] = 'atom_10.php';
         $queryObj->GetSourcesFromTemplate($args['template']);
     }

@@ -98,16 +98,17 @@ class CCUserPage
     function Profile($username)
     {
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         $fun = cc_fancy_user_sql();
         $user_real_name = CCDatabase::QueryItem("SELECT {$fun} FROM cc_tbl_user WHERE user_name ='{$username}'");
         if( !$user_real_name )
         {
-            CCPage::Prompt('str_the_system_doesnt');
+            $page->Prompt('str_the_system_doesnt');
             CCUtil::Send404(false);
         }
         else
         {
-            CCPage::SetTitle($user_real_name);
+            $page->SetTitle($user_real_name);
             require_once('cchost_lib/cc-query.php');
             $query = new CCQuery();
             $args = $query->ProcessAdminArgs('t=user_profile&u='.$username);
@@ -118,12 +119,13 @@ class CCUserPage
     function Uploads($username,$tagfilter='')
     {
         //CCDebug::StackTrace();
-        CCPage::PageArg('user_tags_user',$username,'user_tags');
+        $page =& CCPage::GetPage();
+        $page->PageArg('user_tags_user',$username,'user_tags');
         $tags = array_unique(preg_split('/[\s]?,[\s]?/',$tagfilter,-1,PREG_SPLIT_NO_EMPTY));
         sort($tags);
         $this->_tag_filter = join(' ',$tags);
         $tagfilter_commas = join(',',$tags);
-        CCPage::PageArg('user_tags_tag',$tagfilter_commas);
+        $page->PageArg('user_tags_tag',$tagfilter_commas);
         $where['user_name'] = $username;
         $users =& CCUsers::GetTable();
         $q = 'title=' . $users->QueryItem('user_real_name',$where);
@@ -284,7 +286,8 @@ class CCUserPage
         }
         else
         {
-            $alpha = CCUtil::StripText($_GET['p']);
+            $p = CCUtil::CleanUrl($_GET['p']);
+            $alpha = CCUtil::StripText($p);
             $sqlargs['where'] .= " AND (user_name LIKE '{$alpha}%')";
             $qargs .= '&sort=user_name&ord=ASC';
         }
@@ -318,9 +321,11 @@ END;
         }
 
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
+        
         require_once('cchost_lib/cc-query.php');
 
-        CCPage::PageArg('user_index',$alinks);
+        $page->PageArg('user_index',$alinks);
         $query = new CCQuery();
         $qargs .= '&limit=20';
         $args = $query->ProcessAdminArgs($qargs);
@@ -380,6 +385,9 @@ END;
                                            'id'    => 'fav' );
         }
 
+        $row['is_admin'] = CCUser::IsAdmin($row['user_name']);
+        $row['is_super'] = CCUser::IsSuper($row['user_name']);
+        
         $row['user_tag_links'] = array();
 
         $favs = CCTag::TagSplit($row['user_favorites']);

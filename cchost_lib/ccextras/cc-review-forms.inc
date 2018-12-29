@@ -51,17 +51,18 @@ class CCReviewFormAPI
     function PostReview($upload_id)
     {
         global $CC_GLOBALS, $CC_CFG_ROOT;
-
+        $page =& CCPage::GetPage();
+        
         if( empty($CC_GLOBALS['reviews_enabled']) )
         {
-            CCPage::Prompt(_('Review integration is not enabled.'));
+            $page->Prompt(_('Review integration is not enabled.'));
             return;
         }
 
         $uploads =& CCUploads::GetTable();
         if( !$uploads->KeyExists($upload_id) )
         {
-            CCPage::Prompt(_('Cannot find that upload.'));
+            $page->Prompt(_('Cannot find that upload.'));
             CCUtil::Send404(false);
             return;
         }
@@ -72,14 +73,17 @@ class CCReviewFormAPI
         {
             $form->RemoveFormField( 'user_confirm' );
             $form->RemoveFormField( 'user_mask' );
+            
             $form->SetTemplateVar('form_submit_trap', 'ccReviewFormHook' ); 
         }
 
         require_once('cchost_lib/ccextras/cc-reviews.inc');
 
-        list( $user_real_name, $upload_name, $user_name ) = CCDatabase::QueryRow(
-            'SELECT user_real_name, upload_name, user_name FROM cc_tbl_uploads JOIN cc_tbl_user ON upload_user=user_id WHERE upload_id='
-            . $upload_id, false);
+        $upload_row = CCDatabase::QueryRow(
+            'SELECT user_real_name, upload_name, user_name, upload_user FROM cc_tbl_uploads JOIN cc_tbl_user ON upload_user=user_id WHERE upload_id='
+            . $upload_id);
+        
+        extract($upload_row);
 
         if( empty($_POST['review']) || !$form->ValidateFields() )
         {
@@ -91,7 +95,7 @@ class CCReviewFormAPI
                 CCReview::_build_bread_crumb_trail(array($user_name,$user_real_name),
                                           array( $upload_id, $upload_name), '',_('create new'));
 
-                CCPage::SetTitle(array('str_review_write_s',$upload_name));
+                $page->SetTitle(array('str_review_write_s',$upload_name));
 
                 $args = $query->ProcessAdminArgs('t=list_files&ids=' . $upload_id); 
             }
@@ -102,9 +106,9 @@ class CCReviewFormAPI
 
             $query->Query($args);
 
-            CCPage::PageArg('review_upload',$upload_id);
+            $page->PageArg('review_upload',$upload_id);
             
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -112,41 +116,48 @@ class CCReviewFormAPI
             {
                 // submit was hit twice
                 require_once('cchost_lib/cc-page.php');
-                CCPage::Prompt(_("You have already reviewed this upload."));
+                $page->Prompt(_("You have already reviewed this upload."));
             }
-            else
+            else 
             {
                 $form->GetFormValues($values);
-                $reviews =& CCReviews::GetTable();
-                $values['topic_id'] = $reviews->NextID();
-                $values['topic_upload'] = $upload_id;
-                $values['topic_date'] = date('Y-m-d H:i:s',time());
-                $values['topic_user'] = CCUser::CurrentUser();
-                $values['topic_type'] = 'review';
-                $user_real = CCUser::CurrentUserField('user_real_name');
-                $values['topic_name'] = sprintf(_("Review of '%s' by '%s'"), 
-                                                $upload_name, $user_real);
-                $reviews->Insert($values,0);
-                CCReview::Sync($upload_id,$values['topic_user']);
-
-                $row = $reviews->QueryKeyRow($values['topic_id']);
-                $row['user_real_name'] = $user_real;
-                $row['topic_permalink'] = ccl('reviews',$user_name, $upload_id ) . '#' . $values['topic_id'];
-
-                CCEvents::Invoke( CC_EVENT_REVIEW, array( &$row ) );
-
-                if( empty($_GET['ajax']) )
+                if( CCTopic::OKForUserToPost($values) )
                 {
-                    $url = ccl( 'reviews', $user_name, $upload_id );
-                    CCUtil::SendBrowserTo($url);
+                    $reviews =& CCReviews::GetTable();
+                    $values['topic_id'] = $reviews->NextID();
+                    $values['topic_upload'] = $upload_id;
+                    $values['topic_date'] = date('Y-m-d H:i:s',time());
+                    $values['topic_user'] = CCUser::CurrentUser();
+                    $values['topic_type'] = 'review';
+                    $user_real = CCUser::CurrentUserField('user_real_name');
+                    $values['topic_name'] = sprintf(_("Review of '%s' by '%s'"), 
+                                                    $upload_name, $user_real);
+                    $reviews->InsertNewTopic($values,0);
+                    CCReview::Sync($upload_id,$values['topic_user']);
+
+                    $row = $reviews->QueryKeyRow($values['topic_id']);
+                    $row['user_real_name'] = $user_real;
+                    $row['topic_permalink'] = ccl('reviews',$user_name, $upload_id ) . '#' . $values['topic_id'];
+
+                    CCEvents::Invoke( CC_EVENT_REVIEW, array( &$row, &$upload_row ) );
+                
+                    if( empty($_GET['ajax']) )
+                    {
+                        $url = ccl( 'reviews', $user_name, $upload_id );
+                        CCUtil::SendBrowserTo($url);
+                    }
+                    else
+                    {
+                        $ret['upload_id']   = $upload_id;
+                        $ret['reviews_url'] = ccl('reviews',$user_name, $upload_id );
+                        $ret['num_reviews'] = CCDatabase::QueryItem(
+                                                'SELECT COUNT(*) FROM cc_tbl_topics WHERE topic_type = \'review\' AND topic_upload = '.$upload_id);
+                        CCUtil::ReturnAjaxData($ret);
+                    }
                 }
                 else
                 {
-                    $ret['upload_id']   = $upload_id;
-                    $ret['reviews_url'] = ccl('reviews',$user_name, $upload_id );
-                    $ret['num_reviews'] = CCDatabase::QueryItem(
-                                            'SELECT COUNT(*) FROM cc_tbl_topics WHERE topic_type = \'review\' AND topic_upload = '.$upload_id);
-                    CCUtil::ReturnAjaxData($ret);
+                    $page->AddMacro('topic_throttled.tpl');
                 }
             }
 

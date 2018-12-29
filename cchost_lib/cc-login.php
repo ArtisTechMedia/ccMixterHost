@@ -30,6 +30,43 @@ if( !defined('IN_CC_HOST') )
 require_once('cchost_lib/cc-user.inc');
 require_once('cchost_lib/cc-seckeys.php');
 
+function generator_recaptcha2($form, $varname, $value='',$class='')
+{
+    $html = '<div class="g-recaptcha" data-sitekey="6Le3ihwTAAAAAPk3emDQWuFkttPgN8FhQx5wbs3n"></div>';
+    return $html;
+}
+
+
+function validator_recaptcha2($form,$fieldname)
+{
+    $key = file_get_contents('./cchost_lib/captcha.txt');
+    require_once('cchost_lib/snoopy/Snoopy.class.php');
+    $snoopy = new Snoopy();
+    global $CC_GLOBALS;
+    
+    if( !empty($CC_GLOBALS['curl-path']) )
+    {
+        $snoopy->curl_path = $CC_GLOBALS['curl-path'];
+    }
+    $snoopy->maxredirs = 8;
+    $snoopy->offsiteok = true;
+    
+    $value = $form->GetFormValue($fieldname);
+    $link = 'https://www.google.com/recaptcha/api/siteverify';
+
+    @$snoopy->submit($link, array( 'secret' => $key,
+                                   'response' => $value,
+                                   'remoteip' => $_SERVER['REMOTE_ADDR']));
+
+    if( !empty($snoopy->results) && (strstr($snoopy->results,'"success": true') !== FALSE) ) {
+        return true;
+    }
+
+    $form->SetFieldError($fieldname, _("Yea.... no"));
+    return false;
+
+}
+
 /**
 * Registeration form
 */
@@ -70,6 +107,21 @@ class CCNewUserForm extends CCUserForm
                 );
         }
 
+        $fields += array(
+                'user_registration_agreement' =>
+                    array(
+                        'label' => 'str_registration_agreement',
+                        'formatter' => 'agreement',
+                        'form_tip' => 'str_registration_agreement_tip',
+                        'flags' => CCFF_REQUIRED
+                    ),
+                'g-recaptcha-response' =>
+                    array( 'label' => '',
+                            'formatter' => 'recaptcha2',
+                            'form_tip' => '',
+                            'flags' => CCFF_NOUPDATE | CCFF_REQUIRED )
+            );
+        /*
         $fields += array( 
                     'user_mask' =>
                        array( 'label'       => '',
@@ -84,6 +136,7 @@ class CCNewUserForm extends CCUserForm
                                'form_tip'   => CCSecurityVerifierForm::GetSecurityTipStr(),
                                'flags'      => CCFF_REQUIRED | CCFF_NOUPDATE)
             );
+        */
 
         if( $has_mail )
         {
@@ -98,72 +151,89 @@ class CCNewUserForm extends CCUserForm
         }
 
         $this->AddFormFields( $fields );
-        $this->SetSubmitText('str_login_register');
+        $this->SetSubmitText('str_login_register');        
     }
 
-    /**
-     * Handles generation of &lt;input type='text' HTML field 
-     * 
-     * 
-     * @param string $varname Name of the HTML field
-     * @param string $value   value to be published into the field
-     * @param string $class   CSS class (rarely used)
-     * @returns string $html HTML that represents the field
-     */
-    function generator_newusername($varname,$value='',$class='')
-    {
-        return( $this->generator_textedit($varname,$value,$class) );
-    }
+}
 
-    /**
-    * Handles validator for HTML field, called during ValidateFields()
-    * 
-    * Validates uniqueness of name as well as character checks and length.
-    * 
-    * @see CCForm::ValidateFields()
-    * 
-    * @param string $fieldname Name of the field will be passed in.
-    * @returns bool $ok true means field validates, false means there were errors in user input
-    */
-    function validator_newusername($fieldname)
+/**
+ * Handles generation of &lt;input type='text' HTML field 
+ * 
+ * 
+ * @param string $varname Name of the HTML field
+ * @param string $value   value to be published into the field
+ * @param string $class   CSS class (rarely used)
+ * @returns string $html HTML that represents the field
+ */
+function generator_newusername($form, $varname,$value='',$class='')
+{
+    return( $form->generator_textedit($varname,$value,$class) );
+}
+
+/**
+* Handles validator for HTML field, called during ValidateFields()
+* 
+* Validates uniqueness of name as well as character checks and length.
+* 
+* @see CCForm::ValidateFields()
+* 
+* @param string $fieldname Name of the field will be passed in.
+* @returns bool $ok true means field validates, false means there were errors in user input
+*/
+function validator_newusername($form, $fieldname)
+{
+    if( $form->validator_must_exist($fieldname) )
     {
-        if( $this->validator_must_exist($fieldname) )
+        $value = $form->GetFormValue($fieldname);
+
+        if( preg_match('/[^A-Za-z0-9_]/', $value) )
         {
-            $value = $this->GetFormValue($fieldname);
-
-            if( preg_match('/[^A-Za-z0-9_]/', $value) )
-            {
-                $this->SetFieldError($fieldname, array('str_login_this_must_letters') );
-                return(false);
-            }
-
-            if( strlen($value) > 25 )
-            {
-                $this->SetFieldError($fieldname, array('str_login_this_must_be_less') );
-                return(false);
-            }
-
-            $user = CCDatabase::QueryItem('SELECT user_id FROM cc_tbl_user WHERE user_name=\''.$value.'\'');
-
-            if( empty($user) )
-            {
-                require_once('cchost_lib/cc-tags.inc');
-                $tags =& CCTags::GetTable();
-                $user = $tags->QueryKeyRow($value);
-            }
-
-            if( $user )
-            {
-                $this->SetFieldError($fieldname,array('str_login_that_username_is'));
-                return(false);
-            }
-
-
-            return( true );
+            $form->SetFieldError($fieldname, array('str_login_this_must_letters') );
+            return(false);
         }
 
-        return( false );
+        if( strlen($value) > 25 )
+        {
+            $form->SetFieldError($fieldname, array('str_login_this_must_be_less') );
+            return(false);
+        }
+
+        $user = CCDatabase::QueryItem('SELECT user_id FROM cc_tbl_user WHERE user_name=\''.$value.'\'');
+
+        if( empty($user) )
+        {
+            require_once('cchost_lib/cc-tags.inc');
+            $tags =& CCTags::GetTable();
+            $user = $tags->QueryKeyRow($value);
+        }
+
+        if( $user )
+        {
+            $form->SetFieldError($fieldname,array('str_login_that_username_is'));
+            return(false);
+        }
+
+
+        return( true );
     }
+
+    return( false );
+}
+
+function generator_agreement($form, $varname, $value='', $class='')
+{
+    return($form->generator_checkbox($varname, $value, $class));
+}
+
+function validator_agreement($form, $fieldname)
+{
+    $value = $form->GetFormValue($fieldname);
+    if ($value !== 'on') {
+        $form->SetFieldError($fieldname, array('str_registration_agreement_error'));
+        return(false);
+    }
+
+    return(true);
 }
 
 /**
@@ -345,10 +415,22 @@ class CCLogin
 
         require_once('cchost_lib/cc-page.php');
         $page =& CCPage::GetPage();
+
         $this->_bread_crumbs_login($page,'str_login_create_acc');
         $page->SetTitle('str_login_create_acc');
         $form = new CCNewUserForm();
-        $form->SetHelpText('str_login_this_site_req');
+//        $form->SetHelpText('str_login_this_site_req');
+        
+        $help = _('Already have an account? Log in <a href="/login">here</a>.');
+        
+        if( !empty($CC_GLOBALS['facebook_allow_login']) )
+        {
+            $help .= '<br /><br />' . _('Either way you can login via Facebook: ') . '<br /><br />' .
+                '<fb:login-button scope="public_profile,email" onlogin="fb_check_login_state();"></fb:login-button>' .
+                '<br />';
+        }
+        
+        $form->SetHelpText($help);
         
         $show = empty($_POST['newuser']) || !$form->ValidateFields();
 
@@ -631,7 +713,7 @@ class CCLogin
             exit;
         $ord  = ord($hash[$offset]);
         require_once('cchost_lib/cc-template.php');
-        $fname = CCTemplate::Search( sprintf("images/hex/f%x.png",$ord) );
+        $fname = CCTemplate::SearchStatic( sprintf("images/hex/f%x.png",$ord) );
         header ("Content-Type: image/png");
         readfile($fname);
         exit;

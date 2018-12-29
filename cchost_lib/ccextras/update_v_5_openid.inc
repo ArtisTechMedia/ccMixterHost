@@ -52,7 +52,7 @@ EOF;
               openid_extra mediumtext,
          * 
          */        
-        CCPage::Prompt( _('OpenID extensions installed') );
+       $page =& CCPage::GetPage(); $page->Prompt( _('OpenID extensions installed') );
 
     }
 }

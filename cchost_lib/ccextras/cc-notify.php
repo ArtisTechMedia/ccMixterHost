@@ -32,6 +32,8 @@ if( !defined('IN_CC_HOST') )
 CCEvents::AddHandler(CC_EVENT_MAP_URLS,           array( 'CCNotify',  'OnMapUrls'));
 CCEvents::AddHandler(CC_EVENT_GET_CONFIG_FIELDS,  array( 'CCNotify' , 'OnGetConfigFields') );
 CCEvents::AddHandler(CC_EVENT_FILTER_USER_PROFILE,array( 'CCNotify' , 'OnFilterUserProfile') );
+CCEvents::AddHandler(CC_EVENT_USER_DELETED,       array( 'CCNotify' , 'OnUserDelete') );
+
 
 require_once('cchost_lib/ccextras/cc-extras-events.php'); // for EVENT_TOPIC stuff
 
@@ -66,7 +68,7 @@ class CCNotify
         $notify_api->OnRated($rating_rec,$rating,$record);
     }
 
-    function OnReview(&$review)
+    function OnReview(&$review,&$upload)
     {
         if( !$this->_is_notify_on() )
             return;
@@ -153,7 +155,13 @@ class CCNotify
     */
     function OnMapUrls()
     {
-        CCEvents::MapUrl( ccp('people', 'notify', 'edit'), array('CCNotify','EditMyNotifications'), CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '[username]', _('Display notify options form. Optional parameter is other user to get notified about.'), CC_AG_USER );
+        CCEvents::MapUrl( ccp('people', 'notify', 'edit'), array('CCNotify','EditMyNotifications'), 
+                CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '[username]', 
+                _('Display notify options form. Optional parameter is other user to get notified about.'), CC_AG_USER );
+            
+        CCEvents::MapUrl( ccp('admin', 'notify', 'cleanup'), array('CCNotify','CleanUp'), 
+            CC_ADMIN_ONLY, ccs(__FILE__), '', 
+            _('Remove notifications to dead user accounts.'), CC_AG_USER );
     }
 
     /**
@@ -175,6 +183,37 @@ class CCNotify
                        'formatter'  => 'checkbox',
                        'flags'      => CCFF_POPULATE );
         }
+    }
+
+    function OnUserDelete($user_id)
+    {
+        require_once('cchost_lib/ccextras/cc-notify.inc');
+        $table =& CCNotifications::GetTable();
+        $w['notify_user'] = $user_id;
+        $table->DeleteWhere($w);
+    }
+    
+    function CleanUp()
+    {
+        $sql = "select notify_id from cc_tbl_notifications left outer join cc_tbl_user on notify_user = user_id where isnull(user_id);";
+        $notify_ids = CCDatabase::QueryItems($sql);
+        
+        if( empty($notify_ids) )
+        {
+            $count = '0';
+        }
+        else
+        {
+            $count = count($notify_ids);
+            $notify_str = join(',',$notify_ids);
+            $sql2 = "delete from cc_tbl_notifications where notify_id in ({$notify_str})";
+            CCDatabase::Query($sql2);
+        }
+        
+        require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
+        $page->SetTitle(_('Notifications Cleanup'));
+        $page->Prompt("Notifiations cleaned up {$count} records");
     }
 
     function _is_notify_on()

@@ -23,7 +23,7 @@ function _t_tags_taglinks(&$T,&$A)
 //------------------------------------- 
 function _t_tags_taglinks_str(&$T,&$A) 
 {
-    $tags = split(',',$A['tag_str']);
+    $tags = cc_split(',',$A['tag_str']);
     $urlbase = $A['tag_urlbase'];
     $c = count( $tags );
     $k = array_keys( $tags );

@@ -50,6 +50,7 @@ class CCQueryFormats
             }
             case 'json':
             case 'js':
+            case 'jsex':
             case 'xml':
             case 'textfile':
             case 'csv':
@@ -82,6 +83,13 @@ class CCQueryFormats
 
         switch( $format )
         {
+            case 'jsex':
+            {
+                $mime = 'text/javascript';
+                $json = CCUtil::JSONEncode( $records );
+                $results = array( $json, $mime );
+                break;
+            }
             case 'json':
             case 'js':
             {
@@ -109,6 +117,7 @@ class CCQueryFormats
                 }
                 $text .= ']';
                 $results = array( $text, $mime ); 
+                //$results = array( json_encode($records), $mime ) ;
                 break;
             }
 
@@ -149,7 +158,7 @@ class CCQueryFormats
                 $page->Call($template,true);
                 if( !empty($paging) && ($paging == 'on') )
                 {
-                    CCPage::AddPagingLinks($queryObj->dataview,'',$limit);
+                    $page->AddPagingLinks($queryObj->dataview,'',$limit);
                 }
             }
             break;
@@ -186,7 +195,7 @@ class CCQueryFormats
                 }
                 
                 require_once('cchost_lib/cc-page.php');
-
+                $page =& CCPage::GetPage();
                 $targs = $CC_GLOBALS;
                 $targs['records']  =& $records;
                 $targs['dochop']   = isset($chop) && $chop > 0;
@@ -195,7 +204,7 @@ class CCQueryFormats
 
                 if( !empty($paging) && ($paging == 'on') )
                 {
-                    CCPage::AddPagingLinks($queryObj->dataview,'',$limit, $skinmac);
+                    $page->AddPagingLinks($queryObj->dataview,'',$limit, $skinmac);
                     $skinmac->AddCustomizations(array( 'paging_style'));
                 }
 
@@ -291,7 +300,9 @@ class CCQueryFormats
                 header( "Content-type: $mime" );
         }
 
-        print($value);
+        if( empty($noprint) )
+            print($value);
+        
         if( empty($noexit) )
             exit;
 

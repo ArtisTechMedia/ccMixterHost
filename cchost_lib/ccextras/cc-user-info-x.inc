@@ -101,6 +101,7 @@ class CCUserInfoX
 {
     function UserInfo($contest,$cmd='')
     {
+        $page =& CCPage::GetPage();
         global $CC_GLOBALS;
 
         $info = '';
@@ -140,13 +141,13 @@ class CCUserInfoX
 
         if( !$ok )
         {
-            CCPage::SetTitle(_('Contest Entry User Information'));
+            $page->SetTitle(_('Contest Entry User Information'));
             $form = new CCUserInfoForm();
             if( !empty($info) )
                 $form->PopulateValues($info);
             if( empty($_POST['userinfo']) || !$form->ValidateFields() )
             {
-                CCPage::AddForm ( $form->GenerateForm() );
+                $page->AddForm ( $form->GenerateForm() );
             }
             else
             {

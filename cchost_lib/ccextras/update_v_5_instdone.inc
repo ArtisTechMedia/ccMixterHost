@@ -37,7 +37,7 @@ class v_5_instdone extends CCUpdate
         $configs =& CCConfigs::GetTable();
         $args['install_done'] = true;
         $configs->SaveConfig('config',$args);
-        CCPage::Prompt(_('Installation Complete'));
+        $page =& CCPage::GetPage(); $page->Prompt(_('Installation Complete'));
     }
 }
 

@@ -61,12 +61,12 @@ class CCViewLogs
         if( $type == 'error' )
         {
             $srcfile = $logdir. CC_ERROR_FILE;
-            $parts = split('\.',CC_ERROR_FILE);
+            $parts = cc_split('.',CC_ERROR_FILE);
         }
         elseif( $type == 'log' )
         {
             $srcfile = $logdir . CC_LOG_FILE;
-            $parts = split('\.',CC_LOG_FILE);
+            $parts = cc_split('.',CC_LOG_FILE);
         }
         else
             CCUtil::Send404();

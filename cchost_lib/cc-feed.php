@@ -151,7 +151,7 @@ class CCFeed
      *
      * @param integer $fileid Database ID of file
      */
-    function OnFileDelete($fileid)
+    function OnDeleteFile($fileid)
     {
         $this->_clear_cache($fileid);
     }
@@ -198,6 +198,32 @@ class CCFeed
         }
     }
 
+    public static function CalculateFeedLimit(&$args,$feed_name)
+    {
+        global $CC_GLOBALS;
+        if( $args['limit'] == 'feed' )
+        {
+            $args['limit'] = $CC_GLOBALS['max-feed'];
+            return true;
+        }
+        
+        if( $args['format'] == $feed_name )
+        {
+            if( empty($args['limit']) )
+            {
+                $args['limit'] = $CC_GLOBALS['max-feed'];
+                return true;                
+            }
+            if( (integer)($args['limit']) > $CC_GLOBALS['max-feed'] )
+            {
+                $args['limit'] = $CC_GLOBALS['max-feed'];
+                return true;                
+            }
+        }
+        
+        return false;
+    }
+    
     /**
      * Internal: Checks to see if the cache is on or off.
      *

@@ -230,18 +230,25 @@ class CCForumsAdmin
         CCEvents::MapUrl( ccp('admin','forums','fork'), array( 'CCForumsAdmin', 'ForkThread'),   
                 CC_ADMIN_ONLY, ccs(__FILE__), '{topic_id}', 
                 _("Displays 'Move Thread' form"), CC_AG_FORUMS );
+                
+        CCEvents::MapUrl( ccp('admin','forums','cleanup'), array( 'CCForumsAdmin', 'CleanUpThreads'),   
+                CC_ADMIN_ONLY, ccs(__FILE__), '', 
+                _("Delete orphaned threads/topics"), CC_AG_FORUMS );
+                
     }
 
     
     function ForkThread($topic_id)
     {
+        $page =& CCPage::GetPage();
+    
         $form = new CCForumMoveThreadForm(true); // true means fork
 
         if( empty($_POST['forummovethread']) || !$form->ValidateFields() )
         {
             $title = _('Fork Topic to New Thread');
-            CCPage::SetTitle($title);
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->SetTitle($title);
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -265,11 +272,14 @@ class CCForumsAdmin
             
             // left and right are new as of the ForkBranch
             list( $left, $right ) = CCDatabase::QueryRow('SELECT topic_left, topic_right FROM cc_tbl_topics WHERE topic_id='.$topic_id,false);
-            $where = "topic_left >= $left AND topic_right <= $right";
-            $up_topic['topic_name'] = $values['topic_name'];
-            $up_topic['topic_forum'] = $forum_id;
-            $up_topic['topic_thread'] = $thread_id;
-            $topics->UpdateWhere($up_topic,$where);
+            if( !empty($left) && !empty($right) ) // orphaned topics may be null
+            {
+                $where = "topic_left >= $left AND topic_right <= $right";
+                $up_topic['topic_name'] = $values['topic_name'];
+                $up_topic['topic_forum'] = $forum_id;
+                $up_topic['topic_thread'] = $thread_id;
+                $topics->UpdateWhere($up_topic,$where);
+            }
             
             // We need the newest thread
             $newest_topic = CCDatabase::QueryItem(
@@ -294,6 +304,7 @@ class CCForumsAdmin
 
     function MoveThread($thread_id)
     {
+        $page =& CCPage::GetPage();
         $api = new CCForums();
         $threads =& CCForumThreads::GetTable();
         $threads->AddJoin( new CCTopics(), 'forum_thread_oldest' );
@@ -304,9 +315,9 @@ class CCForumsAdmin
         if( empty($_POST['forummovethread']) || !$form->ValidateFields() )
         {
             $title = sprintf( _('Move topic: %s'), $row['topic_name'] );
-            CCPage::SetTitle($title);
+            $page->SetTitle($title);
 
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -343,20 +354,22 @@ class CCForumsAdmin
 
     function _stick_thread($thread_id)
     {
+        $page =& CCPage::GetPage();
         $threads =& CCForumThreads::GetTable();
         $a['forum_thread_id'] = $thread_id;
         $a['forum_thread_sticky'] = 'forum_thread_sticky ^ 1';
         $threads->Update($a,false);
-        CCPage::SetTitle(_('Change Thread Sticky Flag'));
+        $page->SetTitle(_('Change Thread Sticky Flag'));
         $url = ccl('thread',$thread_id);
         $link1 = "<a href=\"$url\">";
         $link2 = '</a>';
-        CCPage::Prompt(
+        $page->Prompt(
             sprintf(_('Sticky status changed for thread. %sGo back to thread%s'),$link1,$link2) );
     }
 
     function _close_thread($thread_id)
     {   
+        $page =& CCPage::GetPage();
         $threads =& CCForumThreads::GetTable();
         $a['forum_thread_id'] = $thread_id;
         $a['forum_thread_closed'] = 'forum_thread_closed ^ 1';
@@ -369,17 +382,19 @@ class CCForumsAdmin
         $fields['topic_locked'] = $islocked;
         $topics->UpdateWhere($fields,$where);
 
-        CCPage::SetTitle(_('Change Thread Open Status'));
+        $page->SetTitle(_('Change Thread Open Status'));
         $url = ccl('thread',$thread_id);
         $link1 = "<a href=\"$url\">";
         $link2 = '</a>';
-        CCPage::Prompt( 
+        $page->Prompt( 
             sprintf( _('Open status changed for thread. %sGo back to thread%s'), $link1, $link2 ) );
     }
 
 
     function Admin( $param1='', $param2='', $param3='' )
     {
+        $page =& CCPage::GetPage();
+        
         if( $param1 == 'stick' )
         {
             $this->_stick_thread($param2);
@@ -397,14 +412,14 @@ class CCForumsAdmin
 
         if( $param1 == 'newforum' )
         {
-            CCPage::SetTitle('Add Forum');
+            $page->SetTitle('Add Forum');
 
             if( empty($groups) )
             {
                 $href = ccl('admin','forums','newgroup');
                 $link1 = "<a href=\"$href\">";
                 $link2 = '</a>';
-                CCPage::Prompt(
+                $page->Prompt(
                     sprintf( _('You must %sadd groups%s before you can add forums'), $link1, $link2 ) );
                 $param1 = '';
             }
@@ -413,7 +428,7 @@ class CCForumsAdmin
                 $form = new CCForumAddForm($groups);
                 if( empty($_POST['forumadd']) || !$form->ValidateFields() )
                 {
-                    CCPage::AddForm( $form->GenerateForm() );
+                    $page->AddForm( $form->GenerateForm() );
                 }
                 else
                 {
@@ -427,7 +442,7 @@ class CCForumsAdmin
 
         if( ($param1 == 'edit') && !empty($param2) )
         {
-            CCPage::SetTitle( _('Edit Forum Properties') );
+            $page->SetTitle( _('Edit Forum Properties') );
 
             $row = $forums->QueryKeyRow($param2);
             if( empty($row) )
@@ -449,13 +464,13 @@ class CCForumsAdmin
                     CCUtil::SendBrowserTo( ccl('admin','forums') );
                 }
 
-                CCPage::AddForm( $form->GenerateForm() );
+                $page->AddForm( $form->GenerateForm() );
             }
         }
 
         if( ($param1 == 'delete') && !empty($param2) )
         {
-            CCPage::SetTitle( _('Delete Forum') );
+            $page->SetTitle( _('Delete Forum') );
 
             $row = $forums->QueryKeyRow($param2);
             if( empty($row) )
@@ -467,7 +482,7 @@ class CCForumsAdmin
                 if( empty($_POST['forumconfirmdelete']) )
                 {
                     $form = new CCForumConfirmDeleteForm($row['forum_name']);
-                    CCPage::AddForm( $form->GenerateForm() );
+                    $page->AddForm( $form->GenerateForm() );
                 }
                 else
                 {
@@ -481,11 +496,11 @@ class CCForumsAdmin
         
         if( $param1 == 'newgroup' )
         {
-            CCPage::SetTitle( _('Add Forum Group') );
+            $page->SetTitle( _('Add Forum Group') );
             $form = new CCForumAddGroupForm();
             if( empty($_POST['forumaddgroup']) || !$form->ValidateFields() )
             {
-                CCPage::AddForm( $form->GenerateForm() );
+                $page->AddForm( $form->GenerateForm() );
             }
             else
             {
@@ -497,7 +512,7 @@ class CCForumsAdmin
 
         if( ($param1 == 'editgroup') && !empty($param2) )
         {
-            CCPage::SetTitle( _('Edit Forum Group Properties') );
+            $page->SetTitle( _('Edit Forum Group Properties') );
 
             $row = $fgroups->QueryKeyRow($param2);
             if( empty($row) )
@@ -519,13 +534,13 @@ class CCForumsAdmin
                     CCUtil::SendBrowserTo( ccl('admin','forums') );
                 }
 
-                CCPage::AddForm( $form->GenerateForm() );
+                $page->AddForm( $form->GenerateForm() );
             }
         }
 
         if( ($param1 == 'delgroup') && !empty($param2) )
         {
-            CCPage::SetTitle( _('Delete Forum Group') );
+            $page->SetTitle( _('Delete Forum Group') );
 
             $where['forum_group'] = $param2;
             $forums_in_group = $forums->CountRows($where);
@@ -534,7 +549,7 @@ class CCForumsAdmin
             {
                 $link1 = "<a href=\"$href\">";
                 $link2 = '</a>';
-                CCPage::Prompt(
+                $page->Prompt(
                     sprintf( _('Group is not empty. %sReturn to forums.%s'), $link1, $link2 ) );
             }
             else
@@ -569,16 +584,26 @@ class CCForumsAdmin
             $title = _('Forum Admin');
             require_once('cchost_lib/cc-admin.php');
             CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-            CCPage::SetTitle( $title );
-            CCPage::PageArg('fadmin',$args,'forum_admin');
+            $page->SetTitle( $title );
+            $page->PageArg('fadmin',$args,'forum_admin');
         }
     }
 
     function _empty_forum($forum_id)
     {
+        $sql = "SELECT DISTINCT topic_user FROM cc_tbl_topics WHERE topic_forum = ${forum_id}";
+        $user_ids = CCDatabase::QueryItems($sql);
+        
         $topics =& CCTopics::GetTable();
         $where['topic_forum'] = $forum_id;
         $topics->DeleteWhere($where);
+        
+        $forumAPI = new CCForumAPI();
+        $forumAPI->UpdateUserPostCounts($user_ids);
+        
+        $threads =& CCForumThreads::GetTable();
+        $wf['forum_thread_forum'] = $forum_id;
+        $threads->DeleteWhere($wf);
     }
 
     function _delete_forum($forum_id)
@@ -590,9 +615,64 @@ class CCForumsAdmin
         $href = ccl('admin','forums');
         $link1 = "<a href=\"$href\">";
         $link2 = '</a>';
-        CCPage::Prompt(
+        $page =& CCPage::GetPage();
+        $page->Prompt(
             sprintf( _('Forum has been permanantly deleted. %sReturn to forums.%s'), $link1, $link2 ) );
     }
+    
+    // admin/forum/cleanup
+    function CleanUpThreads()
+    {        
+        $sql = "select distinct topic_user from cc_tbl_topics left outer join cc_tbl_user on topic_user = user_id where isnull(user_id);";
+        
+        $user_ids = CCDatabase::QueryItems($sql);        
+        
+        if( !empty($user_ids) )
+        {
+            foreach( $user_ids as $user_id )
+            {
+                print("deleting topics for user {$user_id}<br />");
+                flush();
+                $sql2 = "select topic_left,topic_right from cc_tbl_topics where topic_user = ${user_id} and topic_right - topic_left > 1";
+                $topic_infos = CCDatabase::QueryRows($sql2);
+                foreach( $topic_infos as $topic_info )
+                {
+                    $sql3 = "DELETE FROM cc_tbl_topics WHERE topic_left >= {$topic_info['topic_left']} AND topic_right <= {$topic_info['topic_right']}";
+                    CCDatabase::Query($sql3);
+                }                
+                CCDatabase::Query("DELETE FROM cc_tbl_topics WHERE topic_user = {$user_id}");
+            }
+        }
+        
+        // If the oldest topic is gone then then just nuke the whole thread
+        $sql4 = "select forum_thread_id from cc_tbl_forum_threads left outer join cc_tbl_topics on forum_thread_oldest = topic_id where isnull(topic_id);";
+        $dead_thread_ids = CCDatabase::QueryItems($sql4);
+        if( !empty($dead_thread_ids) )
+        {
+            print("deleting orphaned threads");
+            flush();
+            $ids = join(',',$dead_thread_ids);
+            $sql5 = "DELETE FROM cc_tbl_forum_threads WHERE forum_thread_id IN (${ids})";
+            CCDatabase::Query($sql5);
+        }
+        
+        // If the newest topic is gone, update the newest field
+        // HACK fooling forumAPI into thinking this is the dead topic record
+        $sql6 = "select forum_thread_id as topic_thread from cc_tbl_forum_threads left outer join cc_tbl_topics on forum_thread_newest = topic_id where isnull(topic_id);";
+        $need_update_thread_ids = CCDatabase::QueryRows($sql6);
+        if( !empty($need_update_thread_ids) )
+        {
+            print("updating 'newest' field for threads");
+            flush();
+            $forumAPI = new CCForumAPI();
+            foreach( $need_update_thread_ids as $fakeTopicRow )
+            {
+                $forumAPI->OnPostTopicDelete(0,$fakeTopicRow);
+            }            
+        }
+        print("<br />DONE");
+        exit();
+    }    
 }
 
 ?>

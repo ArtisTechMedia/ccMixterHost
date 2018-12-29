@@ -280,9 +280,10 @@ class CCQueryAdmin
         }
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
+        $page =& CCPage::GetPage();
         $title = _('Admin Query Options Sets');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
 
         $configs = CCConfigs::GetTable();
         $query_opts = $configs->GetConfig('query-browser-opts');
@@ -291,7 +292,7 @@ class CCQueryAdmin
         $form = new CCQueryAdminForm($opts);
         if( empty($_POST['queryadmin']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -302,8 +303,13 @@ class CCQueryAdmin
             if( !empty($_POST['new']) )
                 $this->_proc_qopts($_POST['new'],$new_opts,$names,$counter);
             $configs->SaveConfig('query-browser-opts',$new_opts,CC_GLOBAL_SCOPE,false);
-            CCPage::SetArg('query-browser-opts',$new_opts,'qbrowser_edit_aftermath');
-            CCPage::Prompt(_('Query options sets saved.'));
+            CCUtil::SendBrowserTo();
+            /*
+                not sure what this was... but it's not there now.
+                
+            $page->SetArg('query-browser-opts',$new_opts,'qbrowser_edit_aftermath');
+            $page->Prompt(_('Query options sets saved.'));
+            */
         }
     }
 
@@ -351,12 +357,13 @@ class CCQueryAdmin
     function AdminQueryTypes($typekeys_name)
     {
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle(_('Admin Query Types'));
+        $page =& CCPage::GetPage();
+        $page->SetTitle(_('Admin Query Types'));
 
         $form = new CCAdminQueryTypesForm($typekeys_name);
         if( empty($_POST['adminquerytypes']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -375,7 +382,7 @@ class CCQueryAdmin
             }
             else
             {
-                CCPage::Prompt(_('Query browser types saved') . '<br /><br /><a class="small_button button_small" href="javascript:window.close()">' . _('Close this window') . '</a>');
+                $page->Prompt(_('Query browser types saved') . '<br /><br /><a class="small_button button_small" href="javascript:window.close()">' . _('Close this window') . '</a>');
             }
         }
 

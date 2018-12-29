@@ -38,7 +38,7 @@ class CCRemix
     *
     * @param integer $upload_id Uplaod ID to edit remixes for
     */
-    function EditRemixes($upload_id)
+    public static function EditRemixes($upload_id)
     {
         global $CC_GLOBALS;
 
@@ -46,32 +46,33 @@ class CCRemix
         require_once('cchost_lib/cc-upload.php');
         require_once('cchost_lib/cc-remix-forms.php');
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
 
         CCUpload::CheckFileAccess(CCUser::CurrentUserName(),$upload_id);
 
         $uploads =& CCUploads::GetTable();
         $name = $uploads->QueryItemFromKey('upload_name',$upload_id);
         $msg = array('str_remix_editing',$name);
-        $this->_build_bread_crumb_trail($upload_id,$msg);
-        CCPage::SetTitle($msg);
+        CCRemix::_build_bread_crumb_trail($upload_id,$msg);
+        $page->SetTitle($msg);
 
         $form = new CCEditRemixesForm($upload_id);
         $show = false;
         if( empty($_REQUEST['editremixes']) )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
             // this will do a AddForm if it has to
-            $this->OnPostRemixForm($form, '', '', $upload_id);
+            CCRemix::OnPostRemixForm($form, '', '', $upload_id);
         }
     }
 
     /**
     * @access private
     */
-    function _build_bread_crumb_trail($upload_id,$text)
+    static function _build_bread_crumb_trail($upload_id,$text)
     {
         $trail[] = array( 'url' => ccl(), 
                           'text' => 'str_home');
@@ -95,7 +96,8 @@ class CCRemix
 
         $trail[] = array( 'url' => '', 'text' => $text );
 
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
 
@@ -107,7 +109,7 @@ class CCRemix
     * @param string $ccud System tag to attach to upload
     * @param integer $remixid Upload id of remix editing
     */
-    function OnPostRemixForm(&$form, $relative_dir, $ccud = CCUD_REMIX, $remixid = '')
+    public static function OnPostRemixForm(&$form, $relative_dir, $ccud = CCUD_REMIX, $remixid = '')
     {
         require_once('cchost_lib/cc-pools.php');
         require_once('cchost_lib/cc-sync.php');
@@ -205,7 +207,8 @@ class CCRemix
         }
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddForm( $form->GenerateForm() );
+        $page =& CCPage::GetPage();
+        $page->AddForm( $form->GenerateForm() );
         return false;
     }
 
@@ -213,7 +216,7 @@ class CCRemix
     /**
     * @access private
     */
-    function _update_remix_tree($field, $remixid, $parentf, $childf, &$table)
+    static function _update_remix_tree($field, $remixid, $parentf, $childf, &$table)
     {
         if( empty($_POST[$field]) )
             return;
@@ -238,7 +241,7 @@ class CCRemix
     /**
     * @access private
     */
-    function _check_for_sources( $field, &$table, &$form, &$remix_sources )
+    static function _check_for_sources( $field, &$table, &$form, &$remix_sources )
     {
         if( !empty($_POST[$field]) )
         {
@@ -302,7 +305,74 @@ EOF;
         CCUtil::ReturnAjaxData($row);
     }
 
-    function GetStrictestLicenseForUpload($upload_id)
+    function RemixRequiredTag()
+    {
+        $ok = true;
+        $remix_sources = $_GET['remix_sources'];
+        $tag = $_GET['tag'];
+        $strictest_license = empty($_GET['strictest_license']) ? null : $_GET['strictest_license'];
+        $ok = $this->AreAllSourcesTaggedWith( $tag, $remix_sources, $strictest_license );
+        CCUtil::ReturnAjaxData( array( 'remixAllowed' => $ok ) );        
+    }
+
+    /*
+        remix_sources can be array of records or string of comma
+        separated upload_ids
+        
+        strictest_license is a license_id. Including this parameter
+        says: if the remix source does NOT have the required tag, 
+        allow it if it no stricter than strictest_license.
+        
+        This is used to allow licenses with attribution, cczero or
+        pd to be used as a ccplus remix source.
+        
+        Example: to test whether a remix can be a ccplus remix:
+        
+        $okToCCPlus = AreAllSourcesTaggedWith( 'ccplus', '1234,4444,304', 'attribution_3'); 
+        
+    */
+    public static function AreAllSourcesTaggedWith( $tag, $remix_sources, $strictest_license='' )
+    {
+        if( is_array($remix_sources) )
+        {
+            $rows = $remix_sources;
+            if( !empty($rows) && empty($rows[0]['upload_license']) )
+            {
+                // this looks expensive but there is rarely more 
+                // than 1 or 2 sources
+                for( $i = 0; $i < count($rows); $i++ )
+                {
+                    $sql = "SELECT upload_license FROM cc_tbl_uploads WHERE upload_id = {$rows[$i]['upload_id']}";
+                    $rows[$i]['upload_license'] = CCDatabase::QueryItem($sql);
+                }
+            }
+        }
+        else
+        {
+            $sql = 'SELECT upload_license, upload_tags FROM cc_tbl_uploads WHERE upload_id IN (' . $remix_sources . ')';
+            $rows = CCDatabase::QueryRows($sql);
+        }
+        if( empty($rows) )
+            return false;
+        require_once('cchost_lib/cc-tags.php');
+        require_once('cchost_lib/cc-lics-chart.inc');
+        foreach( $rows as $row )
+        {
+            if( !CCTag::InTag( $tag, $row['upload_tags'] ) )
+            {
+                if( !empty($strictest_license) )
+                {
+                    $license = cc_stricter_license( $row['upload_license'], $strictest_license );
+                    $ok = empty($license) || ($license == $strictest_license);
+                    if( !$ok )
+                        return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    public static function GetStrictestLicenseForUpload($upload_id)
     {
         $remix_sources = CCDatabase::QueryItems('SELECT tree_parent FROM cc_tbl_tree WHERE tree_child = '.$upload_id);
         $remix_sources = empty($remix_sources) ? '' : join(',',$remix_sources);
@@ -316,7 +386,7 @@ EOF;
         return $row;
     }
 
-    function GetStrictestLicense($remix_sources,$pool_sources)
+    public static function GetStrictestLicense($remix_sources,$pool_sources)
     {
         $rows_r = $rows_p = array();
         if( !empty($remix_sources) )
@@ -366,6 +436,8 @@ EOF;
             CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '{upload_id}', _("Displays 'Manage Remixes' for upload"), CC_AG_UPLOAD );
         CCEvents::MapUrl( ccp('remixlicenses'), array( 'CCRemix', 'RemixLicenses'), 
             CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '{upload_id}', _("Ajax callback to calculate licenses"), CC_AG_UPLOAD );
+        CCEvents::MapUrl( ccp('remixrequiredtag'), array( 'CCRemix', 'RemixRequiredTag'), 
+            CC_MUST_BE_LOGGED_IN, ccs(__FILE__), '', _("Ajax callback to restrict remixes by tag"), CC_AG_UPLOAD );
     }
 
 

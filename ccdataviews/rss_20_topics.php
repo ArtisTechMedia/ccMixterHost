@@ -82,5 +82,6 @@ EOF;
     return array(   'sql' => $sql,
                     'e' => array(
                             CC_EVENT_FILTER_FORMAT,
+                            CC_EVENT_FILTER_PODCAST_INFO
                             ) );
 }

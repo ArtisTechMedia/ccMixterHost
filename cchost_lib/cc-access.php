@@ -137,9 +137,10 @@ class CCAccess
         $title = _('Edit Super Admins');
         require_once('cchost_lib/cc-admin.php');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page =& CCPage::GetPage();
+        $page->SetTitle($title);
         $form = new CCAdminSuperForm();
-        CCPage::AddForm($form->GenerateForm());
+        $page->AddForm($form->GenerateForm());
     }
 
     function CommandTest()
@@ -184,8 +185,9 @@ class CCAccess
         
         $title = _('ccHost Commands');
         require_once('cchost_lib/cc-admin.php');
+        $page =& CCPage::GetPage();
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
 
         $user_only   = false;
         $public_only = false;
@@ -299,19 +301,20 @@ EOF;
 </table>
 EOF;
 
-        CCPage::AddContent($html);
+        $page->AddContent($html);
     }
 
     function Access()
     {
+        $page =& CCPage::GetPage();
         $title = _('Restrict Access Rights');
         require_once('cchost_lib/cc-admin.php');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
         $form = new CCAccessEditForm();
         if( empty($_POST['accessedit']) )
         {
-            CCPage::AddForm($form->GenerateForm());
+            $page->AddForm($form->GenerateForm());
         }
         else
         {
@@ -326,7 +329,7 @@ EOF;
 
             $configs =& CCConfigs::GetTable();
             $configs->SaveConfig( 'accmap', $accmap, CC_GLOBAL_SCOPE, false );
-            CCPage::Prompt(_('Access map changes saved'));
+            $page->Prompt(_('Access map changes saved'));
         }
     }
 

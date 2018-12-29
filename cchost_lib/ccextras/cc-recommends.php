@@ -58,8 +58,9 @@ class CCRecommends
         $fullname = $users->QueryItem('user_real_name',$w);
         $args['ruser'] = $user;
         $args['fullname'] = $fullname;
-        CCPage::PageArg('get',$args);
-        CCPage::ViewFile('recommends');
+        $page =& CCPage::GetPage();
+        $page->PageArg('get',$args);
+        $page->ViewFile('recommends');
     }
 
 }

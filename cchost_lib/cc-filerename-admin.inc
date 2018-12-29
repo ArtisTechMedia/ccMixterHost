@@ -53,7 +53,7 @@ class CCAdminRenameForm  extends CCEditConfigForm
         $patterns['%site%']  = _("Site name");
         $dummy = array();
         $masks = array();
-        CCEvents::Invoke( CC_EVENT_GET_MACROS, array( $dummy, $dummy, &$patterns, &$masks ) );
+        CCEvents::Invoke( CC_EVENT_GET_MACROS, array( &$dummy, &$dummy, &$patterns, &$masks ) );
         ksort($patterns);
         $this->CallFormMacro('macro_patterns','show_macro_patterns',$patterns);
 

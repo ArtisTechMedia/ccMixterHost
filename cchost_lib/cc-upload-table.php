@@ -53,7 +53,7 @@ class CCUploads extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -206,7 +206,7 @@ class CCUploads extends CCTable
     * @param array $record Upload record 
     * @return boolean true means tags are in record 
     */
-    function InTags($tags,&$record)
+    public static function InTags($tags,&$record)
     {
         require_once('cchost_lib/cc-tags.php');
         return( CCTag::InTag($tags,$record['upload_tags']));
@@ -257,7 +257,7 @@ class CCFiles extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $_table;
         if( !isset($_table) )

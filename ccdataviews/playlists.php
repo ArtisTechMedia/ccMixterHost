@@ -10,9 +10,10 @@ function playlists_dataview()
     $user_sql = cc_fancy_user_sql('user_real_name');
 
     $sql =<<<EOF
-SELECT cart_id, cart_name, {$user_sql}, cart_dynamic, cart_num_items,
+SELECT cart_id, cart_name, {$user_sql}, user_name, user_id, cart_dynamic, cart_num_items,
         DATE_FORMAT(cart_date, '%W, %M %e, %Y @ %l:%i %p') as cart_date_format,
         CONCAT(SUBSTRING(REPLACE(cart_tags, ',', ' '),1,120),'...') as cart_tags_munged,
+        IF( LENGTH(cart_dynamic) > 0, '1', '0' ) as is_dynamic,
         cart_tags
         %columns%
         FROM cc_tbl_cart 

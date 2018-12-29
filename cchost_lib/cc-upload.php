@@ -33,7 +33,7 @@ if( !defined('IN_CC_HOST') )
 class CCUpload
 {
 
-    function ShowAfterSubmit($upload_id)
+    public static function ShowAfterSubmit($upload_id)
     {
         CCUpload::_build_bread_crumb_trail($upload_id,true,'str_submit_after');
         require_once('cchost_lib/cc-query.php');
@@ -42,7 +42,7 @@ class CCUpload
         $query->Query($args);
     }
 
-    function _build_bread_crumb_trail($upload_id,$do_edit,$cmd)
+    static function _build_bread_crumb_trail($upload_id,$do_edit,$cmd)
     {
         $trail[] = array( 'url' => ccl(), 
                           'text' => 'str_home');
@@ -71,10 +71,11 @@ class CCUpload
         $trail[] = array( 'url' => '', 'text' => $cmd );
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddBreadCrumbs($trail,true);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail,true);
     }
 
-    function AdminUpload($upload_id)
+    public static function AdminUpload($upload_id)
     {
         $uploads =& CCUploads::GetTable();
         $record = CCDatabase::QueryRow('SELECT upload_extra,upload_date,upload_name,upload_license FROM cc_tbl_uploads WHERE upload_id='.$upload_id);
@@ -83,12 +84,13 @@ class CCUpload
             return;
         $name = $record['upload_name'];
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle(sprintf(_("Administrator Functions for '%s'"), $name));
+        $page =& CCPage::GetPage();
+        $page->SetTitle(sprintf(_("Administrator Functions for '%s'"), $name));
         require_once('cchost_lib/cc-upload-forms.php');
         $form = new CCAdminUploadForm($record);
         if( empty($_POST['adminupload']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -106,36 +108,37 @@ class CCUpload
             $user_name = CCDatabase::QueryItem('SELECT user_name FROM cc_tbl_uploads JOIN cc_tbl_user ON upload_user=user_id WHERE upload_id='.$upload_id);
             $url = ccl('files',$user_name,$upload_id);
             $link1 = "<a href=\"$url\">";
-            CCPage::Prompt(sprintf(_("Changes saved to '%s'. Click %shere%s to see results"), 
+            $page->Prompt(sprintf(_("Changes saved to '%s'. Click %shere%s to see results"), 
                         $name, $link1, '</a>'));
         }
     }
 
 
-    function Delete($upload_id)
+    public static function Delete($upload_id)
     {
-        $this->CheckFileAccess(CCUser::CurrentUser(),$upload_id);
+        CCUpload::CheckFileAccess(CCUser::CurrentUser(),$upload_id);
         $uploads =& CCUploads::GetTable();
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle('str_file_deleting');
+        $page =& CCPage::GetPage();
+        $page->SetTitle('str_file_deleting');
         if( empty($_POST['confirmdelete']) )
         {
-            $this->_build_bread_crumb_trail($upload_id,false,'str_file_deleting');
+            CCUpload::_build_bread_crumb_trail($upload_id,false,'str_file_deleting');
             $pretty_name = $uploads->QueryItemFromKey('upload_name',$upload_id);
             require_once('cchost_lib/cc-upload-forms.php');
             $form = new CCConfirmDeleteForm($pretty_name);
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
-            $this->_build_bread_crumb_trail($upload_id,false,'str_file_deleted');
+            CCUpload::_build_bread_crumb_trail($upload_id,false,'str_file_deleted');
             require_once('cchost_lib/cc-uploadapi.php');
             CCUploadAPI::DeleteUpload($upload_id);
-            CCPage::Prompt('str_file_deleted');
+            $page->Prompt('str_file_deleted');
         }
     }
 
-    function AddMacroRef(&$row,$macro_group, $macro)
+    public static function AddMacroRef(&$row,$macro_group, $macro)
     {
         if( empty($row[$macro_group]) || !in_array( $macro, $row[$macro_group] ) )
         {
@@ -143,7 +146,7 @@ class CCUpload
         }
     }
 
-    function CheckFileAccess($usernameorid,$upload_id)
+    public static function CheckFileAccess($usernameorid,$upload_id)
     {
         if( CCUser::IsAdmin() )
             return(true);
@@ -159,7 +162,7 @@ class CCUpload
             CCUtil::AccessError();
     }
 
-    function GetUploadField(&$fields,$field_name = 'upload_file_name')
+    public static function GetUploadField(&$fields,$field_name = 'upload_file_name')
     {
         require_once('cchost_lib/cc-uploadapi.php');
         $verifier =& CCUploadAPI::GetVerifier();
@@ -183,7 +186,21 @@ class CCUpload
                                    'flags'      => CCFF_REQUIRED  );
     }
 
-    function GetTagFields(&$form,$tag_field_name='upload_tags',$insert_how = 'before',$insert_where = 'upload_description')
+    public static function IsRemix($upload_id_or_record)
+    {
+        return CCUpload::HasTag($upload_id_or_record,'remix');
+    }
+
+    public static function HasTag($upload_id_or_record,$tag)
+    {
+        $upload_id = is_array($upload_id_or_record) ? $upload_id_or_record['upload_id'] : $upload_id_or_record;
+        $uploads =& CCUploads::GetTable();
+        $tags = $uploads->QueryItemFromKey( 'upload_tags', $upload_id );
+        require_once('cchost_lib/cc-tags.php');
+        return CCTag::InTag($tag,$tags);
+    }
+    
+    public static function GetTagFields(&$form,$tag_field_name='upload_tags',$insert_how = 'before',$insert_where = 'upload_description')
     {
         require_once('cchost_lib/cc-tags.inc');
         $tags =& CCTags::GetTable();
@@ -210,7 +227,7 @@ class CCUpload
         $form->InsertFormFields( $fields, $insert_how, $insert_where );
     }
 
-    function AddSuggestedTags(&$form,$suggested_tags, $how = 'before', $where = 'popular_tags' )
+    public static function AddSuggestedTags(&$form,$suggested_tags, $how = 'before', $where = 'popular_tags' )
     {
         if( empty($suggested_tags) )
             return;
@@ -233,7 +250,7 @@ class CCUpload
         $form->InsertFormFields( $fields, $how, $where );
     }
 
-    function PostProcessNewUploadForm( &$form, $ccud_tags, $relative_dir, $parents = null)
+    public static function PostProcessNewUploadForm( &$form, $ccud_tags, $relative_dir, $parents = null)
     {
         $form->GetFormValues($values);
         $current_path = $values['upload_file_name']['tmp_name'];
@@ -266,7 +283,7 @@ class CCUpload
         return($ret);
     }
 
-    function PostProcessEditUploadForm($form, $record, $relative_dir)
+    public static function PostProcessEditUploadForm($form, $record, $relative_dir)
     {
         $form->GetFormValues($upload_args);
 

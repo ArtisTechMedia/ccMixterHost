@@ -1413,7 +1413,11 @@ END;
 
             $regex = "/^[A-Z0-9]+([\._\-A-Z0-9+]+)?@[A-Z0-9\.\-_]+\.{1}[A-Z0-9\-_]{2,7}$/i";
 
-            if( !preg_match( $regex, $value ) )
+            // also see cc-facebook.php
+            //
+            $bad_email = "/(@cz\.|@lv\.|@sk\.|\.info$|\.pl$|\.eu|\.top|\.win$)/";
+
+            if( !preg_match( $regex, $value ) || preg_match($bad_email, $value) )
             {
                 $this->SetFieldError($fieldname, _("This is not a valid email address."));
                 return(false);
@@ -1566,11 +1570,11 @@ END;
 
         if( $day_only )
         {
-            list( $year, $month, $today ) = split('-',$value);
+            list( $year, $month, $today ) = cc_split('-',$value);
         }
         else
         {
-            list( $year, $month, $today, $hour, $minute, $ampm ) = split('-',$value);
+            list( $year, $month, $today, $hour, $minute, $ampm ) = cc_split('-',$value);
         }
 
         $month = date('F', mktime(0,0,0,$month));
@@ -1898,7 +1902,8 @@ END;
     function DisableSubmitOnInit()
     {
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddScriptBlock( 'util.php/disable_submit_button', true ); 
+        $page =& CCPage::GetPage();
+        $page->AddScriptBlock( 'util.php/disable_submit_button', true ); 
     }
 
     /**
@@ -1978,25 +1983,43 @@ END;
             }
             else
             {
-                $maxheight = intval($this->GetFormFieldItem($fieldname,'maxheight'));
-                $maxwidth  = intval($this->GetFormFieldItem($fieldname,'maxwidth'));
-                if( $maxheight && $maxwidth )
+                global $CC_GLOBALS;
+                
+                if( empty($CC_GLOBALS['imagemagick-path']) || !file_exists($CC_GLOBALS['imagemagick-path']) )
                 {
-                    // getimagesize will try to read this even if the
-                    // user typed in garbage into the file input field
-                    // is_file() returns true so we have to squash the error
+                    $maxheight = intval($this->GetFormFieldItem($fieldname,'maxheight'));
+                    $maxwidth  = intval($this->GetFormFieldItem($fieldname,'maxwidth'));
+                    if( $maxheight && $maxwidth )
+                    {
+                        // getimagesize will try to read this even if the
+                        // user typed in garbage into the file input field
+                        // is_file() returns true so we have to squash the error
 
-                    list( $width, $height ) = $image_size;
-                    if( !$width || !$height )
-                    {
-                        $this->SetFieldError($fieldname,_("The image size could not be determined."));
-                        $retval = false;
+                        list( $width, $height ) = $image_size;
+                        if( !$width || !$height )
+                        {
+                            $this->SetFieldError($fieldname,_("The image size could not be determined."));
+                            $retval = false;
+                        }
+                        else if( ($width > $maxwidth) || ($height > $maxheight ) )
+                        {
+                            $this->SetFieldError($fieldname,_("The image must be no larger than 93px x 93px."));
+                            $retval = false;
+                        }
                     }
-                    else if( ($width > $maxwidth) || ($height > $maxheight ) )
+                }
+                else
+                {
+                    define('MAX_IMAGE_FILESIZE_MB', 5);
+                    define('MAX_IMAGE_FILESIZE', MAX_IMAGE_FILESIZE_MB * 1024 * 1024);
+                    
+                    $filesize = filesize($tmp_name);
+                    
+                    if( $filesize > MAX_IMAGE_FILESIZE )
                     {
-                        $this->SetFieldError($fieldname,_("The image must be no larger than 93px x 93px."));
-                        $retval = false;
+                        $this->SetFieldError($fieldname, _("The image file is over the " . MAX_IMAGE_FILESIZE_MB . "MB limit."));
                     }
+                    
                 }
             }
         }
@@ -2052,9 +2075,9 @@ END;
         if( $filesobj['error'] != 0 )
         {
             $problems = array( UPLOAD_ERR_INI_SIZE  => 
-                                    _('The file is too big.'),
+                                    _('The file is too big (ini).'),
                                UPLOAD_ERR_FORM_SIZE => 
-                                    _('The file is too big.'),
+                                    _('The file is too big (form).'),
                                UPLOAD_ERR_PARTIAL   => 
                                     _('The file was not fully uploaded.'),
                                UPLOAD_ERR_NO_FILE   => 
@@ -2111,15 +2134,13 @@ END;
                 CCUtil::MakeSubdirs($imagedir);
 
                 $clean_name = preg_replace('/[^a-z0-9\._-]/i','_',$filesobj['name']);
-
                 if( !preg_match('/\.[a-z]+$/i',$clean_name) )
-                {
                     $clean_name .= '.gif'; // er, just a hunch
-                }
                 
                 if( $clean_name != $filesobj['name'] )
                 {
                     $filesobj['name'] = $clean_name;
+                    // I don't think this next line is right...
                     $this->SetFormValue($fieldname,$filesobj);
                 }
 
@@ -2133,6 +2154,13 @@ END;
                 if( $ok )
                 {
                     chmod($realpath,cc_default_file_perms());
+
+                    $maxheight = intval($this->GetFormFieldItem($fieldname,'maxheight'));
+                    $maxwidth  = intval($this->GetFormFieldItem($fieldname,'maxwidth'));
+                
+                    $clean_name = CCForm::ResizeAvatar($maxwidth, $maxheight, $clean_name, $imagedir);
+                    if( $clean_name )
+                        $filesobj['name'] = $clean_name;
                 }
                 else
                 {
@@ -2144,6 +2172,45 @@ END;
         }
         
         return( $ok );
+    }
+    
+    public static function ResizeAvatar($maxwidth, $maxheight, $clean_name, $imagedir, $deleteoid=true)
+    {
+        global $CC_GLOBALS;
+        
+        if( empty($CC_GLOBALS['imagemagick-path']) || 
+            !file_exists($CC_GLOBALS['imagemagick-path']) || 
+            empty($maxwidth) ||
+            empty($maxheight) )
+        {
+            return null;
+        }
+        
+        $sizestr = $maxwidth . 'x' . $maxheight;
+        $oldrealpath = realpath( $imagedir) . '/' . $clean_name ;
+        $clean_name = preg_replace('/(\.[a-z]+)$/i', $sizestr . '\1', $clean_name );
+        $realpath = realpath( $imagedir) . '/' . $clean_name ;
+        if( file_exists($realpath) )
+            unlink($realpath);
+        $cmd = $CC_GLOBALS['imagemagick-path'] . 
+                    " \"" . $oldrealpath . "\" " . 
+                    "-resize " . $sizestr . 
+                    " \"" . $realpath . "\"";
+        $result = exec($cmd,$output,$ret_val);
+
+        // 2>&1         
+        // $arr = array( 'cmd' => $cmd,
+        //               'result' => $result,
+        //               'output' => $output,
+        //               'ret_val' => $ret_val );
+        
+        // CCDebug::PrintV($arr);
+        if( $deleteoid ) {
+            unlink($oldrealpath);
+        }
+        if( file_exists($realpath) )
+            chmod($realpath,cc_default_file_perms());
+        return $clean_name;
     }
 
     /**
@@ -2163,7 +2230,8 @@ END;
     {
         require_once('cchost_lib/cc-page.php');
         $this->AddTemplateVars(array('hide_on_submit' => true));
-        CCPage::AddScriptBlock( 'hide_upload_form', true ); 
+        $page =& CCPage::GetPage();
+        $page->AddScriptBlock( 'hide_upload_form', true ); 
     }
 
 
@@ -2322,7 +2390,7 @@ class CCGridForm extends CCForm
      * 
      * @returns object $varsname Return $this to make it convienent to add to pages
      */
-    function GenerateForm()
+    function GenerateForm($hiddenonly = false)
     {
         $this->_normalize_fields();
 

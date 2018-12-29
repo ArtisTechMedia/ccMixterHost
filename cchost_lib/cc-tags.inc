@@ -51,7 +51,7 @@ class CCTagAliases extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -89,7 +89,7 @@ class CCTags extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -111,7 +111,14 @@ class CCTags extends CCTable
         $this->TagDelete($tossed);
     }
 
-    function Insert($tags,$type,$update_type = true)
+    function Insert($values)
+    {
+        print('Use CCTags::InsertNewTags');
+        CCDebug::StackTrace();
+        exit();
+    }
+    
+    function InsertNewTags($tags,$type,$update_type = true)
     {
         if( !is_array($tags) )
         {
@@ -168,8 +175,10 @@ class CCTags extends CCTable
         $this->DeleteWhere('tags_count = 0 AND tags_type = ' . CCTT_USER);
     }
 
-    function Update($tags)
+    function Update($fields, $autoquote = true)
     {
+        $tags = $fields;
+        
         if( empty($tags) )
             return;
 
@@ -343,7 +352,7 @@ class CCTags extends CCTable
         CCTag::ExpandOnRowA($row,$inkey,$baseurl,$outkey,$label, $outrow, $usehash );
     }
 
-    function & GetRecords()
+    function & GetRecords($where)
     {
         return( $this->QueryRows('') );
     }
@@ -489,7 +498,8 @@ class CCTagEvents
     function OnBrowseTags($tagstr='')
     {
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle('str_tags_s',$tagstr);
+        $page =& CCPage::GetPage();
+        $page->SetTitle('str_tags_s',$tagstr);
 
         if( empty($tagstr) )
         {
@@ -502,7 +512,8 @@ class CCTagEvents
 
     function BrowseTags($tagstr,$search_type='all')
     {
-        CCPage::PageArg('tagstr',$tagstr,'tags.php/tag_picker');
+        $page =& CCPage::GetPage();
+        $page->PageArg('tagstr',$tagstr,'tags.php/tag_picker');
         require_once('cchost_lib/cc-query.php');
         $q = 'tags=' . $tagstr . '&type=' .$search_type;
         $query = new CCQuery();
@@ -537,7 +548,8 @@ class CCTagEvents
         $all_tags = array_unique( CCTag::TagSplit($all_tags) );
         $alltags  = array_diff($all_tags,$currtags);
         sort($alltags);
-        CCPage::PageArg('all_tags', $alltags);
+        $page =& CCPage::GetPage();
+        $page->PageArg('all_tags', $alltags);
 
         // 'Minus tags'
         //
@@ -558,12 +570,12 @@ class CCTagEvents
             }
         }
 
-        CCPage::PageArg("minus_tags", $minustags);
+        $page->PageArg("minus_tags", $minustags);
 
         // Base URLs
         $base_addtag_url = ccl('tags', urlencode($tagstr) . '+');
-        CCPage::PageArg("base_addtag_url", $base_addtag_url);
-        CCPage::PageArg("base_tag_url", ccl('tags'));
+        $page->PageArg("base_addtag_url", $base_addtag_url);
+        $page->PageArg("base_tag_url", ccl('tags'));
         $taghelp = strlen($tagstr) > 10 ? substr($tagstr,0,8) . '...' : $tagstr;
 
         /*
@@ -623,9 +635,10 @@ class CCTagEvents
             $records[$i]['tagurl'] = $tagbase . $records[$i]['tags_tag'];
         }
 
-        CCPage::SetTitle(empty($_GET['title']) ? 'str_tags' : CCUtil::Strip($_GET['title']) );
-        CCPage::PageArg('tag_switch_link',$switch_link);
-        CCPage::PageArg('tag_array',$records,'tags');
+        $page =& CCPage::GetPage();
+        $page->SetTitle(empty($_GET['title']) ? 'str_tags' : CCUtil::Strip($_GET['title']) );
+        $page->PageArg('tag_switch_link',$switch_link);
+        $page->PageArg('tag_array',$records,'tags');
     }
 
     /**
@@ -689,14 +702,15 @@ class CCTagEvents
 
     function Admin()
     {
+        $page =& CCPage::GetPage();
         $title = _('Admin') . ' ' . _('Tags');
         require_once('cchost_lib/cc-admin.php');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
         $form = new CCAdminTagsForm();
         if( empty($_POST['admintags']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -718,7 +732,7 @@ class CCTagEvents
             }
             else
             {
-                $tags->Insert($reserved,CCTT_ADMIN);
+                $tags->InsertNewTags($reserved,CCTT_ADMIN);
                 $run = true;
             }
 
@@ -732,7 +746,7 @@ class CCTagEvents
             // is stuck with it until they do 'Edit Remixes'
             //
             $inherit_tags = CCTag::TagSplit($form->GetFormValue('inherittags'));
-            $tags->Insert($inherit_tags,CCTT_ADMIN);
+            $tags->InsertNewTags($inherit_tags,CCTT_ADMIN);
 
 
             $configs =& CCConfigs::GetTable();
@@ -748,7 +762,7 @@ class CCTagEvents
             $text = $form->GetFormValue('aliases');
             if( !empty($text) )
             {
-                $tuples = split("\n",$text);
+                $tuples = cc_split("\n",$text);
                 $values = array();
                 foreach( $tuples as $tuple )
                 {
@@ -764,7 +778,7 @@ class CCTagEvents
                 $columns = array( 'tag_alias_tag', 'tag_alias_alias' );
                 $aliases->InsertBatch($columns,$values);
                 $run = true;
-                CCPage::Prompt(_("Changes Saved"));
+                $page->Prompt(_("Changes Saved"));
             }
 
             $run_requested = !empty($_POST['runnow']);
@@ -791,11 +805,11 @@ class CCTagEvents
                         CCUploadAPI::_recalc_upload_tags( $row[0] );
                     }
 
-                    CCPage::Prompt(_('Tags updated with new alias rules'));
+                    $page->Prompt(_('Tags updated with new alias rules'));
                 }
                 else
                 {
-                    CCPage::Prompt(_('Tags settings were updated but new alias rules were not performed'));
+                    $page->Prompt(_('Tags settings were updated but new alias rules were not performed'));
                 }
             }
         }

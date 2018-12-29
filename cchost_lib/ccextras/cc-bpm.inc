@@ -95,17 +95,21 @@ class CCBPM
             array_key_exists('upload_bpm',$_POST)
           )
         {
-            $uploads =& CCUploads::GetTable();
-            $old_bpm = $uploads->GetExtraField($upload_id,'bpm');
-            $old_tag = $this->CalcBPMTag($old_bpm);
-            $bpm = $_POST['upload_bpm'];
-            $uploads->SetExtraField($upload_id,'bpm',$bpm);
-            $tag = $this->CalcBPMTag($bpm);
-            if( $tag )
-                CCUploadAPI::UpdateCCUD($upload_id,$tag,$old_tag);
+            $this->SetBPM($upload_id,$_POST['upload_bpm']);
         }
     }
 
+    function SetBPM($upload_id,$bpm) 
+    {
+        $uploads =& CCUploads::GetTable();
+        $old_bpm = $uploads->GetExtraField($upload_id,'bpm');
+        $old_tag = $this->CalcBPMTag($old_bpm);
+        $uploads->SetExtraField($upload_id,'bpm',$bpm);
+        $tag = $this->CalcBPMTag($bpm);
+        if( $tag )
+            CCUploadAPI::UpdateCCUD($upload_id,$tag,$old_tag);
+
+    }
     /**
     * Event handler for {@link CC_EVENT_FORM_FIELDS}
     *

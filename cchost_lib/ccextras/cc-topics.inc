@@ -27,7 +27,14 @@ if( !defined('IN_CC_HOST') )
    die('Welcome to CC Host');
 
 require_once('cchost_lib/ccextras/cc-extras-events.php'); // for EVENT_TOPIC stuff
+require_once('cchost_lib/cc-page.php');
 
+/*
+    NOTE:
+    
+    Hierarchy is achieved via  http://en.wikipedia.org/wiki/Nested_set_model
+    
+*/
 /**
 */
 // Topic Delete Flags
@@ -51,7 +58,7 @@ class CCTopicsi18n extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $table;
         if( !isset($table) )
@@ -132,7 +139,7 @@ class CCTopics extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    function & GetTable()
+    public static function & GetTable()
     {
         static $table;
         if( !isset($table) )
@@ -153,12 +160,30 @@ class CCTopics extends CCTable
         // Locking broken when added if-modified-since
         $this->Lock();
         list( $left, $right ) = CCDatabase::QueryRow('SELECT topic_left,topic_right FROM cc_tbl_topics WHERE topic_id='.$topic_id,false);
-        $wid = ($right - $left) + 1;
-        $sql[] = "DELETE FROM cc_tbl_topics WHERE topic_left BETWEEN $left AND $right";
-        $sql[] = "UPDATE cc_tbl_topics SET topic_right = topic_right - $wid WHERE topic_right > $right";
-        $sql[] = "UPDATE cc_tbl_topics SET topic_left  = topic_left - $wid  WHERE topic_left  > $right";
+        if( empty($left) || empty($right) ) // orphaned
+        {
+            $sql[] = "DELETE FROM cc_tbl_topics WHERE topic_id = {$topic_id}";
+        }
+        else
+        {
+            $wid = ($right - $left) + 1;
+            $sql[] = "DELETE FROM cc_tbl_topics WHERE topic_left BETWEEN $left AND $right";
+            $sql[] = "UPDATE cc_tbl_topics SET topic_right = topic_right - $wid WHERE topic_right > $right";
+            $sql[] = "UPDATE cc_tbl_topics SET topic_left  = topic_left - $wid  WHERE topic_left  > $right";
+        }
         CCDatabase::Query($sql);
         $this->Unlock();
+    }
+
+    function IDsForBranch($topic_id)
+    {
+        list( $left, $right ) = CCDatabase::QueryRow('SELECT topic_left,topic_right FROM cc_tbl_topics WHERE topic_id='.$topic_id,false);
+        if( empty($left) || empty($right) ) // orphaned
+        {
+            return array($topic_id);
+        }
+        $where = "topic_left BETWEEN $left AND $right";
+        return $this->QueryKeys($where);
     }
 
     /**
@@ -218,10 +243,19 @@ class CCTopics extends CCTable
         $this->Unlock();        
     }
     
-    function Insert(&$values,$parent_id)
+    function Insert($values)
     {
+        print('Use CCTopics::InsertNewTopic');
+        CCDebug::StackTrace();
+        exit();        
+    }
+    
+    function InsertNewTopic(&$values,$parent_id)
+    {
+        $values['topic_edited'] = $values['topic_date'];
+        
         // we do a variation of the nested set model discussed here
-        // see: http://dev.mysql.com/tech-resources/articles/hierarchical-data.html
+        // see: http://en.wikipedia.org/wiki/Nested_set_model
         //
         if( $parent_id === 0 )
         {
@@ -232,6 +266,8 @@ class CCTopics extends CCTable
             $right = CCDatabase::QueryItem($right_sql);
             $values['topic_left'] = $right + 1;
             $values['topic_right'] = $right + 2;
+            if( empty($values['topic_tags']) )
+                $values['topic_tags'] = '';
             $ret = parent::Insert($values);
             return $ret;
         }
@@ -252,6 +288,8 @@ class CCTopics extends CCTable
         CCDatabase::Query($sql);
         $values['topic_left'] = $right;
         $values['topic_right'] = $right + 1;
+        if( empty($values['topic_tags']) )
+            $values['topic_tags'] = '';
         $ret = parent::Insert($values);
         $this->Unlock();
 
@@ -297,12 +335,17 @@ class CCTopics extends CCTable
     // helper
     function GetParentTopic($topic_id)
     {
-        // I think this is how to get the immediate parent
+        /*
+            topicA 10 15
+                -> TopicAReply1 11 12
+                -> TopicAReply2 13 14
+        */
         list( $left, $right ) = CCDatabase::QueryRow('SELECT topic_left,topic_right FROM cc_tbl_topics WHERE topic_id='.$topic_id,false);
+        if( empty($left) || empty($right) ) // orphaned topic
+            return array( 0, 0, 0 );
         $sql = "SELECT topic_id FROM cc_tbl_topics WHERE topic_left < $left AND topic_right > $right ORDER BY topic_left DESC LIMIT 1";
         return array( CCDatabase::QueryItem($sql), $left, $right );
     }
-
 
 }
 
@@ -311,11 +354,12 @@ class CCTopic
     function _verify_topic($topic_id,&$topics,&$record,$is_translate=false)
     {
         require_once('cchost_lib/cc-page.php');
-
+        $page =& CCPage::GetPage();
+        
         $topic_id = intval(CCUtil::Strip($topic_id));
         if( empty($topic_id) )
         {
-            CCPage::Prompt(_('no topic specified.'));
+            $page->Prompt(_('no topic specified.'));
             CCUtil::Send404(false,__FILE__,__LINE__); // just a hack
             return false;
         }
@@ -323,7 +367,7 @@ class CCTopic
         $record = CCDatabase::QueryRow('SELECT topic_locked, topic_can_xlat FROM cc_tbl_topics WHERE topic_id='.$topic_id);
         if( empty($record) )
         {
-            CCPage::Prompt(_('Cannot find that topic.') . ' ' . 
+            $page->Prompt(_('Cannot find that topic.') . ' ' . 
                            _('It might have been deleted by the author.'));
             CCUtil::Send404(false,__FILE__,__LINE__);
             return false;
@@ -336,7 +380,7 @@ class CCTopic
         {
             if( !$is_translate || empty($record['topic_can_xlat']) || !$is_logged_in )
             {
-                CCPage::Prompt(_('You are not authorized to post here.'));
+                $page->Prompt(_('You are not authorized to post here.'));
                 return false;
             }
         }
@@ -347,6 +391,7 @@ class CCTopic
     function Translate($topic_id='')
     {
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
 
         if( empty($topic_id) )
         {
@@ -365,7 +410,7 @@ class CCTopic
 
         $topic_name = CCDatabase::QueryItem('SELECT topic_name FROM cc_tbl_topics WHERE topic_id='.$topic_id);
 
-        CCPage::SetTitle( sprintf(_('Translation of "%s"'), $topic_name) );
+        $page->SetTitle( sprintf(_('Translation of "%s"'), $topic_name) );
 
         require_once('cchost_lib/ccextras/cc-topics-forms.inc');
 
@@ -376,7 +421,7 @@ class CCTopic
             $query = new CCQuery();
             $args = $query->ProcessAdminArgs('t=topic_reply&ids='.$topic_id);
             $query->Query($args);
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -399,7 +444,7 @@ class CCTopic
             $values['topic_type']  = 'xlat';
             $values['topic_forum'] = 
             $values['topic_thread'] = 0;
-            $topics->Insert($values,0);
+            $topics->InsertNewTopic($values,0);
 
             CCUtil::SendBrowserTo(); // this will send back to topic
          }
@@ -421,6 +466,7 @@ class CCTopic
         $query->Query($args);
 
         require_once('cchost_lib/ccextras/cc-topics-forms.inc');
+        $page =& CCPage::GetPage();
 
         // this is a round about way of doing form validation
         // but we do this in case we have to shove a 'quote' 
@@ -449,7 +495,7 @@ class CCTopic
             {
                 $title = array('str_topic_reply_to_s',$user_real_name);
             }
-            CCPage::SetTitle($title);
+            $page->SetTitle($title);
 
             if( $is_quote === true && !$did_validation)
             {
@@ -465,47 +511,57 @@ class CCTopic
             CCPage::PageArg('topic_id',$topic_id);
             CCPage::PageArg('topic',$record,'topic_reply' );
             */
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
-        else
+       else
         {
-            $record = CCDatabase::QueryRow('SELECT topic_name,topic_forum,topic_thread,topic_user,topic_type,topic_upload,topic_id FROM cc_tbl_topics WHERE topic_id='.$topic_id);
-
-            $replang = _('Reply');
-            if( strstr($record['topic_name'],$replang) === false )
-                $name = sprintf( '%s (%s)', $record['topic_name'], $replang );
-            else
-                $name = $record['topic_name'];
             $form->GetFormValues($values);
-            $topics = new CCTopics();
-            $next_id = $topics->NextID();
-            $values['topic_id']    = $next_id;
-            $values['topic_date']  = date('Y-m-d H:i:s',time());
-            $values['topic_user']  = CCUser::CurrentUser();
-            $values['topic_type']  = 'reply';
-            $values['topic_forum'] = $record['topic_forum'];
-            $values['topic_thread'] = $record['topic_thread'];
-            $values['topic_upload'] = $record['topic_upload'];
-            $values['topic_name']   = $name;
-            $topics->Insert($values,$topic_id);
-
-            if( !empty($values['topic_thread']) )
+            if( CCTopic::OKForUserToPost($values) )
             {
-                // err, this should be in forums.inc no?
-                require_once('cchost_lib/ccextras/cc-forums.inc');
-                $threads =& CCForumThreads::GetTable();
-                $tvalues['forum_thread_id']   = $record['topic_thread'];
-                $tvalues['forum_thread_newest'] = $next_id;
-                $tvalues['forum_thread_date'] = $values['topic_date'];
-                $threads->Update($tvalues);
+                $record = array();
+                $this->_do_reply($topic_id,$values,$record);
+                CCEvents::Invoke( CC_EVENT_TOPIC_REPLY, array( &$values, &$record ) );
+                CCUtil::SendBrowserTo();
             }
-
-            CCEvents::Invoke( CC_EVENT_TOPIC_REPLY, array( &$values, &$record ) );
-
-            CCUtil::SendBrowserTo();
         }
     }
 
+    function _do_reply($topic_id,&$values,&$record)
+    {
+        $record = CCDatabase::QueryRow('SELECT topic_name,topic_forum,topic_thread,topic_user,topic_type,topic_upload,topic_id FROM cc_tbl_topics WHERE topic_id='.$topic_id);
+
+        $replang = _('Reply');
+        if( strstr($record['topic_name'],$replang) === false )
+            $name = sprintf( '%s (%s)', $record['topic_name'], $replang );
+        else
+            $name = $record['topic_name'];
+        $topics = new CCTopics();
+        $next_id = $topics->NextID();
+        $values['topic_id']    = $next_id;
+        $values['topic_date']  = date('Y-m-d H:i:s',time());
+        $values['topic_user']  = CCUser::CurrentUser();
+        $values['topic_type']  = 'reply';
+        $values['topic_forum'] = (integer)$record['topic_forum'];
+        $values['topic_thread'] = (integer)$record['topic_thread'];
+        $values['topic_upload'] = (integer)$record['topic_upload'];
+        $values['topic_name']   = $name;
+        $values['topic_tags'] = '';
+        $topics->InsertNewTopic($values,$topic_id);
+
+        if( !empty($values['topic_thread']) )
+        {
+            // err, this should be in forums.inc no?
+            require_once('cchost_lib/ccextras/cc-forums.inc');
+            $threads =& CCForumThreads::GetTable();
+            $tvalues['forum_thread_id']   = $record['topic_thread'];
+            $tvalues['forum_thread_newest'] = $next_id;
+            $tvalues['forum_thread_date'] = $values['topic_date'];
+            $threads->Update($tvalues);
+        }
+        
+        return array( $values['topic_thread'], $next_id );
+    }
+    
     function Quote($topic_id)
     {
         $this->Reply($topic_id,true);
@@ -525,14 +581,71 @@ class CCTopic
         cc_exit();
     }
 
+    public static function OKForUserToPost($values)
+    {
+        global $CC_GLOBALS;
+        
+        if( empty($CC_GLOBALS['topic-throttled-flag']) )
+            return true;
+            
+        $ip     = CCUtil::EncodeIP($_SERVER['REMOTE_ADDR']);
+        $sql    = "SELECT user_id, user_num_uploads, user_registered FROM cc_tbl_user WHERE ";
+        $where  = "user_last_known_ip LIKE '{$ip}%'";
+        $rows   = CCDatabase::QueryRows($sql . $where);
+        if( empty($rows) )
+        {
+            // in case the IP addr hasn't been recorded yet
+            // we use the current user record which is 
+            // embedded in CC_GLOBALS
+            // 
+            $rows = array( $CC_GLOBALS ); // talks like a user record, walks like a user record
+        }            
+        
+        $ok = false;
+        
+        foreach( $rows as $row )
+        {
+            $ok = $row['user_num_uploads'] > 0;
+
+            if( $ok )
+                break;
+        }
+        
+        if( !$ok )
+        {
+            $hasLinks = preg_match('%(https?://|\.com|dot com)%i', $values['topic_text']) === 1;
+            $now = new DateTime("now");
+
+            // no uploads, look for when they registered
+            foreach( $rows as $row )
+            {                
+                $reg = new DateTime(substr($row['user_registered'],0,10));
+                $diff = $now->diff($reg);
+                $ageOK = $diff->d > 1; // older than 1 day 
+                $ok = $ageOK || !$hasLinks;
+                if( !$ok ) // at least one of the accounts is too young to post links
+                    break;
+            }
+        }
+
+        if( !$ok )
+        {
+            $page =& CCPage::GetPage();        
+            $page->SetTitle(_('Restricted'));
+            $page->SetArg('topic_throttled',1);
+        }
+        return $ok;
+    }
+    
     function Delete($topic_id,$branch=false)
     {
         if( $branch && !CCUser::IsAdmin() )
             cc_exit();
         require_once('cchost_lib/cc-page.php');
+        $page =& CCPage::GetPage();
         $this->CheckTopicAccess($topic_id);
         $topics =& CCTopics::GetTable();
-        CCPage::SetTitle(_("Deleting Topic"));
+        $page->SetTitle(_("Deleting Topic"));
         if( empty($_POST['confirmtopicdelete']) )
         {
             $topics =& CCTopics::GetTable();
@@ -541,13 +654,23 @@ class CCTopic
                 $pretty_name = _('Topic');
             require_once('cchost_lib/ccextras/cc-topics-forms.inc');
             $form = new CCConfirmTopicDeleteForm($pretty_name);
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
             $this->DeleteTopic($topic_id,$branch);
             //CCPage::Prompt(_("Topic has been deleted"));
             CCUtil::SendBrowserTo();
+        }
+    }
+
+    function OnUserDelete($user_id)
+    {
+        $topic_ids = CCDatabase::QueryItems('SELECT topic_id FROM cc_tbl_topics WHERE topic_user='.$user_id,false);
+    
+        foreach( $topic_ids as $id )
+        {
+            $this->DeleteTopic( $id, true );
         }
     }
 
@@ -605,6 +728,7 @@ class CCTopic
 
     function Edit($topic_id)
     {
+        $page =& CCPage::GetPage();
         $this->CheckTopicAccess($topic_id);
         
         global $CC_GLOBALS;
@@ -622,8 +746,8 @@ class CCTopic
 
         if( !$inpost || !$form->ValidateFields() )
         {
-            CCPage::SetTitle(array('str_topic_edit_s',$record['topic_name']));
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->SetTitle(array('str_topic_edit_s',$record['topic_name']));
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -646,19 +770,29 @@ class CCTopic
     function Lock($topic_id)
     {
         require_once('cchost_lib/cc-page.php');
-        CCPage::SetTitle(_('Locking and Unlocking Topic Replies'));
+        $page =& CCPage::GetPage();
+        $page->SetTitle(_('Locking and Unlocking Topic Replies'));
 
         $row =
             CCDatabase::QueryRow('SELECT topic_left, topic_right, topic_locked FROM cc_tbl_topics WHERE topic_id='.$topic_id,false);
 
         if( empty($row) )
         {
-            CCPage::Prompt(_('Topic does not exist'));
+            $page->Prompt(_('Topic does not exist'));
             return;
         }
         list( $left, $right, $topic_locked  ) = $row;
         $lock = $topic_locked ? '0' : '1';
-        $sql = "UPDATE cc_tbl_topics SET topic_locked = {$lock} WHERE topic_left >= {$left} AND topic_right <= {$right}";
+        $sql = "UPDATE cc_tbl_topics SET topic_locked = {$lock} ";
+        if( empty($left) || empty($right) ) // orphaned
+        {
+            $where = "WHERE topic_id = " . $topic_id;
+        }
+        else
+        {
+            $where = "WHERE topic_left >= {$left} AND topic_right <= {$right}";
+        }
+        $sql .= $where;
         CCDatabase::Query($sql);
 
         $prompt = $lock ? _('Topic is now locked') 
@@ -670,9 +804,28 @@ class CCTopic
                        _('Return to previous page') . '</a>';   
         }
 
-        CCPage::Prompt($prompt);
+       $page->Prompt($prompt);
     }
 
+    function OnGetConfigFields($scope,&$fields)
+    {
+        if( $scope == CC_GLOBAL_SCOPE )
+        {
+            $fields['topic-throttled-flag'] =
+               array(  'label'      => _('Apply Topic Throttles'),
+                       'value'      => '',
+                       'form_tip'   => 'Apply checkes for topic spamming',
+                       'formatter'  => 'checkbox',
+                       'flags'      => CCFF_POPULATE);
+            $fields['topic-throttled-msg'] =
+               array(  'label'      => _('Topic Throttle Message'),
+                       'form_tip'      => 'Seen by users who have posted a invalid topic.',
+                       'value'      => '',
+                       'formatter'  => 'textedit',
+                       'flags'      => CCFF_POPULATE);
+        }
+    }
+    
     /**
     * Event handler for {@link CC_EVENT_MAP_URLS}
     *

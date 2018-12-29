@@ -70,7 +70,7 @@ class CCEditLicensesForm extends CCForm
             'license_prohibits' => array( _('Prohibits'),  _('List of attributes prohibited by this license.') ),
             );
 
-        $attr = split(',','Reproduction,Distribution,DerivativeWorks,CommercialUse,Attribution,Notice,Sharing,ShareAlike');
+        $attr = cc_split(',','Reproduction,Distribution,DerivativeWorks,CommercialUse,Attribution,Notice,Sharing,ShareAlike');
         $arrt = array_combine($attr,$attr);
         foreach( $licattrs as $K => $LA )
         {
@@ -199,7 +199,7 @@ class CCLicense
     */
     function OnGetSysTags(&$record,&$file,&$tags)
     {
-        if( !isset($record) )
+        if( empty($record) )
             return;
 
         if( empty($record['upload_license']) )
@@ -207,7 +207,7 @@ class CCLicense
         $licenses =& CCLicenses::GetTable();
         $where['license_id'] = $record['upload_license'];
         $lic_tags = $licenses->QueryItem('license_tag',$where);
-        $lic_tags = split(',',$lic_tags);
+        $lic_tags = cc_split(',',$lic_tags);
         foreach( $lic_tags as $T )
             $tags[] = trim($T);
     }
@@ -216,8 +216,10 @@ class CCLicense
     {
         if( !defined('IN_MIXTER_PORT') )
         {
-            $sha1 = @sha1_file( $file['local_path'] ) ;
-            $file['file_extra']['sha1'] = $this->_hex_to_base32($sha1);
+            if( $_SERVER['HTTP_HOST'] != 'ccm' ) {
+                $sha1 = @sha1_file( $file['local_path'] ) ;
+                $file['file_extra']['sha1'] = $this->_hex_to_base32($sha1);
+            }
         }
     }
 

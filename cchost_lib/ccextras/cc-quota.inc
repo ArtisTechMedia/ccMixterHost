@@ -130,14 +130,15 @@ class CCQuotaAPI
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
+        $page =& CCPage::GetPage();
         $title = _('Configure User Quota');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        CCPage::SetTitle($title);
+        $page->SetTitle($title);
 
         $form = new CCQuotaAdminForm();
         if( empty($_POST['quotaadmin']) || !$form->ValidateFields() )
         {
-            CCPage::AddForm( $form->GenerateForm() );
+            $page->AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -151,7 +152,7 @@ class CCQuotaAPI
             if( !empty($_POST['new']) )
                 $this->UpdateQuota($_POST['new']);
 
-            CCPage::Prompt(_('Quota saved'));
+            $page->Prompt(_('Quota saved'));
         }
 	
     }

@@ -63,7 +63,7 @@ class CCReview
             $user_id = $users->QueryKey($qkarg);
             if( empty($user_id) )
             {
-                CCPage::Prompt(_('Cannot find that user'));
+                $page->Prompt(_('Cannot find that user'));
                 CCUtil::Send404(false);
                 return;
             }
@@ -73,7 +73,7 @@ class CCReview
                 $uploads =& CCUploads::GetTable();
                 if( !$uploads->KeyExists($upload_id) )
                 {
-                    CCPage::Prompt(_('Cannot find that upload. It may have been removed by the owner.'));
+                    $page->Prompt(_('Cannot find that upload. It may have been removed by the owner.'));
                     CCUtil::Send404(false);
                     return;
                 }
@@ -96,8 +96,8 @@ class CCReview
                 //
                 // This is just a 'recent review' listing for the whole site
                 //
-                CCPage::SetTitle('str_recent_reviews');
-                CCPage::ViewFile('reviews');
+                $page->SetTitle('str_recent_reviews');
+                $page->ViewFile('reviews');
             }
             else
             {
@@ -131,7 +131,7 @@ class CCReview
                 $leftby_link = array( 'text' => array( $otstr, $user_real_name ),
                                       'url' =>  cc_current_url() . '?qtype=' . $qtype );
 
-                CCPage::PageArg('leftby_link',$leftby_link);
+                $page->PageArg('leftby_link',$leftby_link);
             }
         }
         else
@@ -145,7 +145,7 @@ class CCReview
             $query->Query($args);
 
             // this is so we can display the upload record on the page:
-            CCPage::PageArg('topic_upload',$upload_id);
+            $page->PageArg('topic_upload',$upload_id);
         }
 
         //
@@ -181,7 +181,7 @@ class CCReview
         $page->AddFeedLink($query, $title, $title, 'feed_reviews', 'topics' );
     }
 
-    function _build_bread_crumb_trail($user=array(),$upload=array(),$cmd_url='',$cmd_text='')
+    static function _build_bread_crumb_trail($user=array(),$upload=array(),$cmd_url='',$cmd_text='')
     {
         $trail = array();
         $trail[] = array( 'url' => ccl(), 'text' => 'str_home');
@@ -212,7 +212,8 @@ class CCReview
         }
 
         require_once('cchost_lib/cc-page.php');
-        CCPage::AddBreadCrumbs($trail);
+        $page =& CCPage::GetPage();
+        $page->AddBreadCrumbs($trail);
     }
 
     function OnTopicDelete($deltype,$topic_id)
@@ -223,7 +224,7 @@ class CCReview
         if( empty($upload_id) ) // never mind, it wasn't a review
             return;
         $reviewer = $row['topic_user'];
-        $this->Sync($upload_id,$reviewer,-1);
+        CCReview::Sync($upload_id,$reviewer,-1);
     }
 
     function _can_review($row_or_id)
@@ -231,7 +232,12 @@ class CCReview
         return CCReviewsHV::_can_review($row_or_id);
     }
 
-    function Sync($upload_id,$reviewer,$add=0)
+    function OnReview(&$topic,&$upload_rec)
+    {
+        CCReview::Sync($topic['topic_upload'],$topic['topic_user']);
+    }
+    
+    public static function Sync($upload_id,$reviewer,$add=0)
     {
         $count = CCDatabase::QueryItem("SELECT COUNT(*) FROM cc_tbl_topics WHERE topic_type='review' AND topic_upload=$upload_id");
         $count += $add;
@@ -246,13 +252,17 @@ class CCReview
         $users =& CCUsers::GetTable();
         $arg1['user_id'] = $reviewer;
         $count = $users->QueryItemFromKey('user_num_reviews',$reviewer) + $add;
-        $arg1['user_num_reviews'] = $count;
-        $users->Update($arg1);
+        if( $count >= 0 ) {
+            $arg1['user_num_reviews'] = $count;
+            $users->Update($arg1);
+        }
 
         $arg2['user_id'] = $reviewee;
         $count = $users->QueryItemFromKey('user_num_reviewed',$reviewee) + $add;
-        $arg2['user_num_reviewed'] = $count;
-        $users->Update($arg2);
+        if( $count >= 0 ) {
+            $arg2['user_num_reviewed'] = $count;
+            $users->Update($arg2);
+        }
     }
 
     /**
@@ -276,7 +286,7 @@ class CCReview
         {
             $topic_id = $row['topic_id'];
             $reviewer = $row['topic_user'];
-            $this->Sync($upload_id,$reviewer,-1);
+            CCReview::Sync($upload_id,$reviewer,-1);
             $reviews->DeleteKeyRow($topic_id);
         }
     }

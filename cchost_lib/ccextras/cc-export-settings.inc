@@ -39,6 +39,8 @@ class CCSettingsExporter
     {
         global $no_ui;
 
+        $page =& CCPage::GetPage();
+    
         if( !empty($_REQUEST['i']) )
             $fname = CCUtil::StripText($_REQUEST['i']);
 
@@ -47,7 +49,7 @@ class CCSettingsExporter
             $msg = _('ERROR: No import file specified.');
             if( empty($no_ui) )
             {
-                CCPage::Prompt($msg);
+                $page->Prompt($msg);
                 return;
             }
             die($msg);
@@ -57,8 +59,8 @@ class CCSettingsExporter
 
         if( empty($no_ui) )
         {
-            CCPage::SetTitle(_('Import Settings'));
-            CCPage::Prompt(_('Settings have been imported'));
+            $page->SetTitle(_('Import Settings'));
+            $page->Prompt(_('Settings have been imported'));
         }
     }
 
