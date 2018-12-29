@@ -108,6 +108,13 @@ class CCNewUserForm extends CCUserForm
         }
 
         $fields += array(
+                'user_registration_agreement' =>
+                    array(
+                        'label' => 'str_registration_agreement',
+                        'formatter' => 'agreement',
+                        'form_tip' => 'str_registration_agreement_tip',
+                        'flags' => CCFF_REQUIRED
+                    ),
                 'g-recaptcha-response' =>
                     array( 'label' => '',
                             'formatter' => 'recaptcha2',
@@ -163,7 +170,6 @@ function generator_newusername($form, $varname,$value='',$class='')
     return( $form->generator_textedit($varname,$value,$class) );
 }
 
-
 /**
 * Handles validator for HTML field, called during ValidateFields()
 * 
@@ -214,6 +220,21 @@ function validator_newusername($form, $fieldname)
     return( false );
 }
 
+function generator_agreement($form, $varname, $value='', $class='')
+{
+    return($form->generator_checkbox($varname, $value, $class));
+}
+
+function validator_agreement($form, $fieldname)
+{
+    $value = $form->GetFormValue($fieldname);
+    if ($value !== 'on') {
+        $form->SetFieldError($fieldname, array('str_registration_agreement_error'));
+        return(false);
+    }
+
+    return(true);
+}
 
 /**
 * Login form 
