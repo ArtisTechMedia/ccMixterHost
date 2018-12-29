@@ -179,7 +179,6 @@ class CCPhysicalFile
     {        
         require_once('cchost_lib/cc-uploadapi.php');
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
 
         $upload_id = CCUtil::StripText($upload_id);
         if( empty($upload_id) || !intval($upload_id) )
@@ -190,7 +189,7 @@ class CCPhysicalFile
 
         $bct = array( 'str_files_manage_for', $record['upload_name'] );
         $this->_build_bread_crumb_trail($upload_id,true,false,$bct);
-        $page->SetTitle( $bct );
+        CCPage::SetTitle( $bct );
 
         $args['upload_id'] = $upload_id;
         $args['files'] = &$record['files'];
@@ -203,7 +202,7 @@ class CCPhysicalFile
                        'file_change_type_url' => ccl('file','changetype'),
                     );
         
-        $page->PageArg('field', $args, 'edit_files_links' );
+        CCPage::PageArg('field', $args, 'edit_files_links' );
 
     }
 
@@ -220,14 +219,13 @@ class CCPhysicalFile
         require_once('cchost_lib/cc-upload.php');
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-dataview.php');
-        $page =& CCPage::GetPage();
         CCUpload::CheckFileAccess($username,$upload_id);
 
         $this->_build_bread_crumb_trail($upload_id,false,false,'str_file_edit');
 
         $userid = CCUser::IDFromName($username);
 
-        $page->SetTitle('str_edit_properties');
+        CCPage::SetTitle('str_edit_properties');
 
         $info = array(
             'sql' => 'SELECT *, user_name FROM cc_tbl_uploads JOIN cc_tbl_user ON upload_user=user_id WHERE upload_id='.$upload_id,
@@ -253,7 +251,7 @@ class CCPhysicalFile
         }
 
         if( $show )
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
     }
 
     /**
@@ -324,9 +322,7 @@ class CCPhysicalFile
 
         $trail[] = array( 'url' => '', 'text' => $cmd );
 
-        $page =& CCPage::GetPage();
-        
-        $page->AddBreadCrumbs($trail);
+        CCPage::AddBreadCrumbs($trail);
     }
 
     /**
@@ -337,8 +333,7 @@ class CCPhysicalFile
         list( $pretty_name, $user_name ) = CCDatabase::QueryRow(
             'SELECT upload_name,user_name FROM cc_tbl_uploads JOIN cc_tbl_user ON upload_user=user_id WHERE upload_id='.$upload_id, false );
 
-        $page =& CCPage::GetPage();
-        $page->SetTitle('str_edit_properties');
+        CCPage::SetTitle('str_edit_properties');
         $path = ccl('files',$user_name,$upload_id);
         $msg= sprintf(_("Changes saved, see %s."), '<a href="' . $path . '">' . $pretty_name . ' ' . _('page') . '</a>');
         if( $is_manage )
@@ -346,7 +341,7 @@ class CCPhysicalFile
             $url = ccl('file','manage',$upload_id);
             $msg .= sprintf(_("Or, go back to <a href=\"%s\">Manage Files</a>."),$url);
         }
-        $page->Prompt($msg);
+        CCPage::Prompt($msg);
     }
 
     /**
@@ -362,14 +357,13 @@ class CCPhysicalFile
         list( $upload_id, $pretty_name ) = CCDatabase::QueryRow(
                 'SELECT file_upload, file_name FROM cc_tbl_files WHERE file_id ='.$file_id, false );
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         $this->_build_bread_crumb_trail($upload_id,true,true,'str_file_delete_one');
         $files =& CCFiles::GetTable();
         if( empty($_POST['confirmdelete']) )
         {
-            $page->SetTitle('str_files_delete_s',$pretty_name);
+            CCPage::SetTitle('str_files_delete_s',$pretty_name);
             $form = new CCConfirmDeleteForm($pretty_name);
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -388,11 +382,10 @@ class CCPhysicalFile
     {
         $this->CheckFileAccess($file_id);
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         $files =& CCFiles::GetTable();
         $row = $files->QueryKeyRow($file_id);
         $this->_build_bread_crumb_trail($row['file_upload'],true,true,'str_file_replace');
-        $page->SetTitle('str_file_replace_s',$row['file_name']);
+        CCPage::SetTitle('str_file_replace_s',$row['file_name']);
         $row['file_extra'] = unserialize($row['file_extra']);
         $form = new CCFilePropsForm($row['file_nicname'],empty($row['file_extra']['type']) ? '' : $row['file_extra']['type']);
         $show = true;
@@ -421,7 +414,7 @@ class CCPhysicalFile
         }
 
         if( $show )
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
 
     }
 
@@ -434,12 +427,11 @@ class CCPhysicalFile
     */
     function Nicname($file_id)
     {
-        $page =& CCPage::GetPage();
         $this->CheckFileAccess($file_id);
         $files =& CCFiles::GetTable();
         $row = $files->QueryKeyRow($file_id);
         $this->_build_bread_crumb_trail($row['file_upload'],true,true,'str_file_nicname');
-        $page->SetTitle('str_files_nickname_for_s',$row['file_name']);
+        CCPage::SetTitle('str_files_nickname_for_s',$row['file_name']);
         $form = new CCFileNicknameForm($row['file_nicname']);
         $show = true;
         if( !empty($_POST['filenickname']) && $form->ValidateFields() )
@@ -456,7 +448,7 @@ class CCPhysicalFile
         }
 
         if( $show )
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
     }
 
     function _change_type($file_id,$new_type)
@@ -492,7 +484,6 @@ class CCPhysicalFile
         // Update the main upload tags, very heavy handed but safe
         require_once('cchost_lib/cc-uploadapi.php');
         CCUploadAPI::UpdateCCUD($upload_id,'','');
-        return $upload_id;
 
     }
 
@@ -508,8 +499,7 @@ class CCPhysicalFile
         $this->CheckFileAccess($file_id,0);
         if( $new_type == '-' )
             $new_type = '';
-        $upload_id = $this->_change_type($file_id,$new_type);
-        CCEvents::Invoke( CC_EVENT_FILE_CHANGED_TYPE, array( $file_id, $upload_id, $new_type ) );
+        $this->_change_type($file_id,$new_type);
         CCUtil::ReturnAjaxMessage(_('File type has been updated'));
     }
 
@@ -520,12 +510,11 @@ class CCPhysicalFile
     */
     function Add($upload_id)
     {
-        $page =& CCPage::GetPage();
         $this->CheckFileAccess(0,$upload_id);
         require_once('cchost_lib/cc-page.php');
         $upload_name = CCDatabase::QueryItem('SELECT upload_name FROM cc_tbl_uploads WHERE upload_id='.$upload_id);
         $this->_build_bread_crumb_trail($upload_id,true,true,'str_file_add_one');
-        $page->SetTitle('str_files_add_to_s',$upload_name);
+        CCPage::SetTitle('str_files_add_to_s',$upload_name);
         $form = new CCFileAddForm(empty($_POST) && !empty($_GET['atype']) ? $_GET['atype'] : '');
         $show = true;
         if( !empty($_POST['fileadd']) && $form->ValidateFields() )
@@ -572,7 +561,7 @@ class CCPhysicalFile
         if( $show )
         {
             require_once('cchost_lib/cc-page.php');
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
         }
 
     }

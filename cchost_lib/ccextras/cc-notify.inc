@@ -47,7 +47,7 @@ class CCNotifications extends CCTable
         $this->CCTable('cc_tbl_notifications','notify_id');
     }
 
-    public static function & GetTable()
+    function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -68,9 +68,8 @@ class CCNotifyAPI
     function EditMyNotifications($other_user_name='')
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
 
-        $page->SetTitle('str_notify_edit');
+        CCPage::SetTitle('str_notify_edit');
         $bc[] = array( 'url' => ccl('preferences'), 'text' => 'str_pref_title' );
         CCUser::AddUserBreadCrumbs('str_notify_edit',$bc);
 
@@ -154,7 +153,7 @@ class CCNotifyAPI
                 $notifications->Insert($args);
             }
             
-            $page->Prompt('str_notify_updated');
+            CCPage::Prompt('str_notify_updated');
         }
         else
         {
@@ -180,7 +179,7 @@ class CCNotifyAPI
                 }
             }
 
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
         }
     }
 
@@ -529,9 +528,8 @@ EOF;
             $ok = @$mailer->Send();
             if( !$ok )
             {
-                $wasEnabled = CCDebug::Enable(true);
-                CCDebug::Log("*** NOTIFY FAILED *** Message '$subject' send to {$urow['user_name']}");
-                CCDebug::Enable($wasEnabled);
+                CCDebug::Enable(true);
+                CCDebug::Log("Message '$subject' failed to send: \n{$u_body}");
             }
         }
     }

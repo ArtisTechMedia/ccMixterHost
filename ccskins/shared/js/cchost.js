@@ -281,7 +281,7 @@ ratingsHooks.prototype = {
         d_elem.innerHTML = '...';
         var url = home_url + "rate/" + id + "/" + num;
         if( this.return_macro )
-            url += q + 'rmacro=' + this.return_macro + '&_cache_buster=' + new Date().getTime();
+            url += q + 'rmacro=' + this.return_macro;
         new Ajax.Updater(d_elem,url);
 
     },
@@ -385,7 +385,7 @@ recommendsHooks.prototype = {
         d_elem.innerHTML = '...';
         var url = home_url + "rate/" + id + "/5";
         if( this.return_macro )
-            url += q + 'rmacro=' + this.return_macro + '&_cache_buster=' + new Date().getTime();
+            url += q + 'rmacro=' + this.return_macro;
         new Ajax.Updater(d_elem,url,{onComplete:this.onRecommendFilled.bind(this,id)});
     },
 

@@ -37,15 +37,16 @@ class CCFeedsRSS
 {
     function OnApiQuerySetup( &$args, &$queryObj, $validate)
     {
-    
-        CCFeed::CalculateFeedLimit($args,'rss');
-            
-        if( $args['format'] != 'rss' )
+        $f = $args['format'];
+
+        if( ($f == 'rss') || ($args['limit'] == 'feed') )
+            $queryObj->ValidateLimit('max-feed');
+
+        if( $f != 'rss' )
             return;
 
         if( empty($args['datasource']) )
             $args['datasource'] = 'uploads';
-            
         switch( $args['datasource'] )
         {
             case 'topics':
@@ -60,6 +61,7 @@ class CCFeedsRSS
                 break;                
         }
         $queryObj->GetSourcesFromTemplate($args['template']);
+        $queryObj->ValidateLimit('max-feed');
     }
 
     function OnApiQueryFormat( &$records, $args, &$result, &$result_mime )

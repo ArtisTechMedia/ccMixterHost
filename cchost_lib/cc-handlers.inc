@@ -48,7 +48,7 @@ CCEvents::AddHandler(CC_EVENT_FILTER_ED_PICK_DETAIL, array( 'CCEditorials',  'On
 
 CCEvents::AddHandler(CC_EVENT_GET_CONFIG_FIELDS,  array( 'CCFeed', 'OnGetConfigFields'), 'cchost_lib/cc-feed.php' );
 CCEvents::AddHandler(CC_EVENT_DELETE_UPLOAD,      array( 'CCFeed',  'OnUploadDelete'), 'cchost_lib/cc-feed.php');
-CCEvents::AddHandler(CC_EVENT_DELETE_FILE,        array( 'CCFeed',  'OnDeleteFile'), 'cchost_lib/cc-feed.php');
+CCEvents::AddHandler(CC_EVENT_DELETE_FILE,        array( 'CCFeed',  'OnFileDelete'), 'cchost_lib/cc-feed.php');
 CCEvents::AddHandler(CC_EVENT_UPLOAD_DONE,        array( 'CCFeed',  'OnUploadDone'), 'cchost_lib/cc-feed.php');
 
 CCEvents::AddHandler(CC_EVENT_API_QUERY_SETUP,   array( 'CCFeedsAtom', 'OnApiQuerySetup'),'cchost_lib/cc-feeds-atom.php'); 
@@ -166,9 +166,6 @@ CCEvents::AddHandler(CC_EVENT_ADMIN_MENU,  array( 'CCSkinAdmin' , 'OnAdminMenu')
 CCEvents::AddHandler(CC_EVENT_MAIN_MENU,    array( 'CCSubmit',  'OnBuildMenu'), 'cchost_lib/cc-submit.php' );
 CCEvents::AddHandler(CC_EVENT_MAP_URLS,     array( 'CCSubmit',  'OnMapUrls'), 'cchost_lib/cc-submit.php' );
 CCEvents::AddHandler(CC_EVENT_ADMIN_MENU,   array( 'CCSubmit', 'OnAdminMenu'), 'cchost_lib/cc-submit.php' );
-
-CCEvents::AddHandler(CC_EVENT_RATED,  array( 'CCSync', 'OnRated'), 'cchost_lib/cc-sync.php');
-
 
 CCEvents::AddHandler(CC_EVENT_MAIN_MENU,        array( 'CCTagEvents', 'OnBuildMenu'), 'cchost_lib/cc-tags.inc' );
 CCEvents::AddHandler(CC_EVENT_MAP_URLS,         array( 'CCTagEvents', 'OnMapUrls'), 'cchost_lib/cc-tags.inc' );

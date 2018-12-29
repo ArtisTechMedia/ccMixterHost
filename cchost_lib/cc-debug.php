@@ -63,7 +63,7 @@ class CCDebug
     * @param bool $bool true enables 
     * @return bool $previous_state Returns previous state of debug enabled flag
     */
-    public static function Enable($bool)
+    function Enable($bool)
     {
         $states =& CCDebug::_states();
         $prev = !empty($states['enabled']);
@@ -85,7 +85,7 @@ class CCDebug
     * @param bool $bool true means install ccHost custom error handler
     * @returns bool $prev_state true means error hanlder was already installed, false means no handler was installed
     */
-    public static function InstallErrorHandler($bool)
+    function InstallErrorHandler($bool)
     {
         $states =& CCDebug::_states();
         $prev_state = empty($states['error_handler']) ? false : $states['error_handler'];
@@ -115,7 +115,7 @@ class CCDebug
     * @see Enable
     * @return bool $bool true means enabled
     */
-    public static function IsEnabled()
+    function IsEnabled()
     {
         $states =& CCDebug::_states();
         return( isset($states['enabled']) && ($states['enabled'] === true) );
@@ -130,7 +130,7 @@ class CCDebug
     * @see RestoreErrors
     * @param integer $new_level Set the new error_reporting level (default is 0!)
     */
-    public static function QuietErrors($new_level=CC_QUIET_LEVEL)
+    function QuietErrors($new_level=CC_QUIET_LEVEL)
     {
         $states =& CCDebug::_states();
         $states['old_err'] = error_reporting($new_level);
@@ -141,7 +141,7 @@ class CCDebug
     *
     * @see QuietErrors
     */
-    public static function RestoreErrors()
+    function RestoreErrors()
     {
         $states =& CCDebug::_states();
         error_reporting($states['old_err']);
@@ -157,7 +157,7 @@ class CCDebug
     * @see Enable
     * @param bool $template_safe true means you are NOT debugging code that displays HTML
     */
-    public static function StackTrace($template_safe=false,$full=false)
+    function StackTrace($template_safe=false,$full=false)
     {
         if( !CCDebug::IsEnabled() )
             return;
@@ -197,41 +197,28 @@ class CCDebug
     * @see Enable
     * @param mixed $var Reference to variable to dump to screen
     * @param bool $template_safe true means you are NOT debugging code that displays HTML
-    * @param bool $exit true means exit after print
     */
-    public static function PrintVar(&$var, $template_safe = false, $exit = true )
+    function PrintVar(&$var, $template_safe = false)
     {
         if( !CCDebug::IsEnabled() )
             return;
 
         $t =& CCDebug::_textize($var);
-        $sc = htmlspecialchars($t);
-        if( $sc ) {
-            $t = $sc;
-        }
-        $html = '<pre style="font-size: 10pt;text-align:left;">' . 
-                $t .
+
+        $html = '<pre style="font-size: 10pt;text-align:left;">' .
+                htmlspecialchars($t) .
                 '</pre>';
 
         if( $template_safe )
         {
             require_once('cchost_lib/cc-page.php');
-            $page =& CCPage::GetPage();            
-            $page->PrintPage( $html );
+            CCPage::PrintPage( $html );
         }
         else
         {
             print("<html><body>$html</body></html>");
         }
-        if( $exit ) {
-            exit;
-        }
-    }
-
-    public static function PrintV(&$var, $template_safe = false, $exit = true)
-    {
-        CCDebug::Enable(true);
-        CCDebug::PrintVar($var,$template_safe,$exit);
+        exit;
     }
 
     /**
@@ -243,7 +230,7 @@ class CCDebug
     * 
     * @param integer $error_mask Same as php's error_reporting()
     */
-    public static function LogErrors($error_mask)
+    function LogErrors($error_mask)
     {
         $states =& CCDebug::_states();
         $old = $states['log_errors'];
@@ -262,7 +249,7 @@ class CCDebug
     * @param string $msg Use this string to identify what your actually dumping into the log
     * @param $var Reference to variable to dump to screen
     */
-    public static function LogVar($msg, &$var)
+    function LogVar($msg, &$var)
     {
         if( !CCDebug::IsEnabled() )
             return;
@@ -282,7 +269,7 @@ class CCDebug
     * @see Enable
     * @param string $msg Use this string to identify what your actually dumping into the log
     */
-    public static function Log($msg)
+    function Log($msg)
     {
         //print('hello ' . $msg . '<br />');
 
@@ -340,7 +327,7 @@ class CCDebug
     * @param mixed $CHRONO_STARTTIME Reference to timer var
     * @returns float $result Void if starting timer, string (in seconds) formatted
     */
-    public static function Chronometer(&$CHRONO_STARTTIME)
+    function Chronometer(&$CHRONO_STARTTIME)
     {
        global $total_sql;
 
@@ -388,7 +375,7 @@ class CCDebug
     /**
     * Internal buddy
     */
-    static function & _textize(&$var)
+    function & _textize(&$var)
     {
         ob_start();
         if( is_array($var) || is_object($var) || is_resource($var) )
@@ -405,7 +392,7 @@ class CCDebug
     /**
     * Internal buddy
     */
-    static function & _states()
+    function & _states()
     {
         static $_error_states;
         if( !isset($_error_states) )
@@ -438,20 +425,13 @@ function cc_error_handler($errno, $errstr='', $errfile='', $errline='', $errcont
     // same goes for PEAR in php 5
     if( strpos($errfile,'PEAR') !== false )
         return;
-
+    
     // errno will be 0 when caller uses the '@' prefix
     // comment these two lines if want these errors logged
     // anyway
-    if( !$errno || $errno === 8192 ) // || ($errno == 2048) ) // E_STRICT, sorry, we don't care about 
+    if( !$errno ) // || ($errno == 2048) ) // E_STRICT, sorry, we don't care about 
     {                                 // deprecated stuff
         return;
-    }
-
-    if( 1 && ($_SERVER['HTTP_HOST'] == 'ccm') ) {
-        $pack = array( $errno, $errstr, $errfile, $errline, $errcontext );
-        CCDebug::PrintV($pack,false,false);
-        CCDebug::Enable(true);
-        CCDebug::StackTrace();
     }
 
     // just return if system error is below threshold
@@ -496,7 +476,7 @@ function cc_error_handler($errno, $errstr='', $errfile='', $errline='', $errcont
         error_log($err, 3, $logdir. CC_ERROR_FILE);
     }
 
-    if( $_SERVER['HTTP_HOST'] == 'ccm' || ($states['enabled'] === true) )
+    if( $states['enabled'] === true )
     {
         die($err);
     }

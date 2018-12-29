@@ -118,7 +118,7 @@ class CCActivityLog extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    public static function & GetTable()
+    function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -144,7 +144,7 @@ class CCActivityLogTemp extends CCTable
         $this->CCTable($name,'activity_log_id');
     }
 
-    static function _tname() 
+    function _tname() 
     {
         return 'cc_tbl_activity_log_' . CCUser::CurrentUserName();
     }
@@ -157,7 +157,7 @@ class CCActivityLogTemp extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    public static function & GetTable()
+    function & GetTable()
     {
         $tables = CCDatabase::ShowTables();
         $name = CCActivityLogTemp::_tname();
@@ -233,13 +233,12 @@ class CCActivityLogAPI
         global $CC_GLOBALS;
 
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        $page->SetTitle( _('Activity Log Admin Options') );
+        CCPage::SetTitle( _('Activity Log Admin Options') );
         $form = new CCAdminLoggingForm();
         if( empty($_POST['adminlogging']) )
         {
             $form->PopulateValues( empty($CC_GLOBALS['logging']) ? array() : $CC_GLOBALS['logging'] );
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -250,7 +249,7 @@ class CCActivityLogAPI
             // on the other hand, ip_lookup_url is a global variable
             $cfg['ip_lookup_url'] = empty($_POST['ip_lookup_url']) ? $form->_default_ip_url : $_POST['ip_lookup_url'];
             $configs->SaveConfig('config',$cfg,CC_GLOBAL_SCOPE,true);
-            $page->Prompt( _("Logging options saved.") );
+            CCPage::Prompt( _("Logging options saved.") );
         }
 
     }
@@ -265,8 +264,7 @@ class CCActivityLogAPI
     function ViewLog($arg='')
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        
+
         global $CC_GLOBALS;
         
         $searchterm = '';
@@ -278,8 +276,8 @@ class CCActivityLogAPI
             return;
         }
 
-        $page->PageArg('activity_menu',$menuopts,'admin.php/show_activity_menu'); 
-        $page->SetTitle(_('View Activity Log'));
+        CCPage::PageArg('activity_menu',$menuopts,'admin.php/show_activity_menu'); 
+        CCPage::SetTitle(_('View Activity Log'));
 
         $logs =& CCActivityLog::GetTable();
         $logdir = empty($CC_GLOBALS['logfile-dir']) ? './' : $CC_GLOBALS['logfile-dir'];
@@ -289,19 +287,19 @@ class CCActivityLogAPI
             $since = empty($CC_GLOBALS['last-log-save']) ? '2000' : $CC_GLOBALS['last-log-save'];
             if( $this->_do_export($logs,$since) )
             {
-                $page->Prompt(_("Activity log exported succesfully"));
+                CCPage::Prompt(_("Activity log exported succesfully"));
                 $cargs['last-log-save'] = date('Y-m-d H:i:s');
                 $configs =& CCConfigs::GetTable();
                 $configs->SaveConfig('config',$cargs,CC_GLOBAL_SCOPE,true);
                 if( $arg == 'clear' )
                 {
                     $logs->DeleteWhere('1');
-                    $page->Prompt(_('Log Archived and Cleared'));
+                    CCPage::Prompt(_('Log Archived and Cleared'));
                 }
             }
             else
             {
-                $page->Prompt(_("Error opening export file") );
+                CCPage::Prompt(_("Error opening export file") );
             }
             return;
         }
@@ -315,7 +313,7 @@ class CCActivityLogAPI
                 //
                 // view directory of archive files
                 //
-                $page->SetTitle(_("Activity Log Archive"));
+                CCPage::SetTitle(_("Activity Log Archive"));
         
                 $files = glob( $logdir . 'activity-log*.*' );
                 $html = '<table id="activity_log_archive">';
@@ -329,7 +327,7 @@ class CCActivityLogAPI
                     }
                 }
                 $html .= '</table>';
-                $page->AddContent($html);
+                CCPage::AddContent($html);
                 return;
             }
             else
@@ -340,16 +338,16 @@ class CCActivityLogAPI
                 //
                 $filename = $_GET['file'];
                 $fname = $logdir . $filename . '.csv';
-                $page->SetTitle(sprintf(_("Activity Log Archive: %s"),$filename));
+                CCPage::SetTitle(sprintf(_("Activity Log Archive: %s"),$filename));
                 if( !file_exists($fname) )
                 {
-                    $page->Prompt(sprintf(_("Can't find activity archive %s"),$fname));
+                    CCPage::Prompt(sprintf(_("Can't find activity archive %s"),$fname));
                     return;
                 }
                 $f = fopen($fname,'r');
                 if( !$f )
                 {
-                    $page->Prompt(sprintf(_("Can't open activity archive %s"),$fname));
+                    CCPage::Prompt(sprintf(_("Can't open activity archive %s"),$fname));
                     return;
                 }
                 $logs = CCActivityLogTemp::GetTable();
@@ -379,12 +377,12 @@ class CCActivityLogAPI
                 $this->_do_archive_search($logs,$logdir,$searchterm);
         }
 
-        $page->AddPagingLinks($logs,'',50);
+        CCPage::AddPagingLinks($logs,'',50);
         $logs->SetOrder('activity_log_date','DESC');
         $rows = $logs->QueryRows('');
-        $page->PageArg( 'act-searchterm', $searchterm );
-        $page->PageArg( 'activity-url', ccl( 'activity' ) );
-        $page->PageArg('activity_log',$rows,'admin.php/show_activity_log');
+        CCPage::PageArg( 'act-searchterm', $searchterm );
+        CCPage::PageArg( 'activity-url', ccl( 'activity' ) );
+        CCPage::PageArg('activity_log',$rows,'admin.php/show_activity_log');
     }
 
     function _do_import($fname,$logs)
@@ -471,15 +469,14 @@ EOF;
     function _do_export($logs,$since='')
     {
         global $CC_GLOBALS;
-        
+
         // don't bother if there aren't any new log entries
         //
         $where = empty($since) ? '' : "WHERE activity_log_date > '$since'";
         $qr = CCDatabase::Query( "SELECT * FROM {$logs->_table_name} $where ORDER BY activity_log_date DESC" );
         if( !mysql_num_rows($qr) )
         {
-            $page =& CCPage::GetPage();
-            $page->Prompt(_("There are no new records in the activity log"));
+            CCPage::Prompt(_("There are no new records in the activity log"));
             return true;
         }
 

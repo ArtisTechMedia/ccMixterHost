@@ -238,10 +238,8 @@ class CCMailer
         $cc      = empty($this->_cc)  ? '' : implode( ', ', $this->_cc  );
         $to      = $this->_to;
         $message = $this->_message; // do doubt this needs to be messaged...
-        
-        if( !empty($ttags['mail-tag-line']) ) {
-            $message .= "\n\n" . $ttags['mail-tag-line'];
-        }
+        //promo banner
+        $message .= "\n\nMusic connects us: help keep ccMixter.org free! Donate at http://goo.gl/0JsqCg";
 
         $headers  = "MIME-Version: 1.0\r\n";
         $headers .= "Content-type: text/plain; charset=utf-8\r\n";
@@ -323,26 +321,20 @@ class CCContactMailerForm extends CCSecurityVerifierForm
                             'formatter'   => 'textarea',
                             'maxlength'   => 1000,
                             'form_tip'    => 'str_email_msg_limited', 
-                            'flags'      => CCFF_REQUIRED )
-                            );
-                            
-        if( !CCUser::IsLoggedIn() )
-        {
-            $fields += array(                            
-                        'user_mask' =>
-                           array( 'label'       => '',
-                                   'formatter'  => 'securitykey',
-                                   'autocomp'   => 'off',
-                                   'form_tip'   => '',
-                                   'flags'      => CCFF_NOUPDATE),
-                        'user_confirm' =>
-                           array( 'label'       => 'str_security_key',
-                                   'formatter'  => 'securitymatch',
-                                   'class'      => 'cc_form_input_short',
-                                   'form_tip'   => CCSecurityVerifierForm::GetSecurityTipStr(),
-                                   'flags'      => CCFF_REQUIRED | CCFF_NOUPDATE)
-                );
-        }
+                            'flags'      => CCFF_REQUIRED ),
+                    'user_mask' =>
+                       array( 'label'       => '',
+                               'formatter'  => 'securitykey',
+                               'autocomp'   => 'off',
+                               'form_tip'   => '',
+                               'flags'      => CCFF_NOUPDATE),
+                    'user_confirm' =>
+                       array( 'label'       => 'str_security_key',
+                               'formatter'  => 'securitymatch',
+                               'class'      => 'cc_form_input_short',
+                               'form_tip'   => CCSecurityVerifierForm::GetSecurityTipStr(),
+                               'flags'      => CCFF_REQUIRED | CCFF_NOUPDATE)
+            );
 
         $this->AddFormFields($fields);
     }
@@ -386,8 +378,7 @@ class CCMailerAPI
                 $msg = _('Mail has not been properly configured on this system.') . ' ' . _('Contact your administrator through regular email.');
             }
 
-            $page =& CCPage::GetPage();
-            $page->SystemError( $msg );
+            CCPage::SystemError( $msg );
             return false;
         }
 
@@ -543,7 +534,7 @@ class CCMailerAPI
         require_once('cchost_lib/cc-page.php');
         $page =& CCPage::GetPage();
         $page->SetTitle($title);
-        CCUser::AddUserBreadCrumbs($title,null,$user_to);
+        CCUser::AddUserBreadCrumbs($title,null,$userto);
 
         $verify = $this->_ok_to_contact($userto);
 
@@ -598,9 +589,8 @@ class CCMailerAPI
             $page->Prompt( _('Mail sent') );
 
             // enabled debug to force log message
-            $wasEnabled = CCDebug::Enable(true);
+            CCDebug::Enable(true);
             CCDebug::Log("Mail sent from $from_name -- to $userto");
-            CCDebug::Enable($wasEnabled);
         }
     }
 
@@ -682,12 +672,11 @@ class CCMailerAPI
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
-        $page =& CCPage::GetPage();
         $title = _('Configure Mail');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
         $form = new CCMailAdminForm();
-        $page->AddForm( $form->GenerateForm() );
+        CCPage::AddForm( $form->GenerateForm() );
     }
 
     /**

@@ -36,13 +36,11 @@ class CCFeedsXSPFHV
 {
     function OnApiQuerySetup( &$args, &$queryObj, $validate)
     {
-        CCFeed::CalculateFeedLimit($args,'xspf');
-    
         if( $args['format'] != 'xspf' )
             return;
-            
         $args['template'] = 'xspf_10.php';
         $queryObj->GetSourcesFromTemplate($args['template']);
+        $queryObj->ValidateLimit('max-feed');
     }
 
     function OnApiQueryFormat( &$records, $args, &$result, &$result_mime )

@@ -33,7 +33,7 @@ class v_5_1_topic_nsfw extends CCUpdate
     function Update()
     {
         $this->_check_for_field('cc_tbl_topics','topic_nsfw', 'INT(1) NOT NULL ');
-        $page =& CCPage::GetPage(); $page->Prompt( _('Topic nsfw flag') );
+        CCPage::Prompt( _('Topic nsfw flag') );
     }
 }
 

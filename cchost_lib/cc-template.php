@@ -174,7 +174,7 @@ class CCSkin
         if( !empty($args) )
             $this->vars = array_merge($this->vars,$args);
 
-        if( $this->html_mode && 0 ) // $headers )
+        if( $this->html_mode && $headers )
         {
             // Force UTF-8 necessary for some languages (chinese,japanese,etc)
             if( CCDebug::IsEnabled() )
@@ -272,7 +272,7 @@ class CCSkin
         // print $t;
     }
 
-    static function _make_head_names($base)
+    function _make_head_names($base)
     {
         $base .= date('YmdHis');
         return array( 'css' => $base . '.css', 
@@ -280,7 +280,7 @@ class CCSkin
                       'js'  => $base . '.js',  );
     }
     
-    static function _get_head_files($auto_create=1)
+    function _get_head_files($auto_create=1)
     {
         global $CC_GLOBALS,$CC_CFG_ROOT;
 
@@ -645,7 +645,6 @@ class CCSkin
     function Call($macropath,$forceParse=false)
     {
         list( $filename, $funcname ) = $this->LookupMacro($macropath);
-        
         if( function_exists($funcname) )
         {
             // the file is already in memory, just call the function
@@ -766,8 +765,8 @@ class CCSkin
     */
     function GetTemplate($filename,$real_path=true)
     {
-        $files = $this->GetFilenameGuesses($filename);
-        return $this->Search($files,$real_path);
+        $files = CCSkin::GetFilenameGuesses($filename);
+        return CCSkin::Search($files,$real_path);
     }
 
     /**
@@ -780,7 +779,7 @@ class CCSkin
     * @param string $macroname The name of a specific macro to invoke during template generation
     * @return array $guesses Array of guesses, pass this to Search
     */
-    public static function GetFilenameGuesses($filename)
+    function GetFilenameGuesses($filename)
     {
         if( preg_match('/\.(xml|tpl)$/',$filename,$m) )
         {
@@ -889,14 +888,17 @@ class CCSkin
     * @param bool $real_path Set to true to return full local path 
     * @return string Path to requested file or bool(false)
     */
-    public static function SearchStatic( $file, $real_path = false )
-    {
-        global $CC_GLOBALS;
-        return CCUtil::SearchPath( $file, $CC_GLOBALS['template-root'], CC_DEFAULT_SKIN_SEARCH_PATHS, $real_path);
-    }
-    
     function Search($file, $real_path = false)
     {
+        // CCDebug::LogVar('search',$file);
+
+        if( empty($this) || ((strtolower(get_class($this)) != 'ccskin') && 
+                                  !is_subclass_of($this,'CCSkin') ) )
+        {
+            global $CC_GLOBALS;
+            return CCUtil::SearchPath( $file, $CC_GLOBALS['template-root'], CC_DEFAULT_SKIN_SEARCH_PATHS, $real_path);
+        }
+        
         $sfile = is_array($file) ? md5(join('',$file)) : md5($file);
         if( !isset($this->search_cache[$sfile]) )
         {
@@ -910,7 +912,7 @@ class CCSkin
         return $this->search_cache[$sfile];
     }
 
-    public static function UserGraphic($partial)
+    function UserGraphic($partial)
     {
         global $CC_GLOBALS;
         $path = $CC_GLOBALS['image-upload-dir'] . $partial;
@@ -966,12 +968,11 @@ class CCSkin
             {
                 require_once('cchost_lib/cc-tpl-parser.php');
                 $parsed = cc_tpl_parse_file($file,$bfunc);
-//                CCDebug::Enable(true);
-//                 CCDebug::Log( "\n\n-------- $file ------------\n\n  $parsed \n\n---------------\n\n" );
                 $ret = eval( '?>' . $parsed);
+
                 if( $ret != 'ok' && CCUser::IsAdmin() )
                 {
-                    $lines = cc_split("\n",$parsed);
+                    $lines = split("\n",$parsed);
                     array_unshift($lines,"-------- parsed template for $file --------");
                     CCDebug::Enable(true);
                     CCDebug::PrintVar($lines);
@@ -994,7 +995,8 @@ class CCSkin
 
     function _inner_include($path,$funcname='',$forceParse=false)
     {
-//      CCDebug::Log("_inner call: $path / $funcname");
+        //CCDebug::Log("_inner call: $path / $funcname");
+
         $this->_push_path($path);
         $this->_parse($path,$forceParse);
         if( !empty($funcname) )
@@ -1029,7 +1031,7 @@ class CCSkin
     {
     }
 
-    public static function ClearCache() 
+    function ClearCache() 
     { 
         if( function_exists('_catch_log') )
             _catch_log( array(), 'Clearing template head cache' );
@@ -1069,19 +1071,13 @@ class CCSkinMacro extends CCSkin
         $this->_macro_props = parent::GetProps($this->_macro_file);
     }
 
-    /*
-        N.B. 2nd parameter here to satisfy E_STRICT lint - IT IS IGNORED AT RUNTIME
-    */
-    function Call($with,$forceParse=false)
+    function Call($with)
     {
         $this->_hello = true;
         return parent::Call($with);
     }
 
-    /*
-        N.B. 2nd parameter here to satisfy E_STRICT lint - IT IS IGNORED AT RUNTIME
-    */
-    function LookupMacro($macropath='',$allow_fail = false)
+    function LookupMacro($macropath='')
     {
         if( empty($macropath) )
             return array( $this->_macro_file, $this->_macro_macro );

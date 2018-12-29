@@ -52,7 +52,7 @@ if ( !empty($A['records'])) {
         <content:encoded><![CDATA[<?= $item['upload_description_html'] ?>]]></content:encoded>
         <enclosure url="<?= $item['files']['0']['download_url']?>" length="<?= $item['files']['0']['file_rawsize']?>" type="<?= $item['files']['0']['file_format_info']['mime_type']?>"></enclosure>
         <?
-        $tags = cc_split(',',$item['upload_tags']);
+        $tags = split(',',$item['upload_tags']);
         foreach( $tags as $tag )
         { 
             if( !empty($tag) )

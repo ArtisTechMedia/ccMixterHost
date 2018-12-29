@@ -134,10 +134,6 @@ ul#tabs li.selected_tab { margin-top: 0; font-weight: bold; height: 2.7em; }
 
 ul#tabs a {display: block; color: #333; background: url("../images/tab-body-dark.png") no-repeat top right ; text-decoration: none; }
 ul#tabs a span { display: block; padding: 0.5em 1.4em 0.2em; padding-top: 0.7em; background: url("../images/tab-left-dark.png") no-repeat top left; }
-ul#tabs a span img {
-    float: left;
-    margin-right: 4px;
-}
 
 ul#tabs a:hover {text-decoration: none; color: #333;  background: url("../images/tab-body-lit.gif") no-repeat top right #fff; }
 ul#tabs a:hover span { text-decoration: none; background: url("../images/tab-left-lit.png") no-repeat top left; }

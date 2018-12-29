@@ -42,7 +42,7 @@ if( !defined('IN_CC_HOST') )
 */
 class CCTag
 {
-    public static function TagSplit($tagstr)
+    function TagSplit($tagstr)
     {
         if( empty($tagstr) )
             return( array() );
@@ -54,7 +54,7 @@ class CCTag
         return array();
     }
 
-    public static function InTag($needles,$haystack)
+    function InTag($needles,$haystack)
     {
         if( is_array($haystack) )
             $haystack = implode(', ',$haystack);
@@ -66,12 +66,12 @@ class CCTag
         return( preg_match( $regex, $haystack ) );
     }
 
-    public static function ExpandOnRow(&$row,$inkey,$baseurl,$outkey,$label='',$usehash=false)
+    function ExpandOnRow(&$row,$inkey,$baseurl,$outkey,$label='',$usehash=false)
     {
         CCTag::ExpandOnRowA($row,$inkey,$baseurl,$outkey,$label, $row, $usehash );
     }
 
-    public static function ExpandOnRowA(&$row,$inkey,$baseurl,$outkey,$label, &$outrow, $usehash )
+    function ExpandOnRowA(&$row,$inkey,$baseurl,$outkey,$label, &$outrow, $usehash )
     {
         if( empty($row[$inkey]) )
             return;

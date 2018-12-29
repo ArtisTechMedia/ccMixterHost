@@ -5,6 +5,7 @@
     datasource    = topics
     dataview      = reviews_upload
     embedded      = 1
+    valid_args    = match
     required_args = match
 [/meta]
 [dataview]
@@ -24,7 +25,6 @@ SELECT  topic.topic_id, ((COUNT(parent.topic_id)-1) * 30) AS margin, topic.topic
         CONCAT( '$urlp', user.user_name ) as artist_page_url,
         DATE_FORMAT( topic.topic_date, '%a, %b %e, %Y @ %l:%i %p' ) as topic_date_format,
         user.user_image as user_image,
-        topic.topic_date,
         {$user_avatar_col}
 FROM cc_tbl_topics AS topic, 
      cc_tbl_topics AS parent,

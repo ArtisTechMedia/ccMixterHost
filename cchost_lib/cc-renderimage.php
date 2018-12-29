@@ -193,12 +193,11 @@ EOF;
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
         require_once('cchost_lib/cc-renderimage-form.php');
-        $page =& CCPage::GetPage();
         $title = _("Edit Thumbnail Properties");
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
         $form = new CCAdminThumbnailForm();
-        $page->AddForm( $form->GenerateForm() );
+        CCPage::AddForm( $form->GenerateForm() );
     }
 
     /**

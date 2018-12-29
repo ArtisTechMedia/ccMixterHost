@@ -31,7 +31,6 @@ define('CCDV_RET_ITEMS',    2);
 define('CCDV_RET_RESOURCE', 3);
 define('CCDV_RET_ITEM',     4);
 define('CCDV_RET_RECORD',   5);
-define('CCDV_RET_COUNT',    6);
 
 class CCDataView
 {
@@ -150,10 +149,10 @@ class CCDataView
         if( CCUser::IsAdmin() && !empty($_GET['dpreview']) )
         {
             $x['sqlargs'] = $sqlargs;
-            $x['sql'] = $this->sql;
-            $x['dataview'] = !isset($dataview) ? '*no dv*' : $dataview;
+            $x[] = $this->sql;
+            $x[] = !isset($dataview) ? '*no dv*' : $dataview;
             $x[] = $queryObj;
-            CCDebug::PrintV($x);
+            CCDebug::PrintVar($x);
         } 
 
         if( !empty($queryObj->records) )
@@ -184,7 +183,7 @@ class CCDataView
 
             case CCDV_RET_ITEMS:
             {
-                $items = CCDatabase::QueryItems($this->sql);
+                $items =& CCDatabase::QueryItems($this->sql);
                 return $items;
             }
 
@@ -198,12 +197,6 @@ class CCDataView
             {
                 $qr = CCDatabase::Query($this->sql);
                 return $qr;
-            }
-
-            case CCDV_RET_COUNT:
-            {
-                $count = $this->GetCount();
-                return $count;
             }
         }
 

@@ -46,7 +46,7 @@ class CCTALCompiler
         }
         else
         {
-            $parts = cc_split('/',$t);
+            $parts = split('/',$t);
             $text = '$_TV';
             for( $i = 0; $i < count($parts); $i++ )
             {
@@ -59,7 +59,7 @@ class CCTALCompiler
 
     function parse_tal_expr($v, $bracket=true, $condition=false)
     {
-        $parts = cc_split(' \| ',$v);
+        $parts = split(' \| ',$v);
         if( count($parts) > 1 )
         {
             $text = '';
@@ -156,10 +156,10 @@ class CCTALCompiler
         array_unshift($this->loop_stack, array( $i ));
 
         $arr_name = '$carr' . $i;
-        $args = cc_split( 'php:', $value );
+        $args = split( 'php:', $value );
         if( count($args) == 1 )
         {
-            $args = cc_split( ' ',  $value);
+            $args = split( ' ',  $value);
             if( empty($args[1]) ) { print("Lousy value: $value"); exit; }
             $arr_expr = $this->get_arr_name($args[1]);
         }
@@ -208,7 +208,7 @@ class CCTALCompiler
 
     function parse_define($value,&$OUT)
     {
-        $defines = cc_split(';',$value);
+        $defines = split(';',$value);
         $this->php_bracket(true, $OUT);
         foreach( $defines as $define )
         {
@@ -218,7 +218,7 @@ class CCTALCompiler
 
             preg_match('/^([^\s+]+)\s+(.*)$/',$define,$m);
             $name = $m[1];
-            $args = cc_split(' \| ',$m[2]);
+            $args = split(' \| ',$m[2]);
             if( count($args) == 1 )
             {
                 $OUT .= "\$_TV['$name'] = ";
@@ -391,7 +391,7 @@ class CCTALCompiler
                 case NODE_TYPE_ELEMENT:
                     {
                         $this->check_space($OUT);
-                        $parts = cc_split(':',$parser->iNodeName);
+                        $parts = split(':',$parser->iNodeName);
                         if( empty($parts[1]) || in_array($parts[0],array('rdf','dc') ) )
                          {
                             switch( $parts[0] )
@@ -591,7 +591,7 @@ class CCTALCompiler
                         $name = $stack_top[0];
                         if( ( $name != $parser->iNodeName) && $parser->iNodeName != '{singleton}' )
                             die("Misatch tags expecting {$name} got {$parser->iNodeName}  (Stack level:" . count($node_stack) . ")\n");
-                        $parts = cc_split(':',$name);
+                        $parts = split(':',$name);
                         if( empty($parts[1]) )
                         {
                             if( $this->is_singleton($name)  )

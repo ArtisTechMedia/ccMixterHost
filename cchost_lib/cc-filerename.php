@@ -41,7 +41,7 @@ class CCFileRename
     * @param array &$items Menu items go here
     * @param string $scope One of: CC_GLOBAL_SCOPE or CC_LOCAL_SCOPE
     */
-    function OnAdminMenu(&$items,$scope)
+    function OnAdminMenu($items,$scope)
     {
         if( $scope == CC_GLOBAL_SCOPE )
             return;
@@ -79,15 +79,14 @@ class CCFileRename
     function AdminRenaming()
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         require_once('cchost_lib/cc-admin.php');
         $title = _("Edit Upload Renaming Rules");
         CCAdmin::BreadCrumbs(false,array('url'=>'','text'=>$title));
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
 
         require_once('cchost_lib/cc-filerename-admin.inc');
         $form = new CCAdminRenameForm();
-        $page->AddForm( $form->GenerateForm() );
+        CCPage::AddForm( $form->GenerateForm() );
     }
 
     /**
@@ -123,7 +122,7 @@ class CCFileRename
         
         if( !empty($mask) )
         {
-            $newname = CCMacro::TranslateMask($patterns,$mask,true); // $settings['upload-replace-sp']);
+            $newname = CCMacro::TranslateMask($patterns,$mask,$settings['upload-replace-sp']);
             if( !empty($newname) )
             {
                 return( true );

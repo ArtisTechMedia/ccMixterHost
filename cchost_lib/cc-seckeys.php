@@ -49,7 +49,7 @@ class CCSecurityKeys extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    public static function & GetTable()
+    function & GetTable()
     {
         static $_table;
         if( !isset($_table) )

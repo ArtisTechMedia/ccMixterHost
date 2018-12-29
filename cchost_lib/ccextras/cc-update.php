@@ -42,7 +42,7 @@ class CCUpdate
 
         require_once('cchost_lib/cc-page.php');
         $updates = array();
-        $dirs = cc_split(';',$CC_GLOBALS['extra-lib']);
+        $dirs = split(';',$CC_GLOBALS['extra-lib']);
         array_unshift($dirs,'cchost_lib/ccextras');
         foreach( $dirs as $dir )
             $this->_fetch_updates(trim($dir),$updates);
@@ -54,8 +54,7 @@ class CCUpdate
         }
 
         $prompts = join(', ',$prompts);
-        $page =& CCPage::GetPage();
-        $page->Prompt(_('Updates already installed:') . ' ' . $prompts);
+        CCPage::Prompt(_('Updates already installed:') . ' ' . $prompts);
 
         CCMenu::KillCache();
         CCTemplate::ClearCache();

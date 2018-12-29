@@ -1,0 +1,268 @@
+ccHost Release Notes
+====================
+
+New in 5.1
+=====================
+If you've been waiting to upgrade to 5.x for the more stable
+release then the wait is over.
+
++100 bug fixes
+OpenID support for login and new accounts
+Remix "history chart" details sample derivation
+Support for ccZero/public domain waiver
+Admins can edit license info
+Licenses are now per submit form
+Now support RDFa license callbacks
+'News' and 'Blurbs' sidebar widgets
+Support for Y! and other media players
+Many new formats available inside topics
+New skin ala creativecommons.org 2009
+Content topics can be 'sticky'
+Pretty (non-graphic) buttons option
+Modern (non-graphic) rounded corners
+Sample Pool wrappers for any CC sites 
+Google(tm) style paging now an option
+Login will redirect to previous screen
+Skin writers now have priority over system defaults
+Search through sample pool/trackback items
+Fork a forum topic
+Email notify on trackbacks
+Allow users to translate forum topics
+Support for imgmagick thumbnails (hacky)
+Support for 'podcast' topic type w/enclosures (hacky)
+Plug-in devs can now do custom updates
+All commands are now admin documented
+
+
+New in 5.0.1
+=====================
+
+head script/css ganging
+add full date range support to query API
+playlist templates redux
+allow rewrite of tag base url in /tags
+gather uploads' tags for playlist properties form
+allow feed links from content page
+playlist search and templates
+added 'page' and 'feed' limit to query API
+query eng. 2.0
+turn on if-modified-since code for non registered users
+an official admin log viewer
+'edit' on playlist menus
+add edit button to pool item
+add view button to pool admin listing
+allow delete submit forms
+queryapi: new format "textfile"
+display filename as link (not nickname)
+add recent update to user feed page
+num playlists in upload page and user profile
+making queries more friendly to playlists
+num playlists in upload page and user profile
+user feeds hanging off profile
+share playlists
+added - and quoted strs for generic search
+new 'teru' style 'manage files'
+admins can now add google search form with checkbox
+feature: user can select ccud tag type (e.g. sample) when adding files
+feature: user can manage file from 'Submit Files'
+added 'recc' to query to see who recommends an upload
+admin feature: Query browse option sets for driving look/feel of query browser
+query browser now has 'save to playlist' button
+query browser now respect admin edited 'optsets'
+expand ZIPs in sample browser
+security: download urls were linked directly
+'download this page' in menu
+generic sample pool search (import not. impl)
+admin: hide all files for a user
+admin: allow embed code in pool items when editing
+multiple file download indicator
+in-situ reviewing on wide listing page
+allow content admin to control content page width
+edit button on 'approve' page
+
+New Features in 5.0
+=====================
+
+Version 5.0 marks a major feature release that removes all programming
+and HTML/XML markup requirements from admins of a ccHost site with a 
+heavy emphasis on content creation and customization all through admin 
+browser interfaces.
+
+- Content Manager 
+
+Admins can now create pages of content without any PHP, XML or HTML markup. 
+
+- Skin Profiles
+
+Admins can customize skins based on a choice of 40 layouts, color and font profiles,
+drag and drop sidebar extras, etc.
+
+- String Profiles
+
+A simple choice will change every string in the system to be domain specific
+(music site, image site, video site, etc.)
+
+- Query Browser
+
+Admin configurable query browser 
+
+
+New Features in 4.5
+======================
+
+- Collabaration
+
+Users invite each other, discuss collaborations in private, share private files, 
+then publish as a group
+
+- Social bookmarks
+
+Now every upload is one click away from bookmarked in the most popular sites (Digg,
+Yahoo, etc.)
+
+- Recommends method of rating
+
+Count recommendations in stead of star rating system. Browse a users 
+recommendations in a new browser 
+
+- Download packager
+
+Count download, download file with license file (RDF) and checksum
+
+- Various user interface features
+
+Browse users by what tools they use, big Thumbs Up in reviews/comments, 
+see who's remixed who with one click
+
+New Admin Features in 4.5
+==========================
+admin: allow admin to change user email, hooks to activity log
+admin: allow play for admins & hidden files
+admin: allow spaces in paths
+admin: consolidated admin configuration for moderation/flagging 
+admin: delete virtual root
+admin: enhanced activity log
+admin: show 'publish' link for admins on contest sources
+admin: add sendmail additional params to mail()
+admin: added 'reasons' to banning
+admin: activity log browser, archiving
+admin: User quota
+
+
+New Features in 4.0
+======================
+
+- Playlists/Favorites 
+  
+  Users can collect their favorite uploads into lists. If the the upload has
+  audio in it, all items will be treated like a playlist.
+
+- Embedded MP3 player
+
+  Audio uploads can now be played directly in the browser with a customized
+  embedded MP3 player.
+
+- Remix Radio Channels
+
+  A 'remix radio' with configurable streaming channels allows users to 
+  decide what they want to hear and how.
+
+- "Publicize" Users
+
+  Anyone can include a list of links (or audio player) on their blogs or 
+  other websites by cutting and pasting customized code for any artist
+  on the site.
+
+- Query Engine
+
+  A very powerful query engine now sits at the heart of most of the
+  ccHost installation. There are dozens of parameters to control the
+  output which can be formatted as feeds, playlists, plain text or
+  dozens of specialized HTML formats. The engine is avaiable
+  from URLs in the browser, Navigators Tabs, templates and (of 
+  course) directly from plug-in code.
+
+- 'Run Once' Pages
+
+  Admins can configure several 'run once' pages that their registered
+  users will see once and then never again. Perfect for 'Welcome' 
+  screen or pledge drives.
+
+- Default User Avatar
+ 
+  Admins can set a specific default user avatar for new users.
+
+- New 'Super-Admin' Group
+
+  A group of users can be added as 'super-admin' and each URL in the system
+  can be assigned to any level of user.
+
+- Added new Creative Commons 3.0 licenses
+
+  The newly released Creative Commons 3.0 licenses are available from the 
+  virtual root licenses selector. You must select these manually for the
+  time being.
+
+
+Improvements in 4.0
+====================
+
+- Performance Boost
+
+  The entire page loading mechanism has been revamped. While remaining
+  backwards ccmpatible with previous installations page response times
+  have improved by as much as 2-4 times 3.1. (Sites with custom code
+  will have some minor adjustments to make.)
+
+- New License Merging 
+
+  Remixing a new work from different licensed material is now up to
+  CC spec.
+
+- Auto-approve Sample Pools
+
+  Admins now longer have to manually approve remote remixes as they come
+  in from 'trusted' remote pools.
+
+- Reviews/Ratings Changes
+
+  Ratings can now be dependant on reviews and a new ranking system based
+  on favorites and (for audio) embedded plays along with user ratings.
+
+- International Encoding
+
+  Universal encoding is now enforced throughout the site
+
+- Forums Improvments/Features
+
+  Individual topics can be translated by your internations community. Threads
+  can be locked and branches can be deleted.
+
+- AJAX Everywhere
+
+  ccHost has standardized on prototype.js and (pieces of) the Rico library
+  for the browser and Zend's JSON encoder on the server to created performant, 
+  highly interactive user interface.
+
+- New Language Editor
+
+  Now translators and admins have an easy to use string editor to create 
+  internation tranlations and domain specific installations without touching
+  the code.
+
+- Feeds, Streaming, Playlists and Sample Pool use New Query Engine
+
+  All feeds and Sample Pool searches are now using the query engine with
+  means you can now add parameters to do things like offset paging 
+  and dozens of other features.
+
+- Most Active Reviews
+
+  Are now displayed at the top of the 'recent reviews' page.
+
+- Exclude Tags from Search
+
+  A '-' in front of tags will exclude them searches. remix,-downtempo
+  will return all remixes that do NOT have the 'downtempo' tag
+
+

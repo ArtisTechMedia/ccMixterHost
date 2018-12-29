@@ -89,7 +89,6 @@ class CCAdminMenuForm extends CCGridForm
 
         $this->SetHelpText($help);
 
-        //CCDebug::PrintVar($menu);
         uasort($menu,'cc_sort_user_menu');
         uasort($groups,'cc_weight_sorter');
 
@@ -325,10 +324,9 @@ class CCMenuAdmin
         
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
-        $page =& CCPage::GetPage();
         $title = _('Edit Menus');
         CCAdmin::BreadCrumbs(false,array('url'=>'','text'=>$title));
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
 
         $configs =& CCConfigs::GetTable();
 
@@ -337,7 +335,7 @@ class CCMenuAdmin
             $groups      =  $configs->GetConfig('groups');
             $menu_items  =  $configs->GetConfig('menu');
             $form = new CCAdminMenuForm($menu_items,$groups);
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -371,7 +369,7 @@ class CCMenuAdmin
 
             $configs->SaveConfig( 'menu', $copy, '', false);
 
-            $page->Prompt(_("Menu changes have been saved."));
+            CCPage::Prompt(_("Menu changes have been saved."));
         
             CCMenu::Reset();
         }            
@@ -385,10 +383,9 @@ class CCMenuAdmin
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
-        $page =& CCPage::GetPage();
         $title = _('Edit Menu Groups');
         CCAdmin::BreadCrumbs(false,array('url'=>'','text'=>$title));
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
 
         $configs =& CCConfigs::GetTable();
 
@@ -396,7 +393,7 @@ class CCMenuAdmin
         {
             $groups  =  $configs->GetConfig('groups');
             $form = new CCAdminMenuGroupsForm($groups);
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -422,7 +419,7 @@ class CCMenuAdmin
                 $copy[$name]['weight'] = $group['weight'];
             }
             $configs->SaveConfig('groups',$copy,'',false);
-            $page->Prompt(_('Menu group changes have been saved'));
+            CCPage::Prompt(_('Menu group changes have been saved'));
         }            
 
         CCMenu::Reset();

@@ -122,7 +122,6 @@ class CCRatingsAdmin
         global $CC_GLOBALS;
 
         require_once('cchost_lib/cc-tags.php');
-        $page =& CCPage::GetPage();
 
         if( $confirmed != 'confirmed' )
         {
@@ -155,7 +154,7 @@ class CCRatingsAdmin
 
             $bantext = $isbanned ? _('UnBan') : _('Ban');
 
-            $page->SetTitle(_("Manage a User's Ratings"));
+            CCPage::SetTitle(_("Manage a User's Ratings"));
             $deluser_url = ccl('admin','ratings','user',$user_id,$ratings_id,'deluser','confirmed');
             $delrate_url = ccl('admin','ratings','user',$user_id,$ratings_id,'delete','confirmed');
             $banuser_url = ccl('admin','ratings','user',$user_id,$ratings_id,'ban','confirmed');
@@ -172,7 +171,7 @@ class CCRatingsAdmin
             _('This action has no undo.') . "</span></h3>\n" . 
             '<p style="width: 250px"><a class="cc_gen_button" href="' . $deluser_url . '"><span style="color:red">' . sprintf(_('DELETE ALL RATINGS for %s.'), $username) . '</span></a></p>';
 
-            $page->AddContent($html);
+            CCPage::AddContent($html);
             return true;
         }
 
@@ -238,10 +237,9 @@ class CCRatingsAdmin
         require_once('cchost_lib/cc-admin.php');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
         $form = new CCAdminRatingsForm();
-        $page->AddForm( $form->GenerateForm() );
+        CCPage::AddForm( $form->GenerateForm() );
     }
 
 
@@ -257,8 +255,6 @@ class CCRatingsAdmin
     */
     function Admin($cmd='',$user_id='',$ratings_id='',$cmd2='',$confirmed='')
     {
-        $page =& CCPage::GetPage();
-        
         if( $cmd == 'savesettings' )
         {
             // quick hack for getting around that this file
@@ -302,15 +298,15 @@ class CCRatingsAdmin
 
             if( $msgid == 'deluser' )
             {
-                $page->Prompt(_("User's ratings deleted"));
+                CCPage::Prompt(_("User's ratings deleted"));
             }
             elseif( $msgid== 'delete' ) 
             {
-                $page->Prompt(_("Rating deleted"));
+                CCPage::Prompt(_("Rating deleted"));
             }
             elseif( $msgid == 'ban' )
             {
-                $page->Prompt(_("Updated ban list"));
+                CCPage::Prompt(_("Updated ban list"));
             }
 
         }
@@ -364,7 +360,7 @@ class CCRatingsAdmin
             </style>
 END;
 
-        $page->SetTitle(_('Manage Ratings'));
+        CCPage::SetTitle(_('Manage Ratings'));
 
         $arrows['DESC'] = '&dArr;';
         $arrows['ASC']  = '&uArr;';
@@ -451,11 +447,11 @@ END;
         $where = '';
         if( !empty($_GET['f']) )
         {
-            $filters = cc_split(';', $_GET['f']);
+            $filters = split(';', $_GET['f']);
             $curr_filters = array();
             foreach( $filters as $filter )
             {
-                list( $field, $value ) = cc_split( ':', $filter, 2);
+                list( $field, $value ) = split( ':', $filter, 2);
                 $svalue = addslashes($value);
                 $where .= "AND ($field = '$svalue')";
                 $q['f'][$field] = $value;
@@ -482,11 +478,11 @@ END;
         }
         elseif( !empty($_GET['lf']) )
         {
-            $filters = cc_split(';', $_GET['lf']);
+            $filters = split(';', $_GET['lf']);
             $curr_filters = array();
             foreach( $filters as $filter )
             {
-                list( $lfield, $value ) = cc_split( ':', $filter, 2);
+                list( $lfield, $value ) = split( ':', $filter, 2);
                 $field = $F[$lfield][5];
                 $svalue = addslashes($value);
                 $where .= "AND ($field LIKE '%$svalue%')";
@@ -634,7 +630,7 @@ END;
 
         $html .= "<table><tr><td>$prevlink</td><td>&nbsp;</td><td>$nextlink</td></tr></table";
 
-        $page->AddPrompt('body_html',$html);
+        CCPage::AddPrompt('body_html',$html);
     }
 
     /**

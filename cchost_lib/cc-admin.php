@@ -67,9 +67,9 @@ require_once('cchost_lib/cc-form.php');
  * // Then later in the code when it's time to call it up, simply do:
  *function ShowMyAdminForm()
  *{
- *  $page->SetTitle('My Admin Form');
+ *  CCPage::SetTitle('My Admin Form');
  *  $form = new CCMyAdminForm();
- *  $page->AddForm( $form->GenerateForm() );
+ *  CCPage::AddForm( $form->GenerateForm() );
  *}
  *
  * // Still later you can retreive the user's setting:
@@ -339,7 +339,7 @@ class CCAdminMakeCfgRootForm extends CCForm
 class CCAdmin
 {
 
-    public static function BreadCrumbs($global)
+    function BreadCrumbs($global)
     {
         global $CC_CFG_ROOT;
 
@@ -374,21 +374,20 @@ class CCAdmin
 
     function _setup_global(&$args)
     {
-        $page =& CCPage::GetPage();
         $global_items = array();
         CCEvents::Invoke(CC_EVENT_ADMIN_MENU, array( &$global_items, CC_GLOBAL_SCOPE ) );
         uasort($global_items,'cc_weight_sorter');
+        //CCDebug::PrintVar($global_items,false);
         $args['global_title'] = ''; // _('Global Site Settings');
         $args['global_help']  = null; // _('These settings affect the entire site');
         $args['global_items'] = $this->_check_access($global_items);
         $args['do_global'] = true;
-        $page->SetTitle(_('Global Settings'));
+        CCPage::SetTitle(_('Global Settings'));
     }
 
     function _setup_local(&$args)
     {
         global $CC_CFG_ROOT;
-        $page =& CCPage::GetPage();
 
         $local_items = array();
         CCEvents::Invoke(CC_EVENT_ADMIN_MENU, array( &$local_items, CC_LOCAL_SCOPE) );
@@ -427,7 +426,7 @@ class CCAdmin
         $args['local_items'] = $this->_check_access($local_items);
         $args['delete_url'] = $CC_CFG_ROOT == CC_GLOBAL_SCOPE ? '' : url_args( ccl( 'admin/cfgroot' ), 'vroot=del' );
         $args['do_local'] = true;
-        $page->SetTitle(_('Manage Site'));
+        CCPage::SetTitle(_('Manage Site'));
     }
 
     function _add_tabs($subtab)
@@ -461,13 +460,13 @@ class CCAdmin
                 'tabs' => $tabs,
                 );
 
-        $page =& CCPage::GetPage();
-        $page->PageArg('sub_nav_tabs',$tabinfo);
+        //$page =& CCPage::GetPage();
+        CCPage::PageArg('sub_nav_tabs',$tabinfo);
     }
 
     function Site($subtab='')
     {
-        // $page->SetTitle(_('Administer ccHost Site'));
+        // CCPage::SetTitle(_('Administer ccHost Site'));
 
         if( empty($subtab) )
             $subtab = 'local';
@@ -486,8 +485,7 @@ class CCAdmin
         if( $subtab )
             $this->_add_tabs($subtab);
 
-        $page =& CCPage::GetPage();
-        $page->PageArg('admin_menu', $args, 'admin_menu_page' );
+        CCPage::PageArg('admin_menu', $args, 'admin_menu_page' );
     }
 
     /**
@@ -508,14 +506,13 @@ class CCAdmin
     {
         if( !CCUser::IsAdmin() )
             return;
-        $page =& CCPage::GetPage();
 
         $is_del = !empty($_GET['vroot']) && ($_GET['vroot'] == 'del');
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
         $title = $is_del ? _('Delete a Virtual Root') : _('Create New Virtual Root');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
 
 
         if( !$is_del )
@@ -531,7 +528,7 @@ class CCAdmin
                 CCUtil::SendBrowserTo( ccc( '/' . $new_cfg_root, 'admin', 'settings' ) );
             }
 
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -544,7 +541,7 @@ class CCAdmin
             {
                 require_once('cchost_lib/cc-upload-forms.php');
                 $form = new CCConfirmDeleteForm($CC_CFG_ROOT);
-                $page->AddForm( $form->GenerateForm() );
+                CCPage::AddForm( $form->GenerateForm() );
             }
             else
             {
@@ -764,12 +761,11 @@ END;
     function Setup()
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         $title = _('Global Site Setup');
         $this->BreadCrumbs(true,array('url'=>'','text'=>$title));
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
         $form = new CCAdminConfigForm();
-        $page->AddForm( $form->GenerateForm() );
+        CCPage::AddForm( $form->GenerateForm() );
     }
 
     /**
@@ -782,13 +778,12 @@ END;
         global $CC_CFG_ROOT;
 
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         $title = _("Edit Settings:") . " '$CC_CFG_ROOT'";
         $this->BreadCrumbs(false,array('url'=>'','text'=>$title));
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
 
         $form = new CCAdminSettingsForm();
-        $page->AddForm( $form->GenerateForm() );
+        CCPage::AddForm( $form->GenerateForm() );
     }
 
     /**

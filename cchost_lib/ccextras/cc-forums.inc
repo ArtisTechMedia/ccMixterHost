@@ -29,7 +29,7 @@ if( !defined('IN_CC_HOST') )
 /**
 */
 require_once('cchost_lib/ccextras/cc-topics.inc');
-require_once('cchost_lib/cc-page.php');
+
 
 /**
 * Wrapper for cc_tbl_forums table
@@ -43,7 +43,7 @@ class CCForum extends CCTable
         $this->SetSort( 'forum_group_weight,forum_weight', 'ASC' );
     }
 
-    public static function & GetTable()
+    function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -65,7 +65,7 @@ class CCForumGroups extends CCTable
         $this->SetSort('forum_group_weight','ASC');
     }
 
-    public static function & GetTable()
+    function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -90,7 +90,7 @@ class CCForumThreads extends CCTable
         $this->SetSort('forum_thread_sticky DESC, forum_thread_date', 'DESC');
     }
 
-    public static function & GetTable()
+    function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -157,6 +157,7 @@ class CCForumAPI
         $threads->SetOffsetAndLimit(0,1);
         $threads->SetSort('forum_thread_date', 'DESC');
 
+
         //
         // and finally Topics
         //
@@ -207,9 +208,8 @@ class CCForumAPI
         }
 
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        $page->SetTitle('str_forums');
-        $page->PageArg('forums',$visible_groups,'forum_index');
+        CCPage::SetTitle('str_forums');
+        CCPage::PageArg('forums',$visible_groups,'forum_index');
     }
 
     function _add_last_topic_join(&$threads)
@@ -222,7 +222,6 @@ class CCForumAPI
     function _show_forum($forum_id)
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
 
         //
         // Get the forums row and check this
@@ -267,7 +266,7 @@ class CCForumAPI
 EOF;
 
         $wf['forum_thread_forum'] = $forum_id;
-        $page->AddPagingLinks($threads,$wf,30);
+        CCPage::AddPagingLinks($threads,$wf,30);
         $forum_threads =& $threads->QueryRows($wf,$columns);
 
         $topic_counter = new CCTable('cc_tbl_topics','topic_id');
@@ -292,9 +291,9 @@ EOF;
         //
         // Build the page
         //
-        $page->SetTitle($forum_row['forum_name']);
-        $page->PageArg( 'forum_cmds', $commands );
-        $page->PageArg( 'threads', $forum_threads , 'forum_listing' );
+        CCPage::SetTitle($forum_row['forum_name']);
+        CCPage::PageArg( 'forum_cmds', $commands );
+        CCPage::PageArg( 'threads', $forum_threads , 'forum_listing' );
     }
 
     function _add_feed_links( $thread = '', $user = '', $user_real_name='', $thread_name ='')
@@ -341,8 +340,7 @@ EOF;
             }
         }
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        $page->AddBreadCrumbs($trail);
+        CCPage::AddBreadCrumbs($trail);
     }
 
     function _build_bread_crumb_trail2($topic_id, $text)
@@ -360,14 +358,9 @@ EOF;
         $trail[] = array( 'url' => ccl('thread',$thread_id), 'text' => $thread_name );
         $trail[] = array( 'url' => '', 'text' => $text );
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        $page->AddBreadCrumbs($trail);
+        CCPage::AddBreadCrumbs($trail);
     }
 
-    // The topic database record is actually gone at this point
-    // the $topic argument is a shadow of that record
-    // Here we update the 'newest' topic in the thread. If there
-    // are no more topics in the thread, the thread is destroyed.
     function OnPostTopicDelete($deltype,$topic)
     {
         if( empty($topic['topic_thread']) )
@@ -383,8 +376,7 @@ EOF;
             ORDER BY topic_date DESC 
             LIMIT 1
 EOF;
-        $row = CCDatabase::QueryRow($sql,false);
-        list( $newest, $topic_date ) = $row;
+        list( $newest, $topic_date ) = CCDatabase::QueryRow($sql,false);
         if( empty($newest) )
         {
             $topic_threads->DeleteKey( $thread_id );
@@ -398,9 +390,6 @@ EOF;
         }
     }
 
-    // This topic_id is about to be deleted from the database
-    // all we are doing here is updating the users' forum
-    // post count
     function OnTopicDelete($deltype,$topic_id)
     {
         $deep = $deltype == CCTDF_DEEP;
@@ -408,14 +397,7 @@ EOF;
         if( $deep )
         {
             list( $left, $right ) = CCDatabase::QueryRow('SELECT topic_left, topic_right FROM cc_tbl_topics WHERE topic_id='.$topic_id,false);
-            if( empty($left) || empty($right) ) // orphaned
-            {
-                $where = "topic_id = $topic_id";
-            }
-            else
-            {            
-                $where = "topic_left >= $left AND topic_right <= $right";
-            }
+            $where = "topic_left >= $left AND topic_right <= $right";
         }
         else
         {
@@ -424,27 +406,19 @@ EOF;
 
         $sql = "SELECT topic_user FROM cc_tbl_topics WHERE {$where}";
         $user_ids = CCDatabase::QueryItems($sql);
-        $this->UpdateUserPostCounts($user_ids);
+        $user_ids = join( ', ', $user_ids );
+        $sql =<<<EOF
+            SELECT COUNT(*)-1 as user_num_posts, topic_user as user_id 
+            FROM cc_tbl_topics 
+            WHERE topic_user IN ({$user_ids}) AND topic_thread > 0 
+            GROUP BY topic_user
+EOF;
+        $rows = CCDatabase::QueryRows($sql);
+        $users =& CCUsers::GetTable();
+        foreach( $rows as $row )
+            $users->Update($row);
     }
 
-    function UpdateUserPostCounts($user_ids)
-    {
-        if( !empty($user_ids) ) // topics were orphaned if null
-        {
-            $user_ids = join( ', ', $user_ids );
-            $sql =<<<EOF
-                SELECT COUNT(*)-1 as user_num_posts, topic_user as user_id 
-                FROM cc_tbl_topics 
-                WHERE topic_user IN ({$user_ids}) AND topic_thread > 0 
-                GROUP BY topic_user
-EOF;
-            $rows = CCDatabase::QueryRows($sql);
-            $users =& CCUsers::GetTable();
-            foreach( $rows as $row )
-                $users->Update($row);
-        }
-    }
-    
     function OnTopicReply(&$reply, &$original)
     {
         $this->_on_new_topic($reply);
@@ -476,7 +450,7 @@ EOF;
         $api->Reply($topic_id,true);
     }
     
-   function PostNew($forum_id)
+    function PostNew($forum_id)
     {
         $api = new CCForums();
         $forums =& CCForum::GetTable();
@@ -489,97 +463,75 @@ EOF;
         }
 
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        $page->SetTitle( 'str_forum_post_new_topic' );
+        CCPage::SetTitle( 'str_forum_post_new_topic' );
         $this->_build_bread_crumb_trail($forum_id,'str_forum_post_new_topic' );
 
         require_once('cchost_lib/ccextras/cc-topics-forms.inc');
         $form = new CCTopicForm( 'str_forum_new_topic_text', 'str_forum_submit_topic', CC_TTF_EDIT );
         if( empty($_POST['topic']) || !$form->ValidateFields() )
         {
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
         }
         else
         {
             $form->GetFormValues($values);
-            if( CCTopic::OKForUserToPost($values) )
-            {
-                list( $thread_id, $topic_id ) = $this->_post_new_topic($values,$forum_id);
-                $url = ccl('thread',$thread_id);
-                CCUtil::SendBrowserTo($url);
-            }
-            else
-            {
-                $page->AddMacro('topic_throttled.tpl');
-            }
+            $topics =& CCTopics::GetTable();
+            $topic_id = $topics->NextID();
+            $threads =& CCForumThreads::GetTable();
+            $thread_id = $threads->NextID();
+
+            $values['topic_forum'] = $forum_id;
+            $values['topic_date'] = date('Y-m-d H:i:s',time());
+            $values['topic_user'] = CCUser::CurrentUser();
+            $values['topic_id'] = $topic_id;
+            $values['topic_thread'] = $thread_id;
+            $topics->Insert($values,0);
+
+            $ftvalues = array();
+            $ftvalues['forum_thread_id'] = $thread_id;
+            $ftvalues['forum_thread_forum'] = $forum_id;
+            $ftvalues['forum_thread_user'] = CCUser::CurrentUser();
+            $ftvalues['forum_thread_oldest'] = 
+            $ftvalues['forum_thread_newest'] = $topic_id;
+            $ftvalues['forum_thread_date'] = $values['topic_date'];
+            $ftvalues['forum_thread_name'] = $values['topic_name'];
+            $threads->Insert($ftvalues);
+
+            $this->_on_new_topic($values);
+
+            CCEvents::Invoke( CC_EVENT_FORUM_POST, array( &$values ) );
+
+            $url = ccl('thread',$thread_id);
+            CCUtil::SendBrowserTo($url);
         }
     }
 
-    function _post_new_topic($values,$forum_id)
-    {
-        $topics =& CCTopics::GetTable();
-        $topic_id = $topics->NextID();
-        $threads =& CCForumThreads::GetTable();
-        $thread_id = $threads->NextID();
-
-        $values['topic_forum'] = $forum_id;
-        $values['topic_date'] = date('Y-m-d H:i:s',time());
-        $values['topic_user'] = CCUser::CurrentUser();
-        $values['topic_id'] = $topic_id;
-        $values['topic_thread'] = $thread_id;
-        $values['topic_tags'] = '';
-        $topics->InsertNewTopic($values,0);
-
-        $ftvalues = array();
-        $ftvalues['forum_thread_id'] = $thread_id;
-        $ftvalues['forum_thread_forum'] = $forum_id;
-        $ftvalues['forum_thread_user'] = CCUser::CurrentUser();
-        $ftvalues['forum_thread_oldest'] = 
-        $ftvalues['forum_thread_newest'] = $topic_id;
-        $ftvalues['forum_thread_date'] = $values['topic_date'];
-        $ftvalues['forum_thread_name'] = $values['topic_name'];
-        if( empty($ftvalues['forum_thread_extra']) )
-            $ftvalues['forum_thread_extra'] = '';
-        $threads->Insert($ftvalues);
-
-        $this->_on_new_topic($values);
-
-        CCEvents::Invoke( CC_EVENT_FORUM_POST, array( &$values ) );
-        
-        return array( $thread_id, $topic_id );
-
-    }
-    
     function ViewThread($thread_id='')
     {
         global $CC_GLOBALS;
-        
-        $page =& CCPage::GetPage();
 
         $api = new CCForums();
 
         $threads =& CCForumThreads::GetTable();
-        $thread_id = CCUtil::CleanNumber($thread_id);
         if( empty($thread_id) || !$threads->KeyExists($thread_id) )
         {
             $this->_build_bread_crumb_trail(1);
-            $page->SetTitle( 'str_forum_thread_missing' );
-            $page->Prompt('str_forum_thread_not_there');
+            CCPage::SetTitle( 'str_forum_thread_missing' );
+            CCPage::Prompt('str_forum_thread_not_there');
             return;
         }
 
         $sql = <<<EOF
-        SELECT topic_name, topic_id, topic_locked, topic_user,
-                forum_thread_forum, forum_read_access,                 
-                forum_post_access, forum_thread_closed, forum_thread_sticky, forum_id, forum_name
+        SELECT topic_name, forum_thread_forum, forum_read_access, topic_id, topic_locked,
+               forum_post_access, forum_thread_closed, forum_thread_sticky, forum_id, forum_name
             FROM cc_tbl_topics 
             JOIN cc_tbl_forum_threads ON forum_thread_oldest = topic_id 
             JOIN cc_tbl_forums        ON forum_thread_forum = forum_id
             WHERE forum_thread_id = $thread_id
 EOF;
-        
+
         $row = CCDatabase::QueryRow($sql);
-        
+
         $mask = CCMenu::GetAccessMask();
         if( ($mask & $row['forum_read_access']) == 0 )
         {
@@ -590,8 +542,8 @@ EOF;
             else
                 $msg = 'str_forum_perm_denied';
             require_once('cchost_lib/cc-page.php');
-            $page->SetTitle('str_forum_restricted_access');
-            $page->Prompt($msg);
+            CCPage::SetTitle('str_forum_restricted_access');
+            CCPage::Prompt($msg);
             return;
         }
 
@@ -600,15 +552,13 @@ EOF;
         if( ($mask & $row['forum_post_access']) != 0 )
             $this->_thread_commands($row,$thread_id);
 
-        $page->PageArg('topic_thread_id',$thread_id);
+        CCPage::PageArg('topic_thread_id',$thread_id);
         
         require_once('cchost_lib/cc-query.php');
         $query = new CCQuery();
         $args = $query->ProcessAdminArgs('limit=0&sort=left&paging=off&f=page&t=topic_thread&&title=' . 
             urlencode($row['topic_name']) . '&match='. $thread_id );
-
-        $query->Query($args);                        
-        
+        $query->Query($args);
         $name = $row['forum_name'] . '::' . $row['topic_name'];
         $this->_add_feed_links( $thread_id, '', '', $name );
         $this->_build_bread_crumb_trail($row['forum_id'],$row['topic_name']);
@@ -641,8 +591,7 @@ EOF;
                                  'text' => $ctext, 'msg' => 0  );
         }
 
-        $page =& CCPage::GetPage();
-        $page->PageArg('thread_commands',$commands);
+        CCPage::PageArg('thread_commands',$commands);
     }
 
     function User($user_name='')

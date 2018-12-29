@@ -45,8 +45,6 @@ class CCMediaHost
     */
     function Media($username ='', $upload_id = '', $title='')
     {
-        require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         $upload_id = sprintf("%0d",$upload_id);
         $this->_build_bread_crumb_trail($username,$upload_id);
 
@@ -55,7 +53,8 @@ class CCMediaHost
 
         if( empty($username) )
         {
-            $page->SetTitle('str_file_browse_uploads');
+            require_once('cchost_lib/cc-page.php');
+            CCPage::SetTitle('str_file_browse_uploads');
             $args = $query->ProcessAdminArgs(array('title' => _('Latest Files')));
             $query->Query($args); 
         }
@@ -71,9 +70,9 @@ class CCMediaHost
             require_once('cchost_lib/cc-page.php');
             if( empty($name) )
             {
-                $page->SetTitle('str_file_unknown');
-                $page->Prompt('str_file_cannot_be_found');
-                $page->Prompt('str_file_it_may_have');
+                CCPage::SetTitle('str_file_unknown');
+                CCPage::Prompt('str_file_cannot_be_found');
+                CCPage::Prompt('str_file_it_may_have');
                 CCUtil::Send404(false);
                 return;
             }
@@ -85,8 +84,8 @@ class CCMediaHost
                     CCUtil::SendBrowserTo( ccl('people',$username,'hidden') );
                     return;
                 }
-                $page->SetTitle($name);
-                $page->Prompt('str_file_this_upload_is');
+                CCPage::SetTitle($name);
+                CCPage::Prompt('str_file_this_upload_is');
                 return;
             }
 
@@ -119,8 +118,7 @@ class CCMediaHost
             $avail_lics = 'attribution_3';
             
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        $page->SetTitle($page_title);
+        CCPage::SetTitle($page_title);
         if( empty($username) )
         {
             $uid = CCUser::CurrentUser();
@@ -162,7 +160,7 @@ class CCMediaHost
         if( !empty($form_help) )
             $form->SetFormHelp($form_help);
 
-        $page->AddForm( $form->GenerateForm() );
+        CCPage::AddForm( $form->GenerateForm() );
     }
 
     /**
@@ -179,8 +177,6 @@ class CCMediaHost
     function SubmitRemix($submit_meta)
     {
         global $CC_GLOBALS;
-
-        $page =& CCPage::GetPage();
 
         $title = $submit_meta['text'];
         $tags  = $submit_meta['tags'];
@@ -200,7 +196,7 @@ class CCMediaHost
         if( !empty($suggested_tags) )
             $form->AddSuggestedTags($suggested_tags);
 
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
 
         if(!empty($form_help) )
             $form->SetFormHelp($form_help);
@@ -225,7 +221,7 @@ class CCMediaHost
             }
             $form->SetFormFieldItem('sources','remix_id',$url_extra);
 
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -642,8 +638,7 @@ class CCMediaHost
         }
 
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        $page->AddBreadCrumbs($trail);
+        CCPage::AddBreadCrumbs($trail);
     }
 
 }

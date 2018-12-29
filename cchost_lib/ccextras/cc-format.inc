@@ -30,7 +30,7 @@ if( !defined('IN_CC_HOST') )
 */
 require_once('cchost_lib/ccextras/cc-topics.php');
 
-function  _generator_cc_format($form, $fieldname, $value, $class )
+function _generator_cc_format($form, $fieldname, $value, $class )
 {
     $textarea = $form->generator_textarea($fieldname,$value,$class);
 
@@ -43,7 +43,7 @@ function  _generator_cc_format($form, $fieldname, $value, $class )
             </div>';
 
     require_once('cchost_lib/cc-page.php');
-    $page =& CCPage::GetPage();
+    $page = CCPage::GetPage();
     $thumbs_up_tiny = ccd( $page->Search( 'images/thumbs_up_tiny.gif' ) );
     
 
@@ -94,8 +94,7 @@ class CCFormat
         if( !_cc_is_formatting_on() || empty($_GET['ptext']) )
             exit;
 
-        $decoded = urldecode($_GET['ptext']);
-        $text = CCUtil::StripSlash($decoded);
+        $text = CCUtil::StripSlash(urldecode($_GET['ptext']));
         print _cc_format_format($text);
         exit;
     }

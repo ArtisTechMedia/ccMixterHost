@@ -31,8 +31,9 @@ if( !defined('IN_CC_HOST') )
 class CCRatingsHV
 {
     /**
+    * @access private
     */
-    public static function _fill_scores(&$record,$prefix)
+    function _fill_scores(&$record,$prefix)
     {
         $configs =& CCConfigs::GetTable();
         $ratings_config = $configs->GetConfig('chart');

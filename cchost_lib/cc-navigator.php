@@ -111,7 +111,7 @@ class CCNavigator
                               $tab_info );
 
         // Step 3. This displays the tab on the page
-        $page_out->AddTabNavigator( $tab_info, 'page_tabs' );
+        $page_out->AddTabNaviator( $tab_info, 'page_tabs' );
 
         if( empty($default_tab) )
             return;
@@ -167,7 +167,7 @@ class CCNavigator
                 $action = CCEvents::ResolveUrl( $pieces[0], true );
                 
                 if( empty($action) )
-                    $page_out->Prompt("The naviation tab could not resolve the url: $url");
+                    CCPage::Prompt("The naviation tab could not resolve the url: $url");
                 else
                    CCEvents::PerformAction($action);
                 
@@ -349,9 +349,8 @@ class CCNavigator
     */
     function _signal_error($lineno)
     {
-        $page =& CCPage::GetPage();
-        $page->SetTitle(_("System Error") . " (" . CC_HOST_VERSION . ':' . $lineno . ')' );
-        $page->SystemError(_('Invalid Path'));
+        CCPage::SetTitle(_("System Error") . " (" . CC_HOST_VERSION . ':' . $lineno . ')' );
+        CCPage::SystemError(_('Invalid Path'));
         CCUtil::Send404();
     }
 

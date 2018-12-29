@@ -62,14 +62,14 @@ class CCFileProps
         $text = file_get_contents($filename);
         if( !preg_match('#.*\[meta\](.*)\[/meta\].*#Ums',$text,$m) )
             return null;
-        $lines = cc_split("\n",$m[1]);
+        $lines = split("\n",$m[1]);
         $props = array();
         foreach( $lines as $line )
         {
             $line = trim($line);
             if( empty($line) )
                 continue;
-            $parts = cc_split('=',$line);
+            $parts = split('=',$line);
             $prop_name = array_shift($parts);
             $props[ trim($prop_name) ] = trim( join( '=', $parts) );
         }

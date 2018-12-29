@@ -184,8 +184,7 @@ class CCSkinSettingsForm extends CCEditConfigForm
         $this->AddFormFields($fields);
         $this->SetSubmitText(_('Submit Basic Skin Settings'));
         $this->SetModule(ccs(__FILE__));
-        $page =& CCPage::GetPage();
-        $page->AddScriptLink('js/skin_editor.js');
+        CCPage::AddScriptLink('js/skin_editor.js');
     }
 }
 
@@ -265,8 +264,7 @@ class CCSkinLayoutForm extends CCEditConfigForm
         $this->SetSubmitText(_('Submit Skin Layout Changes'));
         $this->SetModule(ccs(__FILE__));
 
-        $page =& CCPage::GetPage();
-        $page->AddScriptLink('js/skin_editor.js',true);
+        CCPage::AddScriptLink('js/skin_editor.js',true);
     }
 }
 
@@ -317,8 +315,7 @@ class CCAdminColorSchemesForm extends CCEditConfigForm
         $this->SetSubmitText(_('Submit Skin Appearance Changes'));
         $this->SetModule(ccs(__FILE__));
 
-        $page =& CCPage::GetPage();
-        $page->AddScriptLink('js/skin_editor.js',true);
+        CCPage::AddScriptLink('js/skin_editor.js',true);
     }
 
 }
@@ -367,11 +364,10 @@ class CCSkinAdmin
         }
 
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        
+
         $this->_build_bread_crumb_trail(_('Configure Skins'));
 
-        $page->SetTitle(_('Configure Skins'));
+        CCPage::SetTitle(_('Configure Skins'));
 
         $args[] = array( 'action'    => ccl('admin','skins','profiles'),
                          'menu_text' => _('Load a Profile'),
@@ -398,14 +394,13 @@ class CCSkinAdmin
                          'help'      => _('For web developers: Sets up a new skin template') );
 
         require_once('cchost_lib/cc-page.php');
-        $page->PageArg('client_menu_help', $msg );
-        $page->PageArg('client_menu',$args,'print_client_menu');
+        CCPage::PageArg('client_menu_help', $msg );
+        CCPage::PageArg('client_menu',$args,'print_client_menu');
     }
 
     function Profiles()
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         $title = _('Select a New Skin Profile');
         $this->_build_bread_crumb_trail($title,true);
 
@@ -413,8 +408,8 @@ class CCSkinAdmin
         if( empty($_POST['skinprofiles']) || !$form->ValidateFields() )
         {
             require_once('cchost_lib/cc-page.php');
-            $page->SetTitle($title);
-            $page->AddForm($form->GenerateForm());
+            CCPage::SetTitle($title);
+            CCPage::AddForm($form->GenerateForm());
         }
         else
         {
@@ -465,14 +460,13 @@ class CCSkinAdmin
     function ProfileSave()
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         $title = _('Save Skin Profile');
         $this->_build_bread_crumb_trail($title,true);
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
         $form = new CCSkinProfileSaveForm();
         if( empty($_POST['skinprofilesave']) || !$form->ValidateFields() )
         {
-            $page->AddForm($form->GenerateForm());
+            CCPage::AddForm($form->GenerateForm());
         }
         else
         {
@@ -512,10 +506,9 @@ class CCSkinAdmin
     function Layout()
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         $title = _('Configure Skins Layouts');
         $this->_build_bread_crumb_trail($title,true);
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
         $form = new CCSkinLayoutForm();
         $help =<<<EOF
     Note that many combinations of layouts will not work together because
@@ -524,31 +517,29 @@ class CCSkinAdmin
     skin templates. Experimentaion is encouraged...    
 EOF;
         $form->SetFormHelp($help);
-        $page->AddForm($form->GenerateForm());
+        CCPage::AddForm($form->GenerateForm());
     }
 
     function Settings()
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         $title = _('Configure Skins Settings');
         $this->_build_bread_crumb_trail($title,true);
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
         $form = new CCSkinSettingsForm();
-        $page->AddForm($form->GenerateForm());
+        CCPage::AddForm($form->GenerateForm());
     }
 
     function Create()
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         $title = _('Create a Skin Template');
         $this->_build_bread_crumb_trail($title,true);
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
         $form = new CCSkinCreateForm();
         if( empty($_POST['skincreate']) || !$form->ValidateFields() )
         {
-            $page->AddForm($form->GenerateForm());
+            CCPage::AddForm($form->GenerateForm());
         }
         else
         {
@@ -559,7 +550,7 @@ EOF;
             if( file_exists($target) )
             {
                 $form->SetFieldError('skin-name',_('A directory with that name already exists'));
-                $page->AddForm($form->GenerateForm());
+                CCPage::AddForm($form->GenerateForm());
             }
             else
             {
@@ -600,7 +591,7 @@ EOF;
                 $f = fopen($tpl_file,'w');
                 fwrite($f,$text);
                 fclose($f);
-                $page->Prompt($msg);
+                CCPage::Prompt($msg);
             }
         }
     }
@@ -639,12 +630,11 @@ EOF;
     function ColorSchemes()
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         $title = _('Manage Color Schemes');
         $this->_build_bread_crumb_trail($title,true);
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
         $form = new CCAdminColorSchemesForm();
-        $page->AddForm($form->GenerateForm());
+        CCPage::AddForm($form->GenerateForm());
     }
 
     function OnAdminMenu( &$items, $scope )

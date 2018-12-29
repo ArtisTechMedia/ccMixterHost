@@ -28,40 +28,60 @@ if( !defined('IN_CC_HOST') )
 
 class CCUser
 {
-    public static function IsLoggedIn()
+    function IsLoggedIn()
     {
         global $CC_GLOBALS;
 
         return( !empty($CC_GLOBALS['user_name']) );
     }
 
-    static function _isSomething($name,$key) {
+    function IsSuper($name='')
+    {
         if( !CCUtil::IsHTTP() )
             return true;
 
         global $CC_GLOBALS;
 
-        if( empty($CC_GLOBALS[$key]) )
+        if( empty($CC_GLOBALS['supers']) )
             return false; // err...
 
         if( empty($name) )
             $name = CCUser::CurrentUserName();
-        $ok = !empty($name) && (preg_match( "/(^|\W|,)$name(\W|,|$)/i",$CC_GLOBALS[$key]) > 0);
+        $ok = !empty($name) && (preg_match( "/(^|\W|,)$name(\W|,|$)/i",$CC_GLOBALS['supers']) > 0);
 
         return $ok;
-
     }
-    public static function IsSuper($name='')
+
+    function IsAdmin($name='')
     {
-        return CCUser::_isSomething($name,'supers');
+        static $checked;
+
+        if( empty($name) && isset($checked) )
+        {
+            return $checked;
+        }
+        else
+        {
+            if( empty($name) && (!CCUtil::IsHTTP() || CCUser::IsSuper($name)) )
+            {
+                $checked = true;
+                return true;
+            }
+
+            $configs =& CCConfigs::GetTable();
+            $settings = $configs->GetConfig('settings');
+            $_admins = $settings['admins'];
+
+            if( empty($name) )
+                $name = CCUser::CurrentUserName();
+
+            $checked = !empty($name) && (preg_match( "/(^|\W|,)$name(\W|,|$)/i",$_admins) > 0);
+
+            return $checked;
+        }
     }
 
-    public static function IsAdmin($name='')
-    {
-        return CCUser::_isSomething($name,'admins');
-    }
-
-    public static function CurrentUser()
+    function CurrentUser()
     {
         global $CC_GLOBALS;
 
@@ -69,21 +89,21 @@ class CCUser
     }
 
 
-    public static function CurrentUserName()
+    function CurrentUserName()
     {
         global $CC_GLOBALS;
 
         return( CCUser::IsLoggedIn() ? $CC_GLOBALS['user_name'] : '' );
     }
 
-    public static function CurrentUserField($field)
+    function CurrentUserField($field)
     {
         global $CC_GLOBALS;
 
         return( CCUser::IsLoggedIn() ? $CC_GLOBALS[$field] : '' );
     }
 
-    public static function GetUserName($userid)
+    function GetUserName($userid)
     {
         if( $userid == CCUser::CurrentUser() )
             return( CCUser::CurrentUserName() );
@@ -92,7 +112,8 @@ class CCUser
         return( $users->QueryItemFromKey('user_name',$userid) );
     }
 
-    public static function CheckCredentials($usernameorid)
+
+    function CheckCredentials($usernameorid)
     {
         $id     = CCUser::CurrentUser();
         $argid  = intval($usernameorid);
@@ -104,45 +125,17 @@ class CCUser
         }
     }
 
-    // N.B. we don't validate if the argument is valid if it's already
-    // numeric (and I'm too afraid to change this behavoir at this point)
-    public static function IDForName($username_or_id)
-    {        
-        if( is_numeric($username_or_id) > 0 ) {
-            return $username_or_id;
-        }
+    function IDFromName($username)
+    {
         return CCDatabase::QueryItem(
                   'SELECT user_id FROM cc_tbl_user WHERE user_name = \'' .
-                  strtolower($username_or_id) . '\'' );
+                  strtolower($username) . '\'' );
     }
 
-    public static function NameForID($username_or_id)
-    {
-        if( empty($username_or_id) ) {
-            return null;
-        }
-        if( is_numeric($username_or_id) ) {
-            $sql = 'SELECT user_name FROM cc_tbl_user WHERE user_id = ' . $username_or_id;
-        } else {
-            $sql = 'SELECT user_name FROM cc_tbl_user WHERE LOWER(user_name) = \'' .
-                 strtolower($username_or_id) . '\'';
-        }
-
-        return CCDatabase::QueryItem($sql);
-    }
-
-    public static function IDFromName($username_or_id) {
-        return CCUser::IDForName($username_or_id);
-    }
-    public static function NameFromID($username_or_id) {
-        return CCUser::NameForID($username_or_id);
-    }
-
-    
     /**
     * Digs around the cookies looking for an auto-login. If succeeds, populate CC_GLOBALS with user data
     */
-    public static function InitCurrentUser()
+    function InitCurrentUser()
     {
         global $CC_GLOBALS;
 
@@ -167,14 +160,14 @@ class CCUser
         }
     }
 
-    public static function GetPeopleDir()
+    function GetPeopleDir()
     {
         global $CC_GLOBALS;
         return( empty($CC_GLOBALS['user-upload-root']) ? 'content' : 
                             $CC_GLOBALS['user-upload-root'] );
     }
 
-    public static function GetUploadDir($name_or_row)
+    function GetUploadDir($name_or_row)
     {
         if( is_array($name_or_row) )
             $name_or_row = $name_or_row['user_name'];
@@ -188,15 +181,13 @@ class CCUser
     */
     function OnPatchMenu(&$menu)
     {
-        $page =& CCPage::GetPage();
-        
         $current_user_name = $this->CurrentUserName();
 
         // technically this isn't supposed to happen
 
         if( empty($menu['artist']['action']) )
         {
-            $page->Prompt(_('Attention: Menus have been corrupted'));
+            CCPage::Prompt(_('Attention: Menus have been corrupted'));
             return;  
         }
 
@@ -214,7 +205,7 @@ class CCUser
         }
     }
 
-    public static function AddUserBreadCrumbs($text,$more=array(),$userrec=array())
+    function AddUserBreadCrumbs($text,$more=array(),$userrec=array())
     {
         require_once('cchost_lib/cc-page.php');
         $page =& CCPage::GetPage();
@@ -263,7 +254,7 @@ class CCUsers extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    public static function & GetTable()
+    function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -274,9 +265,9 @@ class CCUsers extends CCTable
     function SetExtraField($user_id,$name,$data)
     {
         $extra = $this->QueryItemFromKey('user_extra',$user_id);
-        $args['user_extra'] = unserialize($extra);
-        $args['user_extra'][$name] = $data;
-        $args['user_extra'] = serialize($args['user_extra']);
+        $args['extra'] = unserialize($extra);
+        $args['extra'][$name] = $data;
+        $args['extra'] = serialize($args['extra']);
         $args['user_id'] = $user_id;
         $this->Update($args);
     }
@@ -290,12 +281,12 @@ class CCUsers extends CCTable
 
     function UnsetExtraField($user_id,$name)
     {
-        $extra = $this->QueryItemFromKey('user_extra',$user_id);
+        $extra = $this->QueryItemFromKey($user_id);
         $extra = unserialize($extra);
         if( !isset($extra[$name]) )
             return;
         unset($extra[$name]);
-        $args['user_extra'] = serialize($extra);
+        $args['extra'] = serialize($extra);
         $args['user_id'] = $user_id;
         $this->Update($args);
     }

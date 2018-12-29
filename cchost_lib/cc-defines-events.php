@@ -180,7 +180,7 @@ define('CC_EVENT_UPLOAD_DONE',         'uploaddone' );
 *
 * Call back (handler) prototype:
 *<code>
-*function OnSourcesChanged($upload_id, &$sources)
+*function OnFileDone($upload_id, &$sources)
 *</code>
 * @see CCEvents::AddHandler()
 * @see CC_EVENT_UPLOAD_DONE
@@ -200,20 +200,6 @@ define('CC_EVENT_SOURCES_CHANGED',      'srcchange' );
 * @see CC_EVENT_UPLOAD_DONE
 */
 define('CC_EVENT_FILE_DONE',           'filedone' );
-
-/**
-* Notification Event: A new physical file has been uploaded or changed.
-*
-* Triggered when a physical file has been added, replaced or edited. 
-*
-* Call back (handler) prototype:
-*<code>
-*function OnFileChangedType(&$file,$newtype)
-*</code>
-* @see CCEvents::AddHandler()
-* @see CC_EVENT_UPLOAD_DONE
-*/
-define('CC_EVENT_FILE_CHANGED_TYPE', 'filechangedtype');
 
 /**
 * @access private
@@ -433,44 +419,16 @@ define('CC_EVENT_CONFIG_CHAGNED', 'cfgchanged');
 */
 define('CC_EVENT_DELETE_UPLOAD',       'delete' );
 
-
-/**
-* Notification Event: Pre-Deletion notification
-*
-* This is sent before CC_EVENT_DELETE_UPLOAD to
-* allow modules that rely on ancillary upload
-* records (like review, recommendations) being
-* present before the deletion actually happens
-*
-* Event call back (handler) prototype:
-*<code>
-* function OnUploadDelete( &$record );
-*</code>
-* @see CCEvents::AddHandler()
-*/
-define('CC_EVENT_DELETING_UPLOAD',     'deleting' );
-
 /**
 * Notification Event: Physical file is about to be deleted
 *
 * Event call back (handler) prototype:
 *<code>
-* function OnDeleteFile( $file_id, $path );
+* function OnUploadFile( &$file_id );
 *</code>
 * @see CCEvents::AddHandler()
 */
 define('CC_EVENT_DELETE_FILE',         'deletefile' );
-
-/**
-* Notification Event: Physical file has been deleted 
-*
-* Event call back (handler) prototype:
-*<code>
-* function OnDeletedFile( $upload_id, $path);
-*</code>
-* @see CCEvents::AddHandler()
-*/
-define('CC_EVENT_DELETED_FILE',        'deletedfile' );
 
 /**
 * Notification Event: User record is about to be deleted
@@ -623,16 +581,6 @@ define('CC_EVENT_USER_REGISTERED',      'userreg' );
 */
 define('CC_EVENT_USER_PROFILE_CHANGED', 'userprof' );
 
-/**
-* Request for Data Event: Data request for user admin menu
-*
-* Event handler prototype:
-*<code>
-*function OnUserUserAdminMenu($user_id,&$menuarray)
-*</code>
-* @see CCEvents::AddHandler()
-*/
-define('CC_EVENT_USER_ADMIN_MENU', 'useradminmenu' );
 
 /**
 * Notification Event: User logged in

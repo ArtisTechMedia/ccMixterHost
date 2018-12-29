@@ -217,8 +217,7 @@ EOF;
         global $CC_GLOBALS;
 
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        
+
         $args = array(); // $CC_GLOBALS;
         list( $tags, $bpms ) = $this->_get_tags();
 
@@ -239,9 +238,9 @@ EOF;
         //$args['browser_macro']  = 'sample_browser.xml/browser_page';
 
         foreach( $args as $K => $V )
-            $page->PageArg( $K, $V );
+            CCPage::PageArg( $K, $V );
 
-        $page->AddMacro( 'sample_browser' );
+        CCPage::AddMacro( 'sample_browser' );
 
     }
 

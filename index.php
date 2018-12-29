@@ -17,9 +17,7 @@
 * $Id: index.php 13849 2009-12-27 22:47:13Z fourstones $
 *
 */
-
 libxml_disable_entity_loader(true);
-
 if( !empty($_GET['ccm']) && preg_match('/\.(gif|png|ico|jpg|mp3|jpeg|___)$/i',$_GET['ccm']) )
 {
     header("HTTP/1.0 404 Not Found");
@@ -28,7 +26,7 @@ if( !empty($_GET['ccm']) && preg_match('/\.(gif|png|ico|jpg|mp3|jpeg|___)$/i',$_
 
 $CC_GLOBALS   = array();
 $CC_CFG_ROOT  = '';
-$cc_error_level = E_ALL | E_STRICT; //  & ~E_STRICT;
+$cc_error_level = E_ALL;
 $_sql_time = 0;
 
 error_reporting($cc_error_level); 
@@ -61,8 +59,7 @@ if( !file_exists('cc-host-db.php') )
 *  All ccHost includes require this define to prevent direct 
 *  web access to them.
 */
-if( !defined('IN_CC_HOST') )
-    define('IN_CC_HOST', true);
+define('IN_CC_HOST', true);
 
 /*
 *  The .cc-ban.txt file is written by doing 'Account Management' 
@@ -94,8 +91,6 @@ CCDebug::LogErrors( $cc_error_level );
 */
 CCDebug::InstallErrorHandler(true);     
 
-// require_once('mixter-lib/d.inc'); // turns on debugging and shuts off mail
-
 /*
 *  Internaitionalization requires (for now) that gettext be 
 *  compiled into PHP
@@ -125,7 +120,7 @@ CCConfigs::Init();
 *  disable the site while doing other work (like a SVN 
 *  update)
 */
-if( ($_SERVER['HTTP_HOST'] !== 'ccm') && file_exists('ccadmin') )
+if( file_exists('ccadmin') )
 {
     die('<html><body>' . _('ccHost installation is not complete.') . ' ' . 
         _('For security reasons, you should rename "ccadmin".') .  
@@ -168,8 +163,7 @@ CCEvents::PerformAction();
 *  Show the resulting page
 */
 require_once('cchost_lib/cc-page.php');
-$page =& CCPage::GetPage();
-$page->Show();           
+CCPage::Show();           
 
 /*
 *  Shut down the session
