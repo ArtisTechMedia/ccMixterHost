@@ -68,10 +68,9 @@ class CCBlogPing
 
     function Admin()
     {
-        $page =& CCPage::GetPage();
-        $page->SetTitle(_('Administer Blog Notification'));
+        CCPage::SetTitle(_('Administer Blog Notification'));
         $form = new CCAdminBlogPingForm();
-        $page->AddForm( $form->GenerateForm() );
+        CCPage::AddForm( $form->GenerateForm() );
     }
 
     /**
@@ -157,8 +156,7 @@ class CCBlogPing
         // $post_vars = array( 'data' => $xml );
         // $ok = $snoopy->Submit($URL_to_ping, $post_vars);
 
-        $page =& CCPage::GetPage();
-        $page->Prompt("Blog ($URL_to_ping) pinged for {$record['upload_name']}");
+        CCPage::Prompt("Blog ($URL_to_ping) pinged for {$record['upload_name']}");
     }
 
     /**

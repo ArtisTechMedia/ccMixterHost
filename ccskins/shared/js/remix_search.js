@@ -75,7 +75,6 @@ ccRemixSearch.prototype = {
 
             if( numChecked )
             {
-                
                 var url = home_url + '/remixlicenses' + q + 'remix_sources=' + remix_sources + '&pool_sources=' + pool_sources;
                 new Ajax.Request(url, { method: 'get', onComplete: this.onLicenseResults.bind(this) } );
             }
@@ -84,7 +83,6 @@ ccRemixSearch.prototype = {
 
             if( $('form_submit') )
                 $('form_submit').disabled = numChecked ? false : true;
-                
         }
         catch (e)
         {

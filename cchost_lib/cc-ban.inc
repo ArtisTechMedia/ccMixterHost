@@ -74,7 +74,7 @@ class CCBanForm extends CCForm
 
         global $CC_GLOBALS;
 
-        $ban_reasons = empty($CC_GLOBALS['ban-reasons']) ? array() : cc_split(';',$CC_GLOBALS['ban-reasons']);
+        $ban_reasons = empty($CC_GLOBALS['ban-reasons']) ? array() : split(';',$CC_GLOBALS['ban-reasons']);
         $reasons = array( '0' => _('(Skip the reason)') );
         foreach($ban_reasons as $BR)
         {
@@ -144,13 +144,12 @@ class CCBan
         }
 
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        $page->SetTitle(_('Moderate Upload'));
+        CCPage::SetTitle(_('Moderate Upload'));
         $form = new CCBanForm($upload_id);
         if( empty($_POST['ban']) || !$form->ValidateFields() )
         {
             $form->PopulateValues($CC_GLOBALS);
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -169,18 +168,17 @@ class CCBan
         // of language, not the users
 
         $row = CCDatabase::QueryRow(
-            'SELECT upload_banned, upload_name, user_name, upload_id, user_email FROM cc_tbl_uploads JOIN cc_tbl_user ON upload_user=user_id WHERE upload_id='.$upload_id);
+            'SELECT upload_banned, upload_name, user_name, user_email FROM cc_tbl_uploads JOIN cc_tbl_user ON upload_user=user_id WHERE upload_id='.$upload_id);
         $uploads =& CCUploads::GetTable();
         $new_ban_flag = $row['upload_banned'] ^= 1;
         $args['upload_id'] = $upload_id;
         $args['upload_banned'] = $new_ban_flag;
         $uploads->Update($args);
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        $page->SetTitle(sprintf(_("Banning upload: '%s'"),$row['upload_name']));
+        CCPage::SetTitle(sprintf(_("Banning upload: '%s'"),$row['upload_name']));
         $yn = array( _("no longer banned"), _("banned") );
         CCEvents::Invoke( CC_EVENT_UPLOAD_MODERATED, array( &$row, $yn[ $new_ban_flag ]  ) );
-        $page->Prompt("The upload has been marked as " . $yn[ $new_ban_flag ] );
+        CCPage::Prompt("The upload has been marked as " . $yn[ $new_ban_flag ] );
 
         if( $new_ban_flag && !empty($CC_GLOBALS['ban-email-enable']) )
         {
@@ -188,7 +186,7 @@ class CCBan
 
             if( !empty($CC_GLOBALS['ban-reason']) )
             {
-                $reasons = cc_split(';',$CC_GLOBALS['ban-reasons']);
+                $reasons = split(';',$CC_GLOBALS['ban-reasons']);
                 foreach( $reasons as $BR )
                 {
                     if( $CC_GLOBALS['ban-reason'] == sprintf('%08X',crc32($BR)) )
@@ -205,7 +203,7 @@ class CCBan
                 $mailer->Subject( _('Your upload has been moderated') ); 
                 $mailer->Body($text);
                 $ok = $mailer->Send();
-                $page->Prompt(_('Moderation email notificaiton sent'));
+                CCPage::Prompt(_('Moderation email notificaiton sent'));
             }
         }
     }
@@ -213,13 +211,12 @@ class CCBan
     function Admin()
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         require_once('cchost_lib/cc-admin.php');
         $title = _('Configure Moderation');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
         $form = new CCBanAdminForm();
-        $page->AddForm( $form->GenerateForm() );
+        CCPage::AddForm( $form->GenerateForm() );
     }
 
     /**

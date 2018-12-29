@@ -104,15 +104,14 @@ class CCDatabaseAdmin
     */
     function Admin()
     {
-        $page =& CCPage::GetPage();
-        $page->SetTitle(_('Database Configuration'));
+        CCPage::SetTitle(_('Database Configuration'));
         $form = new CCAdminDatabaseForm();
         $config_db = CCDatabase::_config_db();
         if( empty($_POST['admindatabase']) || !$form->ValidateFields() )
         {   
             include($config_db);
             $form->PopulateValues($CC_DB_CONFIG);
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -146,7 +145,7 @@ END;
             //CCDebug::PrintVar($perms);
             chmod($config_db, $perms);
 
-            $page->Prompt(sprintf(_("Database configuration saved to %s (%04o)"), $config_db, $perms));
+            CCPage::Prompt(sprintf(_("Database configuration saved to %s (%04o)"), $config_db, $perms));
         }
 
     }

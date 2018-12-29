@@ -52,11 +52,10 @@ class CCGetID3
     * Called internally when we cant find the installation of GetID3
     *
     */
-    public static function BadPath()
+    function BadPath()
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        
+
         global $CC_GLOBALS;
         $getid3path = $CC_GLOBALS[CCGETID3_PATH_KEY] . '/getid3.php';
         $msg = _('GetID3 library integration is not properly installed:') . '<br />' . _("The path does not exist") . '<br />';
@@ -66,17 +65,16 @@ class CCGetID3
         else
             $msg .= _('Please ask the site administrator to correct this.');
 
-        $page->SystemError($msg);
+        CCPage::SystemError($msg);
     }
 
     /**
     * Called internally when GetID3 is not properly installed 
     *
     */
-    public static function NotConfigured()
+    function NotConfigured()
     {
-        $page =& CCPage::GetPage();
-        $page->SystemError(_("GetID3 library integration is not properly installed:") . 
+        CCPage::SystemError(_("GetID3 library integration is not properly installed:") . 
             "<br />". _("Please ask the site administrator to configure properly."));
     }
 
@@ -96,7 +94,7 @@ class CCGetID3
     * 
     * @returns object $id3obj Initialized GetID3 library object
     */
-    public static function & InitID3Obj()
+    function & InitID3Obj()
     {
         static $ID3Obj;
 
@@ -128,7 +126,7 @@ class CCGetID3
     * 
     * @returns array $formats Array of format info structures
     */
-    public static function & GetFormats()
+    function & GetFormats()
     {
         static $file_formats;
 

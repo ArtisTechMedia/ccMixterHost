@@ -113,7 +113,7 @@ class CCSkinExport
     function _out_html_and_exit($html)
     {
         $html = addslashes($html);
-        $lines = cc_split("\n",$html);
+        $lines = split("\n",$html);
 
         header("Content-type: text/plain");
         foreach($lines as $line)

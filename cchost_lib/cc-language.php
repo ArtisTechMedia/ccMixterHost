@@ -84,13 +84,6 @@ class CCLanguage
      */
     var $_browser_default_language;
 
-    /**
-     * @access private
-     * @var integer
-     * Error state of this object === 0 ok, otherwise bail
-     */
-     var $_error_state;
-
     
     /**
      * Constructor
@@ -178,7 +171,7 @@ class CCLanguage
      *
      * @return bool true if installation is get_text enabled
      */
-    public static function IsEnabled()
+    function IsEnabled()
     {
         static $_enabled;
         if( !isset($_enabled) )
@@ -436,12 +429,10 @@ class CCLanguage
     {
         if( !CCLanguage::IsEnabled() )
         {
-            //language_log('Language is disabled, no init');
+            //CCDebug::Log('Language is disabled, no init');
             return;
         }
 
-        $err = 0;
-        
         // set the LANGUAGE environmental variable
         // This one for some reason makes a difference FU@#$%^&*!CK
         // and when combined with bind_textdomain_codeset allows one
@@ -451,19 +442,13 @@ class CCLanguage
         // hence the '@' prefix (which allows it it work)
 
         if ( false == @putenv("LANGUAGE=" . $this->_language ) )
-        {
-            language_log(sprintf("Could not set the ENV variable LANGUAGE = %s",
+            CCDebug::Log(sprintf("Could not set the ENV variable LANGUAGE = %s",
                              $this->_language));
-            $err = 1;
-        }                             
 
         // set the LANG environmental variable
-        if ( ($err === 0) && false == @putenv("LANG=" . $this->_language ) )
-        {
-            language_log(sprintf("Could not set the ENV variable LANG = %s", 
+        if ( false == @putenv("LANG=" . $this->_language ) )
+            CCDebug::Log(sprintf("Could not set the ENV variable LANG = %s", 
                              $this->_language));
-            $err = 2;
-        }                             
 
         // if locales are not installed in locale folder, they will not
         // get set! This is usually in /usr/lib/locale
@@ -482,65 +467,47 @@ class CCLanguage
         //
         // if (!defined('LC_MESSAGES')) define('LC_MESSAGES', 6);
         // yes, setlocale is case-sensitive...arg
-        if ($err === 0) 
+        $locale_set = setlocale(LC_ALL, $this->_language . ".utf8", 
+                        $this->_language . ".UTF8",
+                        $this->_language . ".utf-8",
+                        $this->_language . ".UTF-8",
+                        $this->_language, 
+                        CC_LANG);
+        // if we don't get the setting we want, make sure to complain!
+        if ( ( $locale_set != $this->_language && CC_LANG == $locale_set) || 
+             empty($locale_set) )
         {
-            $locale_set = setlocale(LC_ALL, $this->_language . ".utf8", 
-                            $this->_language . ".UTF8",
-                            $this->_language . ".utf-8",
-                            $this->_language . ".UTF-8",
-                            $this->_language, 
-                            CC_LANG);
-            // if we don't get the setting we want, make sure to complain!
-            if ( ( $locale_set != $this->_language && CC_LANG == $locale_set) || 
-                 empty($locale_set) )
-            {
-                language_log(
-                    sprintf("Tried: setlocale to '%s', but could only set to '%s'.",                        
-                            $this->_language, $locale_set) );
-                $err = 3;                                                
-            }
+            CCDebug::Log(
+                sprintf("Tried: setlocale to '%s', but could only set to '%s'.",                        $this->_language, $locale_set) );
         }
         
-        if( $err === 0 )
-        {
-            $bindtextdomain_set = bindtextdomain($this->_domain, 
-                                      CC_LANG_LOCALE . "/" . $this->_locale_pref );
-            if ( empty($bindtextdomain_set) )
-            {
-                language_log(
-                    sprintf("Tried: bindtextdomain, '%s', to directory, '%s', " . 
-                            "but received '%s'",
-                            $this->_domain, CC_LANG_LOCALE . "/" . $this->_locale_pref,
-                            $bindtextdomain_set) );
-                $err = 4;                            
-            }
-        }
-        
+        $bindtextdomain_set = bindtextdomain($this->_domain, 
+                                  CC_LANG_LOCALE . "/" . $this->_locale_pref );
+        if ( empty($bindtextdomain_set) )
+            CCDebug::Log(
+                sprintf("Tried: bindtextdomain, '%s', to directory, '%s', " . 
+                        "but received '%s'",
+                        $this->_domain, CC_LANG_LOCALE . "/" . $this->_locale_pref,
+                        $bindtextdomain_set) );
+
         // This is the magic key to not being bound by a system locale
-        if ( ($err === 0) && "UTF-8" != bind_textdomain_codeset($this->_domain, "UTF-8") )
+        if ( "UTF-8" != bind_textdomain_codeset($this->_domain, "UTF-8") )
         {
-            language_log(
+            CCDebug::Log(
                 sprintf("Tried: bind_textdomain_codeset '%s' to 'UTF-8'",
                         $this->_domain));
-            $err = 5;                        
         }
 
-        if( $err === 0 )
+        $textdomain_set = textdomain($this->_domain);
+        if ( empty($textdomain_set) )
         {
-            $textdomain_set = textdomain($this->_domain);
-            if ( empty($textdomain_set) )
-            {
-                language_log(sprintf("Tried: set textdomain to '%s', but got '%s'",
-                                     $this->_domain, $textdomain_set));
-                $err = 6;                                     
-            }
-            else
-            {
-                // language_logVar( 'lang', $this->_language );
-            }
+            CCDebug::Log(sprintf("Tried: set textdomain to '%s', but got '%s'",
+                                 $this->_domain, $textdomain_set));
         }
-        
-        $this->_error_state = $err;
+        else
+        {
+            // CCDebug::LogVar( 'lang', $this->_language );
+        }
     
     } // end of method Init ()
 
@@ -591,8 +558,4 @@ class CCLanguage
     }
 } // end of CCLanguage class
 
-function language_log($s)
-{
-//    CCDebug::Log($s);
-}
 ?>

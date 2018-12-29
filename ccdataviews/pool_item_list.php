@@ -1,4 +1,5 @@
 <?/*
+<?/*%%
 [meta]
     type     = dataview
     desc     = _('Pool Item Listing')

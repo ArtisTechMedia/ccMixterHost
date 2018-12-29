@@ -103,9 +103,10 @@ EOF;
 
         if( !empty($CC_GLOBALS['reviews_enabled']) )
         {
+            $revapi = new CCReviewsHV();
             $reviewable_ids = array();
             foreach( $recs as $R )
-                if( CCReviewsHV::_can_review($R) )
+                if( $revapi->_can_review($R) )
                     $reviewable_ids[] = $R['upload_id'];
             if( !empty($reviewable_ids) )
             {

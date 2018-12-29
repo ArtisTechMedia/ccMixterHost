@@ -40,20 +40,16 @@ class CCPlaylistBrowse
     */
     function User($user)
     {
-        CCUtil::SendBrowserTo('http://beta.ccmixter.org/people/' . $user . '/playlists');
-        /*
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         $fancy_name = cc_fancy_user_sql();
         $user_name = CCDatabase::QueryItem('SELECT ' . $fancy_name . ' FROM cc_tbl_user WHERE user_name ="' . $user . '"');
         $title = array('str_pl_browse_user_s',$user_name);
         $q = 't=playlist_2_browse&u='.$user;
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
         require_once('cchost_lib/cc-query.php');
         $query = new CCQuery();
         $args = $query->ProcessAdminArgs($q);
         $query->Query($args);
-        */
     }
 
 
@@ -66,8 +62,7 @@ class CCPlaylistBrowse
         $trail[] = array( 'url' => ccl('people',$user,'playlists'),  'text' => 'str_playlists' );
         $trail[] = array( 'url' => '',  'text' => $title);
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        $page->AddBreadCrumbs($trail);
+        CCPage::AddBreadCrumbs($trail);
     }
 
     function _bbt_user_upload($upload_id, $upload_name, $user, $user_real_name, $title)
@@ -79,8 +74,7 @@ class CCPlaylistBrowse
         $trail[] = array( 'url' => ccl('files',$user,$upload_id),  'text' => $upload_name );
         $trail[] = array( 'url' => '',  'text' => $title);
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        $page->AddBreadCrumbs($trail);
+        CCPage::AddBreadCrumbs($trail);
     }
 
     function _bbt_tags($title)
@@ -91,8 +85,7 @@ class CCPlaylistBrowse
         $trail[] = array( 'url' => ccl('view/media/playlists/browse'),  'text' => 'str_pl_browse_playlists' );
         $trail[] = array( 'url' => '',  'text' => $title);
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        $page->AddBreadCrumbs($trail);
+        CCPage::AddBreadCrumbs($trail);
     }
 
     function _build_bread_crumb_trail($playlist_id,$cmd='',$cmd2='')
@@ -126,8 +119,7 @@ class CCPlaylistBrowse
         }
 
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        $page->AddBreadCrumbs($trail);
+        CCPage::AddBreadCrumbs($trail);
     }
 
     function OnFilterCartMenu(&$records)
@@ -137,6 +129,36 @@ class CCPlaylistBrowse
         $this->_add_menu($records[0],$records[0]['cart_id']);
     }
     
+    function OnFilterCartNSFW(&$records)
+    {
+        if( empty($records[0]['cart_id']) )
+            return;
+        $val = $this->_calc_is_nsfw($records[0]['cart_id']);
+        $records[0]['cart_nsfw'] = $val;
+    }
+
+    function _calc_is_nsfw($playlist_id)
+    {
+        $sql =<<<EOF
+            SELECT upload_extra
+            FROM cc_tbl_uploads
+            JOIN cc_tbl_cart_items ON upload_id=cart_item_upload
+            JOIN cc_tbl_cart ON cart_item_cart=cart_id
+            WHERE cart_id = $playlist_id
+EOF;
+
+        $extas = CCDatabase::QueryItems($sql);
+        foreach( $extas as $ex ) {
+            $ex = unserialize($ex);
+            if( !empty($ex['nsfw'])) {
+                return '1';
+            }
+        }
+        
+        return '0';
+
+    }
+
     function _add_menu(&$row,$playlist_id,$is_popup=false)
     {
         $is_dynamic = !empty($row['cart_dynamic']);
@@ -215,10 +237,6 @@ class CCPlaylistBrowse
         $args = $_GET;
         $query->_arg_alias_ref($args);
 
-        if( !empty($args['user']) ) {
-            CCUtil::SendBrowserTo('http://beta.ccmixter.org/people/' . $args['user']);
-        }
-
         if( !empty($playlist_id) )
             $playlist_id = sprintf("%0d",CCUtil::Strip($playlist_id));
         elseif( !empty($args['ids']) )
@@ -244,7 +262,6 @@ class CCPlaylistBrowse
                 // upload 
                 //
                 $upload_id = sprintf('%0d',CCUtil::Strip($args['upload']));
-
                 if( empty($upload_id) || ($upload_id < 1) )
                     CCUtil::Send404();
                 $sql =<<<EOF
@@ -290,10 +307,6 @@ EOF;
         }
         else
         {
-            $url = 'http://beta.ccmixter.org/playlist/browse/' . $playlist_id;
-            CCUtil::SendBrowserTo($url);
-
-            /*
             // displaying a specific playlist
             //
             $this->_build_bread_crumb_trail($playlist_id);
@@ -305,7 +318,6 @@ EOF;
             if( isset($_GET['ids']) )
                 unset($_GET['ids']);
             $template = 'playlist_2_show_one';
-            */
         }
 
         $ex['template'] = $template;

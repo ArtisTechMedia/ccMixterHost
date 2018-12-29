@@ -58,8 +58,8 @@ class CCAdminTaggerForm  extends CCEditConfigForm
         $patterns['%title%'] = _("Title");
         $patterns['%site%']  = _("Site name");
         $dummy = array();
-        CCEvents::Invoke( CC_EVENT_GET_MACROS, array( &$dummy, &$dummy, 
-                                                      &$patterns, &$dummy ) );
+        CCEvents::Invoke( CC_EVENT_GET_MACROS, array( $dummy, $dummy, 
+                                                      &$patterns, $dummy ) );
         ksort($patterns);
         $this->CallFormMacro('macro_patterns','show_macro_patterns',$patterns);
         $this->SetModule( ccs(__FILE__) );

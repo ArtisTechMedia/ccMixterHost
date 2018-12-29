@@ -159,15 +159,3 @@ a.topic_permalink {
 .topic_reply_text {
 	padding: 1em;
 }
-
-.topic_throttled_msg {
-    margin: 10px;
-    padding: 10px;
-    font-weight: bold;
-    border: 1px solid black;
-	font-size: 1.2em;
-}
-
-.topic_throttle_msg a {
-    color: blue;
-}

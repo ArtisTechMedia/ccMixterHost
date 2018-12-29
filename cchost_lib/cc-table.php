@@ -271,7 +271,7 @@ class CCTable
     * Where CCUploads is a derivation of CCTable.
     * @return object $table Returns a singleton instance of this object.
     */
-    static function & GetTable()
+    function GetTable()
     {
     }
 
@@ -600,7 +600,11 @@ class CCTable
     function QueryKeys($where='')
     {
         $sql = $this->_get_select($where,$this->_key_field);
-        return CCDatabase::QueryItems($sql);
+        $qr = CCDatabase::Query($sql);
+        $keys = array();
+        while( $r = mysql_fetch_row($qr) )
+            $keys[] = $r[0];
+        return($keys);
     }
 
     /**
@@ -662,19 +666,6 @@ class CCTable
     {
         $key = addslashes($key);
         return( $this->QueryItem( $column_name, $this->_key_field . " = '$key'" ) );
-    }
-
-    /**
-    * Return several items from the record where key is $key
-    * 
-    * @param mixed $column_name Name of table's columns
-    * @param string $key Key value
-    * @return mixed $item Items from database 
-    */
-    function QueryItemsFromKey($column_names,$key)
-    {
-        $key = addslashes($key);
-        return( $this->QueryRow( $this->_key_field . " = '$key'", $column_names ) );
     }
 
     /**
@@ -916,12 +907,6 @@ class CCTable
     {
         $key = addslashes($key);
         $this->DeleteWhere($this->_key_field . "= '$key'");
-    }
-
-    function DeleteKeys($keys)
-    {
-        $keys = implode(',', $keys);
-        $this->DeleteWhere($this->_key_field . " IN ({$keys})");
     }
 
     /**

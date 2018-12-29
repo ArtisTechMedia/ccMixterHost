@@ -71,7 +71,7 @@ class CCAdminLicWaiverForm extends CCEditConfigForm
         $this->SetFormHelp( _('For example, if a remix would result in a ShareAlike license and the user is offered to license the remix as Attribution, that would be a violation of the source\'s ShareAlike license.'));
     }
 
-    function PopulateValues($vals)
+    function PopulateValues(&$vals)
     {
         $vals['licenses'] = empty($vals['licenses']) ? '' : join(',',array_keys( $vals['licenses']));
         $vals['waivers'] = empty($vals['waivers']) ? '' : join(',',array_keys( $vals['waivers']));
@@ -85,14 +85,13 @@ class CCLicWaiver
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
-        $page =& CCPage::GetPage();
         $title = _('Configure Upgrade Alternatives');
         $trail1 = array( 'url' => '/license_menu', 'text' => 'Edit System Licenses' );
         $trail2 = array('url'=>'','text'=>$title);
         CCAdmin::BreadCrumbs(true,$trail1,$trail2);
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
         $form = new CCAdminLicWaiverForm();
-        $page->AddForm( $form->GenerateForm() );
+        CCPage::AddForm( $form->GenerateForm() );
     }
     
     function OnMapUrls()

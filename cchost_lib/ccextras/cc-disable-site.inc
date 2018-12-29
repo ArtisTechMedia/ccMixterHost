@@ -93,12 +93,11 @@ class CCDisableSite
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
-        $page =& CCPage::GetPage();
         $title = _('Disable Site');
         CCAdmin::BreadCrumbs(true,array('url'=>'','text'=>$title));
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
         $form = new CCDisableSiteForm();
-        $page->AddForm($form->GenerateForm());
+        CCPage::AddForm($form->GenerateForm());
     }
 
     /**

@@ -1,3 +1,0 @@
-#!/bin/bash
-php -f cc-mixter-unbatch.php $1
-

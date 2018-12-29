@@ -33,7 +33,6 @@ class v_5_1_paging extends CCUpdate
     function Update()
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         global $CC_GLOBALS;
         $cfg =& CCConfigs::GetTable();
         $skin_settings = $cfg->GetConfig('skin-settings');
@@ -42,7 +41,7 @@ class v_5_1_paging extends CCUpdate
         $CC_GLOBALS['paging_style'] =    /* just to be safe, put it in the globals */
         $skin_settings['paging_style'] = 'ccskins/shared/layouts/paging_basic.php'; /* this we'll write to disk */
         $cfg->SaveConfig( 'skin-settings', $skin_settings,'',false );
-        $page->Prompt( sprintf(_('Installed new paging styles') ) );
+        CCPage::Prompt( sprintf(_('Installed new paging styles') ) );
     }
 }
 

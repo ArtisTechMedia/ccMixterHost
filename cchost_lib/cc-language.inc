@@ -104,15 +104,14 @@ class CCLanguageAdmin
     function Admin()
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         global $CC_GLOBALS;
 
         $form = new CCLanguageAdminForm();
-        $page->SetTitle(_("Language Support"));
+        CCPage::SetTitle(_("Language Support"));
 
         if( empty($_POST['languageadmin']) || !$form->ValidateFields() )
         {
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -136,10 +135,9 @@ class CCLanguageAdmin
      */
     function SavePage ()
     {
-        $page =& CCPage::GetPage();
 
-        $page->SetTitle(_("Language Support"));
-        $page->Prompt(_("Language support options saved."));
+        CCPage::SetTitle(_("Language Support"));
+        CCPage::Prompt(_("Language support options saved."));
     }
 
     /**
@@ -150,9 +148,8 @@ class CCLanguageAdmin
     function DiagnosticPage ()
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         global $CC_GLOBALS;
-        $page->SetTitle(_("Diagnostic") . " : " . _("Language") );
+        CCPage::SetTitle(_("Diagnostic") . " : " . _("Language") );
         $var_mixed = array("CC_GLOBALS"        => &$CC_GLOBALS, 
                            "_SERVER VARIABLES" => &$_SERVER,
                            "_ENV VARIABLES"    => &$_ENV,

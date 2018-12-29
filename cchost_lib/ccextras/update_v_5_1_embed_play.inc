@@ -41,8 +41,7 @@ class v_5_1_embed_play extends CCUpdate
             $config['embedded_player'] = 'ccskins/shared/players/player_native.php';
             $configs->SaveConfig('config',$config,'',true);
         }
-        $page =& CCPage::GetPage();
-        $page->Prompt( _('Multiple embedded player installed') );
+        CCPage::Prompt( _('Multiple embedded player installed') );
 
     }
 }

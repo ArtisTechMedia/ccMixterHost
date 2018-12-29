@@ -16,8 +16,6 @@ function default_dataview()
 SELECT 
     upload_id, upload_name, upload_extra, upload_contest, user_name, upload_tags,
     upload_description as format_text_upload_description,
-    upload_description as format_html_upload_description,
-    upload_num_scores,
     CONCAT( '$urlf', user_name, '/', upload_id ) as file_page_url,
     user_real_name,
     CONCAT( '$urlp', user_name ) as artist_page_url,

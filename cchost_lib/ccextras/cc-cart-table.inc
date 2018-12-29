@@ -51,7 +51,7 @@ class CCCart extends CCTable
         }
     }
 
-    public static function & GetTable()
+    function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -114,7 +114,7 @@ class CCCartItems extends CCTable
         $this->CCTable( 'cc_tbl_cart_items', 'cart_item_id');
     }
 
-    public static function & GetTable()
+    function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -135,7 +135,7 @@ class CCPlaylist extends CCCart
         $this->LimitType('playlist');
     }
 
-    public static function & GetTable()
+    function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -157,7 +157,7 @@ class CCPlaylistItems extends CCCartItems
         $this->_has_cart_join = false;
     }
 
-    public static function & GetTable()
+    function & GetTable()
     {
         static $_table;
         if( !isset($_table) )
@@ -165,9 +165,9 @@ class CCPlaylistItems extends CCCartItems
         return $_table;
     }
 
-    function AddJoin($other_cctable, $joinfield, $jointype = 'LEFT OUTER', $other_key='' )
+    function AddJoin($other_cctable, $joinfield, $jointype = 'LEFT OUTER' )
     {
-        $join = parent::AddJoin( $other_cctable, $joinfield, $jointype, $other_key  );
+        $join = parent::AddJoin( $other_cctable, $joinfield, $jointype  );
         $other_class = strtolower(get_class($other_cctable));
         if(  $other_class == 'cccart' || is_subclass_of($other_cctable, 'CCCart') )
             $this->_cart_join = $join;

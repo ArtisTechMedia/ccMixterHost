@@ -117,17 +117,6 @@ div.addtype {
             type = '-';
         var url  = '%(field/urls/file_change_type_url)%' + '/' + id + '/' + type;
         new Ajax.Request( url, { method: 'get' } );
-
-        var disp = 'none';
-        $$('.type_picker').each( function(e) {
-            var t = e.options[ sel.selectedIndex ].value;
-            if( t == 'samples' || t == 'pella') {
-                disp = 'block';
-            }
-        });
-        $$('.cc_system_prompt').each( function(e) {
-            e.style.display = disp;
-        });
     }
 
     $$('.type_picker').each( function(e) {

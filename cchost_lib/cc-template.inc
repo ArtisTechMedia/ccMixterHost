@@ -71,17 +71,13 @@ class CCExtrasForm extends CCEditConfigForm
             // the drop target area
             for( $i = 0; $i < count($mac_keys); $i++ )
             {
-                    $macro = $macros[$mac_keys[$i]];
-                if( array_key_exists($macro, $extras) ) 
-                {
-                    $target['targetmacros_'.($i+1)] = $extras[$macro];
+                $macro = $macros[$mac_keys[$i]];
+                $target['targetmacros_'.($i+1)] = $extras[$macro];
 
-                    $map[$i+1] = $macro;
-                    
-                    // remove it from what will be the sources
-                    unset($extras[$macro]);
-                }
+                $map[$i+1] = $macro;
 
+                // remove it from what will be the sources
+                unset($extras[$macro]);
             }
 
             // put what's left into the sources area
@@ -96,8 +92,7 @@ class CCExtrasForm extends CCEditConfigForm
             $fields['macros']['mac_target'] = $target;
             $fields['macros']['mac_map']    = $map;
             $msg = '<b><i>%(edit_extra)%</i> is no longer valid. Change it to %call(\'extras_drop\')%</b>';
-            $page =& CCPage::GetPage();
-            $page->PageArg('edit_extra',$msg);
+            CCPage::PageArg('edit_extra',$msg);
 
             $help = _('Drag items from here to sidebar (and back) to add (and remove) items. '.
                       'Drag items within sidebar to reorder.');
@@ -193,32 +188,32 @@ class CCNewTemplateTagForm extends CCForm
 */
 class CCTemplateAdmin
 {
-    public static function GetPropType($dir,$type,$ret_files=true)
+    function GetPropType($dir,$type,$ret_files=true)
     {
         $fp = new CCFileProps(); return $fp->GetProps($dir,$type,$ret_files);
     }
     
-    public static function GetFormats($type)
+    function GetFormats($type)
     {
         $fp = new CCFileProps(); return $fp->GetProps('formats',$type);
     }
 
-    public static function GetProfiles()
+    function GetProfiles()
     {
         $fp = new CCFileProps(); return $fp->GetProps('profiles','profile',true);
     }
 
-    public static function GetStringProfiles()
+    function GetStringProfiles()
     {
         $fp = new CCFileProps(); return $fp->GetProps('strings','string_profile');
     }
 
-    public static function GetLayouts($type)
+    function GetLayouts($type)
     {
         $fp = new CCFileProps(); return $fp->GetProps('layouts',$type,false);
     }
 
-    public static function GetMultipleLayouts( $types )
+    function GetMultipleLayouts( $types )
     {
         $fp = new CCFileProps();
         // sigh, this should optimized
@@ -230,53 +225,53 @@ class CCTemplateAdmin
         return $ret;
     }
 
-    public static function GetFonts()
+    function GetFonts()
     {
         $fp = new CCFileProps(); return $fp->GetProps('colors','font',false);
     }
 
-    public static function GetFontSizes()
+    function GetFontSizes()
     {
         $fp = new CCFileProps(); return $fp->GetProps('colors','fontsize',false);
     }
 
-    public static function GetColors()
+    function GetColors()
     {
         $fp = new CCFileProps(); return $fp->GetProps('colors','color',false);
     }
 
-    public static function GetStyles($type)
+    function GetStyles($type)
     {
         $fp = new CCFileProps(); return $fp->GetProps('css',$type);
     }
 
-    public static function GetExtras($user_only=false)
+    function GetExtras($user_only=false)
     {
         $fp = new CCFileProps(); return $fp->GetProps('extras','extras',true,'',$user_only?'allow_user':'');
     }
 
-    public static function GetSkins($skip_shared=false)
+    function GetSkins($skip_shared=false)
     {
         $fp = new CCFileProps(); return $fp->GetProps('','skin');
     }
 
-    public static function GetHeads()
+    function GetHeads()
     {
         $fp = new CCFileProps(); return $fp->GetProps('','head');
     }
 
-    public static function GetContentTemplates()
+    function GetContentTemplates()
     {
         $fp = new CCFileProps(); return $fp->GetProps('pages','content_page');
     }
 
-    public static function GetContentPages()
+    function GetContentPages()
     {
         global $CC_GLOBALS;
         $fp = new CCFileProps(); return $fp->GetProps('','dynamic_content_page',true,$CC_GLOBALS['files-root']);
     }
 
-    public static function GetMultipleTypes( $types )
+    function GetMultipleTypes( $types )
     {
         $fp = new CCFileProps(); return $fp->GetMultipleProps($types);
     }
@@ -285,24 +280,22 @@ class CCTemplateAdmin
     {
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
-        $page =& CCPage::GetPage();
         $title = _("Sidebar Extras Content");
         CCAdmin::BreadCrumbs(false,array('url'=>'','text'=>$title));
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
         $form = new CCExtrasForm(true);
-        $page->AddForm( $form->GenerateForm() );
+        CCPage::AddForm( $form->GenerateForm() );
     }
 
     function OnPeopleCustomize($username)
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         if( empty($_POST) )
         {
-            $page->SetTitle(_("Custom Skin"));
+            CCPage::SetTitle(_("Custom Skin"));
             $form = new CCPickStyleSheetForm();
             $form->SetHandler( ccl('people','customize',$username) ); // otherwise it's global
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
         }
         else
         {
@@ -311,7 +304,7 @@ class CCTemplateAdmin
             cc_setcookie('style-sheet-' . CCUser::CurrentUserName(),$css,time() + (60*60*24*30) );
 
             if( empty($_POST['http_referer']) )
-                $page->SetStyleSheet($css);
+                CCPage::SetStyleSheet($css);
             else
                 CCUtil::SendBrowserTo();
         }
@@ -330,14 +323,13 @@ class CCTemplateAdmin
 
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-admin.php');
-        $page =& CCPage::GetPage();
         $title = _("Edit Template Tags");
         CCAdmin::BreadCrumbs(false,array('url'=>ccl('admin','templatetags','menu'),'text'=>_('Edit Banners and Footers')),
                                    array('url'=>'','text'=>$title));
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
 
         $form = new CCAdminTemplateTagsForm();
-        $page->AddForm( $form->GenerateForm() );
+        CCPage::AddForm( $form->GenerateForm() );
     }
 
     function OnBannerLogo()
@@ -370,23 +362,21 @@ class CCTemplateAdmin
         {
             require_once('cchost_lib/cc-page.php');
             require_once('cchost_lib/cc-admin.php');
-            $page =& CCPage::GetPage();
             $title = _('Set Banner Image Logo');
             CCAdmin::BreadCrumbs(false,array('url'=>ccl('admin','templatetags','menu'),'text'=>_('Edit Banners and Footers')),
                                        array('url'=>'','text'=>$title));
-            $page->SetTitle($title);
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::SetTitle($title);
+            CCPage::AddForm( $form->GenerateForm() );
         }
     }
 
     function OnAdminTemplateMenu()
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         require_once('cchost_lib/cc-admin.php');
         $title = _('Edit Banners and Footers');
         CCAdmin::BreadCrumbs(false,array('url'=>'','text'=>$title));
-        $page->SetTitle($title);
+        CCPage::SetTitle($title);
 
         $args[] = array( 'action'    => ccl('admin','templatetags','profiles'),
                          'menu_text' => _('Banner Text, Footers, etc.'),
@@ -400,13 +390,12 @@ class CCTemplateAdmin
                          'menu_text' => _('New Page Element'),
                          'help'      => _('Web developers: Create a new element for page template skin') );
 
-        $page->PageArg('client_menu',$args,'print_client_menu');
+        CCPage::PageArg('client_menu',$args,'print_client_menu');
     }
 
     function OnNewTags()
     {
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         require_once('cchost_lib/cc-admin.php');
         $title = _("Add a New Template Tag");
         CCAdmin::BreadCrumbs(false,array('url'=>ccl('admin','templatetags','menu'),'text'=>_('Edit Banners and Footers')),
@@ -414,7 +403,7 @@ class CCTemplateAdmin
         $form = new CCNewTemplateTagForm();
         if( empty($_POST['newtemplatetag']) )
         {
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
         }
         else
         {

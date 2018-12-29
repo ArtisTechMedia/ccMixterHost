@@ -53,7 +53,7 @@ EOF;
 %end_if%
 %loop(records,R)%
 <div class="file_line" id="_file_line_%(#R/upload_id)%">
-   <div class="ccud light_border"><?=  join(', ',array_diff(cc_split(',',$R['upload_extra']['ccud']),array('media'))) ?></div>
+   <div class="ccud light_border"><?=  join(', ',array_diff(split(',',$R['upload_extra']['ccud']),array('media'))) ?></div>
    <div class="file_info"><a class="fname cc_file_link" href="%(#R/file_page_url)%">%(#R/upload_name)%</a> 
       %text(str_by)% <a class="cc_user_link" href="%(#R/artist_page_url)%">%(#R/user_real_name)%</a></div>
 

@@ -53,7 +53,7 @@ class CCConfigs extends CCTable
     * 
     * @returns object $table An instance of this table
     */
-    public static function & GetTable()
+    function & GetTable()
     {
         static $table;
         if( !isset($table) )
@@ -210,7 +210,7 @@ class CCConfigs extends CCTable
     * Internal helper for initializes globals
     *
     */
-    public static function Init()
+    function Init()
     {
         global $CC_GLOBALS, $CC_CFG_ROOT;
 
@@ -383,7 +383,7 @@ class CCConfigs extends CCTable
     * 
     * @param string $config_in_db Version string to check against code
     */
-    static function _check_version($config_in_db)
+    function _check_version($config_in_db)
     {
         global $CC_GLOBALS;
 
@@ -425,10 +425,6 @@ class CCConfigs extends CCTable
 */
 function cc_check_site_enabled()
 {
-    if( defined('CC_HOST_CMD_LINE') ) {
-        return;
-    }
-
     global $CC_GLOBALS;
 
     $enable_password = $CC_GLOBALS['enable-password'];

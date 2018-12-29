@@ -14,4 +14,3 @@
 %(records/0/topic_text_html)%
 </div>
 </div>
-%call('topic_throttled.tpl')%

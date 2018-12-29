@@ -50,7 +50,7 @@ class CCReviews extends CCTopics
     * 
     * @returns object $table An instance of this table
     */
-    public static function & GetTable()
+    function & GetTable()
     {
         static $table;
         if( !isset($table) )

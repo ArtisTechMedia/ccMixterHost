@@ -34,7 +34,6 @@ class CCUserSearch
             CCUtil::Send404();
             
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
 
         switch( $field )
         {
@@ -47,7 +46,7 @@ class CCUserSearch
             case 'whatilike':
             {
                 $field = 'user_' . $field;
-                $page->SetTitle('str_search_users_that', $tag);
+                CCPage::SetTitle('str_search_users_that', $tag);
                 require_once('cchost_lib/cc-query.php');
                 $query = new CCQuery();
                 $sqlargs['where'] = "CONCAT($field,',') LIKE '%$tag,%'";
@@ -59,8 +58,7 @@ class CCUserSearch
 
     function _lookin_for($tag)
     {
-        $page =& CCPage::GetPage();
-        $page->SetTitle('str_search_wipo');
+        CCPage::SetTitle('str_search_wipo');
 
         $org_tag = $tag;
         $tag = strtolower($tag);
@@ -76,7 +74,7 @@ class CCUserSearch
         $base = ccl('people') . '/';
         foreach( $rows as $row )
         {
-            $wids = cc_split(',',$row['wid']);
+            $wids = split(',',$row['wid']);
             unset($row['user_whatido']);
             foreach($wids as $wid)
                 $whatidos[strtolower($wid)][] = 
@@ -120,7 +118,7 @@ EOF;
 
         $html .= '</table>';
 
-        $page->AddContent($html);
+        CCPage::AddContent($html);
     }
     
     /**

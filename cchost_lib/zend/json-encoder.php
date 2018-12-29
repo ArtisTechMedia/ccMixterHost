@@ -52,7 +52,7 @@ class CCZend_Json_Encoder
      * @param mixed $value  value the object to be encoded
      * @return string  The encoded value
      */
-    public static function encode($value)
+    function encode($value)
     {
         $encoder = new CCZend_Json_Encoder();
 

@@ -283,7 +283,7 @@ class CCSubmit
                 $submit_types[$typekey] = $typeinfo['submit_type'];
             $lics[] = $typeinfo['licenses'];
         }
-        $lics = "'" . join("','",array_unique(cc_split(',',join(',',$lics)))) . "'";
+        $lics = "'" . join("','",array_unique(split(',',join(',',$lics)))) . "'";
         $lics = CCDatabase::QueryRows(
             "SELECT license_id,license_name FROM cc_tbl_licenses WHERE license_id IN ({$lics})");
 
@@ -386,9 +386,7 @@ class CCSubmit
         global $CC_GLOBALS;
 
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        
-        $page->SetTitle('str_pick_submission_type');
+        CCPage::SetTitle('str_pick_submission_type');
         $keys = array_keys($types);
         $sorted = array();
         foreach( $keys as $key )
@@ -408,13 +406,13 @@ class CCSubmit
                     unset($types[$key]['logo']);
                 }
             }
-            $weight = (integer)$types[$key]['weight'];
+            $weight = $types[$key]['weight'];
             while( array_key_exists( $weight, $sorted ) )
                $weight .= '1';
             $sorted[ $weight ] = $types[$key];
         }
         ksort($sorted);
-        $page->PageArg('submit_form_infos', $sorted, 'html_form.php/submit_forms');
+        CCPage::PageArg('submit_form_infos', $sorted, 'html_form.php/submit_forms');
     }
 
 
@@ -544,17 +542,15 @@ class CCSubmit
         global $CC_CFG_ROOT;
 
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        
         $this->_build_bread_crumb_trail('');
-        $page->SetTitle(_('Manage Submit Forms'));
+        CCPage::SetTitle(_('Manage Submit Forms'));
         if( $cmd == 'revert' )
         {
             $configs =& CCConfigs::GetTable();
             $where['config_scope'] = $CC_CFG_ROOT;
             $where['config_type'] = 'submit_forms';
             $configs->DeleteWhere($where);
-            $page->Prompt(_('Submit forms have been reverted to global settings'));
+            CCPage::Prompt(_('Submit forms have been reverted to global settings'));
         }
 
         $form_types = $this->_get_form_types(false);
@@ -583,8 +579,8 @@ class CCSubmit
         $prompt .= "<p><a class=\"cc_gen_button\" style=\"float:left;margin-bottom:8px;\" href=\"$url\"><span>" 
                     . _('Add a new form type...') . '</span></a><div style=\"clear:both;\">&nbsp;</div></p>';
 
-        $page->PageArg('client_menu',$args,'print_client_menu');
-        $page->PageArg('client_menu_help',$prompt);
+        CCPage::PageArg('client_menu',$args,'print_client_menu');
+        CCPage::PageArg('client_menu_help',$prompt);
     }
 
     function EditForm($form_type_key)
@@ -644,9 +640,8 @@ class CCSubmit
         global $CC_GLOBALS;
 
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
         $this->_build_bread_crumb_trail(_('New Submit Form'));
-        $page->SetTitle( _('Create a New Submit Form') );
+        CCPage::SetTitle( _('Create a New Submit Form') );
 
         $form = new CCAdminSubmitFormForm();
         if( !empty($_POST['adminsubmitform']) && $form->ValidateFields() )
@@ -667,7 +662,7 @@ class CCSubmit
             $form->FinalizeAvatarUpload('logo', $CC_GLOBALS['image-upload-dir'] );
             $form->GetFormValues($values);
             $form_types = $this->SaveFormType($values,$form_type_key,$form_types);
-            $page->Prompt( _('New Form type saved.') );
+            CCPage::Prompt( _('New Form type saved.') );
         }
         else
         {
@@ -676,7 +671,7 @@ class CCSubmit
                 $form->PopulateValues($init_values);
                 $form->SetHandler(ccl('admin','newsubmitform'));
             }
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::AddForm( $form->GenerateForm() );
         }
     }
 

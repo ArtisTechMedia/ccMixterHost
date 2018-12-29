@@ -58,7 +58,7 @@ class CCEditorials
     
         require_once('cchost_lib/cc-page.php');
         require_once('cchost_lib/cc-query.php');
-        $page =& CCPage::GetPage();
+        $page = CCPage::GetPage();
         $title = $page->String('str_editors_picks');
         $query = new CCQuery();
         $q = 'limit=15&t=ed_picks&tags=editorial_pick&title='.$title;
@@ -149,9 +149,8 @@ class CCEditorials
         if( $showform )
         {
             require_once('cchost_lib/cc-page.php');
-            $page =& CCPage::GetPage();
-            $page->SetTitle(array('str_editorial_edit',$upload_name));
-            $page->AddForm( $form->GenerateForm() );
+            CCPage::SetTitle(array('str_editorial_edit',$upload_name));
+            CCPage::AddForm( $form->GenerateForm() );
         }
     }
 

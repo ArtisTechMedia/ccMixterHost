@@ -80,10 +80,9 @@ class CCLanguageEditor
         $args['msg']                 = $msg;
 
         require_once('cchost_lib/cc-page.php');
-        $page =& CCPage::GetPage();
-        $page->PageArg('language_editor_menu', 'language-editor.xml/language_editor_menu');
-        $page->PageArg('LEM',$args,'language_editor_menu');
-        $page->SetTitle(_('Language Domain Terms Editor'));
+        CCPage::PageArg('language_editor_menu', 'language-editor.xml/language_editor_menu');
+        CCPage::PageArg('LEM',$args,'language_editor_menu');
+        CCPage::SetTitle(_('Language Domain Terms Editor'));
     }
 
     function MakeDomain($domname='')
@@ -136,15 +135,14 @@ class CCLanguageEditor
     {
         global $CC_GLOBALS;
 
-        $page =& CCPage::GetPage();
-        $page->SetTitle(_('Language Terms Editor'));
+        CCPage::SetTitle(_('Language Terms Editor'));
 
         $domain     = CCUtil::Strip($domain);
         $language   = CCUtil::Strip($language);
 
         if( empty($domain) || empty($language) )
         {
-            $page->Prompt(_('Missing domain or language'));
+            CCPage::Prompt(_('Missing domain or language'));
             return;
         }
 
@@ -213,8 +211,8 @@ class CCLanguageEditor
         $args['str_clear'] =               _('Clear Search');
         $args['str_query'] =               $q;
 
-        $page->PageArg('language_editor', 'language-editor.xml/language_editor');
-        $page->PageArg('LE',$args,'language_editor');
+        CCPage::PageArg('language_editor', 'language-editor.xml/language_editor');
+        CCPage::PageArg('LE',$args,'language_editor');
     }
 
     function _search_strings($str)
@@ -353,8 +351,7 @@ class CCLanguageEditor
             $pot_file = "cchost.pot";
             if( !file_exists($pot_file) )
             {
-                $page =& CCPage::GetPage();
-                $page->SystemError(_('Can not find language map') . " ($pot_file)" );
+                CCPage::SystemError(_('Can not find language map') . " ($pot_file)" );
                 return;
             }
         }
@@ -437,7 +434,7 @@ END;
             for( $n = 0; $n < 2; $n++ )
             {
                 $txt .= $heads[$n];
-                $strs = cc_split("\n",$e[$n]);
+                $strs = split("\n",$e[$n]);
                 if( count($strs) > 1  ) 
                 {
                     $txt .= "\"\"\n";

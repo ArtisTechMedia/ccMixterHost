@@ -117,9 +117,8 @@ EOF;
         else
         {
             require_once('cchost_lib/cc-page.php');
-            $page =& CCPage::GetPage();
-            $page->SetTitle('str_browse_remixes');
-            $page->AddMacro('query_browser');
+            CCPage::SetTitle('str_browse_remixes');
+            CCPage::AddMacro('query_browser');
         }
     }
 }

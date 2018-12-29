@@ -14,14 +14,14 @@ function validate_user()
     $data = data(array('media','config'));
     if( empty($data['supers']) )
         die('no supers');
-    $supers = cc_split(',',$data['supers']);
+    $supers = split(',',$data['supers']);
     if( !in_array($user_name,$supers) )
         die('you are not in the media/config/supers list');
 }
 
 error_reporting(E_ALL); validate_user(); 
 
-$path = empty($_REQUEST['path']) ? array() : cc_split('/',$_REQUEST['path']);
+$path = empty($_REQUEST['path']) ? array() : split('/',$_REQUEST['path']);
 
 if( !empty($_REQUEST['cmd']) )
 {
