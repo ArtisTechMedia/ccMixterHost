@@ -42,7 +42,6 @@ class CCRenderImage
         for( $i = 0; $i < $c; $i++ )
         {
             $R =& $records[$keys[$i]];
-            $F = $R['files'][0];
             if (isset($R['files'][0])) {
                 if (isset($R['files'][0]['file_name'])) {
                     $F = $R['files'][0];
