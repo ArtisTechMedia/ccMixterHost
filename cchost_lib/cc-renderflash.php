@@ -41,16 +41,18 @@ class CCRenderFlash
         {
             $R =& $records[$keys[$i]];
             if (isset($R['files'][0])) {
-                $F = $R['files'][0];
-                if( !empty($F['file_format_info']['format-name']) &&
-                         ($F['file_format_info']['format-name'] == 'video-swf-swf' ) &&
-                         !empty($F['file_format_info']['dim']) )
-                {
-                    $R['flash_id'] = 'flash_play_' . $R['upload_id'];
-                    list( $w, $h ) = $F['file_format_info']['dim'];
-                    $info[] = array( 'url' => $R['download_url'],
-                                     'w' => $w, 'h' => $h, 'id' => $R['flash_id'],
-                                     'title' => $R['upload_name']  );
+                if (isset($R['files'][0]['file_name'])) {
+                    $F = $R['files'][0];
+                    if( !empty($F['file_format_info']['format-name']) &&
+                             ($F['file_format_info']['format-name'] == 'video-swf-swf' ) &&
+                             !empty($F['file_format_info']['dim']) )
+                    {
+                        $R['flash_id'] = 'flash_play_' . $R['upload_id'];
+                        list( $w, $h ) = $F['file_format_info']['dim'];
+                        $info[] = array( 'url' => $R['download_url'],
+                                         'w' => $w, 'h' => $h, 'id' => $R['flash_id'],
+                                         'title' => $R['upload_name']  );
+                    }
                 }
             }
         }
