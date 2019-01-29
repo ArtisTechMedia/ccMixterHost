@@ -43,19 +43,24 @@ class CCRenderImage
         {
             $R =& $records[$keys[$i]];
             $F = $R['files'][0];
-            if( !empty($F['file_format_info']['media-type']) &&
-                     ($F['file_format_info']['media-type'] == 'image' ) &&
-                     !empty($F['file_format_info']['dim']) )
-            {
-                $R['image_id'] = 'image_show_' . $R['upload_id'];
-                list( $w, $h ) = $F['file_format_info']['dim'];
-                //if( !empty($CC_GLOBALS['thumbnail-on']) )
-                {
-                    $R['thumbnail'] = ccl('thumbnail',$R['upload_id']);
+            if (isset($R['files'][0])) {
+                if (isset($R['files'][0]['file_name'])) {
+                    $F = $R['files'][0];
+                    if( !empty($F['file_format_info']['media-type']) &&
+                             ($F['file_format_info']['media-type'] == 'image' ) &&
+                             !empty($F['file_format_info']['dim']) )
+                    {
+                        $R['image_id'] = 'image_show_' . $R['upload_id'];
+                        list( $w, $h ) = $F['file_format_info']['dim'];
+                        //if( !empty($CC_GLOBALS['thumbnail-on']) )
+                        {
+                            $R['thumbnail'] = ccl('thumbnail',$R['upload_id']);
+                        }
+                        $info[] = array( 'url' => $R['download_url'],
+                                         'w' => $w, 'h' => $h, 'id' => $R['image_id'],
+                                         'title' => $R['upload_name'] );
+                    }
                 }
-                $info[] = array( 'url' => $R['download_url'],
-                                 'w' => $w, 'h' => $h, 'id' => $R['image_id'],
-                                 'title' => $R['upload_name'] );
             }
         }
 
