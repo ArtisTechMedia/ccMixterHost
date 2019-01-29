@@ -40,7 +40,6 @@ class CCRenderFlash
         for( $i = 0; $i < $c; $i++ )
         {
             $R =& $records[$keys[$i]];
-            try {
             if (isset($R['files'][0])) {
                 if (isset($R['files'][0]['file_name'])) {
                     $F = $R['files'][0];
@@ -57,9 +56,6 @@ class CCRenderFlash
                 }
             }
         }
-        catch (Exception $e) {
-            //nothing for now.
-        }    
 
         if( !empty($info) )
         {
