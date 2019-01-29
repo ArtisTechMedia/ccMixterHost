@@ -78,7 +78,17 @@ function cc_filter_std(&$records,&$dataview_info)
                         cc_filter_files($R);
 
                     $r_user = $R['user_name'];
-                    $f_name = $R['files'][0]['file_name'];
+                     if (isset($R['files'][0])) {
+                        if (isset($R['files'][0]['file_name'])) {
+                            $f_name = $R['files'][0]['file_name'];
+                        }
+                        else {
+                            $f_name = "undefined";
+                        }
+                    }
+                    else {
+                        $f_name = "undefined";
+                    }
 
                     if( $R['upload_contest'] )
                     {
